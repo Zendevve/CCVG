@@ -11,3 +11,4 @@ directories = "5.0"
 open = "5.0"
 semver = "1.0"
 human-sort = "0.2"
+egui-phosphor = { version = "0.7", features = ["fill", "regular"] }
