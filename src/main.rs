@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use eframe::{egui, NativeOptions};
 use std::fs;
 use std::path::{Path, PathBuf};
