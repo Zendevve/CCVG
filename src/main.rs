@@ -192,190 +192,201 @@ impl eframe::App for CapCutGuardApp {
         self.process_messages();
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.add_space(25.0);
+            // Wrap everything in a scroll area for responsiveness
+            egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
+                let available_width = ui.available_width();
+                let card_margin = 20.0_f32.min(available_width * 0.05);
 
-            // --- Header ---
-            ui.vertical_centered(|ui| {
-                ui.label(egui::RichText::new("⬢").size(36.0).color(COLOR_ACCENT_PRIMARY)); // Cisco-style hex icon
-                ui.add_space(8.0);
-                ui.label(egui::RichText::new("CapCut Version Guard").size(26.0).strong().color(COLOR_TEXT_BRIGHT));
-                ui.label(egui::RichText::new("Enterprise Edition").size(12.0).color(COLOR_TEXT_DIM));
-            });
-            ui.add_space(25.0);
+                ui.add_space(20.0);
 
-            // --- Progress Steps Card ---
-            egui::Frame::none()
-                .fill(COLOR_BG_CARD)
-                .rounding(14.0)
-                .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
-                .inner_margin(egui::Margin::symmetric(24.0, 20.0))
-                .outer_margin(egui::Margin::symmetric(20.0, 0.0))
-                .show(ui, |ui| {
-                    ui.label(egui::RichText::new("Protection Status").size(13.0).strong().color(COLOR_TEXT_MUTED));
-                    ui.add_space(16.0);
+                // --- Header ---
+                ui.vertical_centered(|ui| {
+                    ui.label(egui::RichText::new("⬢").size(32.0).color(COLOR_ACCENT_PRIMARY));
+                    ui.add_space(6.0);
+                    ui.label(egui::RichText::new("CapCut Version Guard").size(24.0).strong().color(COLOR_TEXT_BRIGHT));
+                    ui.label(egui::RichText::new("Enterprise Edition").size(11.0).color(COLOR_TEXT_DIM));
+                });
+                ui.add_space(20.0);
 
-                    let steps = [
-                        ("1", "System Scan", ProgressStep::Scanning),
-                        ("2", "Version Cleanup", ProgressStep::CleaningVersions),
-                        ("3", "Config Lock", ProgressStep::LockingConfig),
-                        ("4", "Update Blocker", ProgressStep::CreatingBlockers),
-                    ];
+                // --- Progress Steps Card ---
+                egui::Frame::none()
+                    .fill(COLOR_BG_CARD)
+                    .rounding(12.0)
+                    .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
+                    .inner_margin(egui::Margin::symmetric(16.0, 14.0))
+                    .outer_margin(egui::Margin::symmetric(card_margin, 0.0))
+                    .show(ui, |ui| {
+                        ui.set_width(ui.available_width());
 
-                    let current_idx = self.current_step.index();
-                    let is_complete = matches!(self.current_step, ProgressStep::Complete);
-                    let is_failed = matches!(self.current_step, ProgressStep::Failed(_));
+                        ui.label(egui::RichText::new("Protection Status").size(12.0).strong().color(COLOR_TEXT_MUTED));
+                        ui.add_space(12.0);
 
-                    for (i, (num, label, step)) in steps.iter().enumerate() {
-                        let step_idx = step.index();
-                        let is_active = current_idx == step_idx;
-                        let is_done = current_idx > step_idx || is_complete;
+                        let steps = [
+                            ("1", "System Scan", ProgressStep::Scanning),
+                            ("2", "Version Cleanup", ProgressStep::CleaningVersions),
+                            ("3", "Config Lock", ProgressStep::LockingConfig),
+                            ("4", "Update Blocker", ProgressStep::CreatingBlockers),
+                        ];
 
-                        ui.horizontal(|ui| {
-                            // Step indicator circle
-                            let circle_color = if is_done {
-                                COLOR_SUCCESS
-                            } else if is_active {
-                                COLOR_ACCENT_PRIMARY
-                            } else {
-                                COLOR_BG_CARD_HIGHLIGHT
-                            };
+                        let current_idx = self.current_step.index();
+                        let is_complete = matches!(self.current_step, ProgressStep::Complete);
+                        let is_failed = matches!(self.current_step, ProgressStep::Failed(_));
 
-                            let circle_text_color = if is_done || is_active {
-                                COLOR_TEXT_BRIGHT
-                            } else {
-                                COLOR_TEXT_DIM
-                            };
+                        for (i, (num, label, step)) in steps.iter().enumerate() {
+                            let step_idx = step.index();
+                            let is_active = current_idx == step_idx;
+                            let is_done = current_idx > step_idx || is_complete;
 
-                            // Draw circle with number
-                            let (rect, _) = ui.allocate_exact_size(egui::vec2(28.0, 28.0), egui::Sense::hover());
-                            ui.painter().circle_filled(rect.center(), 14.0, circle_color);
-                            ui.painter().text(
-                                rect.center(),
-                                egui::Align2::CENTER_CENTER,
-                                if is_done { "✓" } else { *num },
-                                egui::FontId::new(12.0, egui::FontFamily::Proportional),
-                                circle_text_color,
-                            );
-
-                            ui.add_space(12.0);
-
-                            // Step label
-                            let label_color = if is_done || is_active {
-                                COLOR_TEXT_BRIGHT
-                            } else {
-                                COLOR_TEXT_DIM
-                            };
-                            ui.label(egui::RichText::new(*label).size(14.0).color(label_color));
-
-                            // Spinner if active
-                            if is_active && !is_failed {
-                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                    ui.add(egui::Spinner::new().size(16.0).color(COLOR_ACCENT_PRIMARY));
-                                });
-                            }
-                        });
-
-                        // Connector line between steps
-                        if i < steps.len() - 1 {
                             ui.horizontal(|ui| {
-                                ui.add_space(13.0); // Align with circle center
-                                let line_color = if current_idx > step_idx || is_complete {
+                                let circle_color = if is_done {
                                     COLOR_SUCCESS
+                                } else if is_active {
+                                    COLOR_ACCENT_PRIMARY
                                 } else {
                                     COLOR_BG_CARD_HIGHLIGHT
                                 };
-                                let (rect, _) = ui.allocate_exact_size(egui::vec2(2.0, 16.0), egui::Sense::hover());
-                                ui.painter().rect_filled(rect, 1.0, line_color);
+
+                                let circle_text_color = if is_done || is_active {
+                                    COLOR_TEXT_BRIGHT
+                                } else {
+                                    COLOR_TEXT_DIM
+                                };
+
+                                let (rect, _) = ui.allocate_exact_size(egui::vec2(24.0, 24.0), egui::Sense::hover());
+                                ui.painter().circle_filled(rect.center(), 12.0, circle_color);
+                                ui.painter().text(
+                                    rect.center(),
+                                    egui::Align2::CENTER_CENTER,
+                                    if is_done { "✓" } else { *num },
+                                    egui::FontId::new(11.0, egui::FontFamily::Proportional),
+                                    circle_text_color,
+                                );
+
+                                ui.add_space(10.0);
+
+                                let label_color = if is_done || is_active {
+                                    COLOR_TEXT_BRIGHT
+                                } else {
+                                    COLOR_TEXT_DIM
+                                };
+                                ui.label(egui::RichText::new(*label).size(13.0).color(label_color));
+
+                                if is_active && !is_failed {
+                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                        ui.add(egui::Spinner::new().size(14.0).color(COLOR_ACCENT_PRIMARY));
+                                    });
+                                }
                             });
+
+                            if i < steps.len() - 1 {
+                                ui.horizontal(|ui| {
+                                    ui.add_space(11.0);
+                                    let line_color = if current_idx > step_idx || is_complete {
+                                        COLOR_SUCCESS
+                                    } else {
+                                        COLOR_BG_CARD_HIGHLIGHT
+                                    };
+                                    let (rect, _) = ui.allocate_exact_size(egui::vec2(2.0, 12.0), egui::Sense::hover());
+                                    ui.painter().rect_filled(rect, 1.0, line_color);
+                                });
+                            }
                         }
-                    }
 
-                    // Final status
-                    ui.add_space(16.0);
-                    ui.separator();
-                    ui.add_space(12.0);
+                        ui.add_space(12.0);
+                        ui.separator();
+                        ui.add_space(10.0);
 
-                    let (status_icon, status_text, status_color) = match &self.current_step {
-                        ProgressStep::Complete => ("🛡️", "System Protected", COLOR_SUCCESS),
-                        ProgressStep::Failed(e) => ("⚠", e.as_str(), COLOR_ERROR),
-                        ProgressStep::Idle => ("●", "Ready", COLOR_TEXT_MUTED),
-                        _ => ("◉", self.current_step.label(), COLOR_ACCENT_PRIMARY),
-                    };
+                        let (status_icon, status_text, status_color) = match &self.current_step {
+                            ProgressStep::Complete => ("🛡️", "System Protected", COLOR_SUCCESS),
+                            ProgressStep::Failed(e) => ("⚠", e.as_str(), COLOR_ERROR),
+                            ProgressStep::Idle => ("●", "Ready", COLOR_TEXT_MUTED),
+                            _ => ("◉", self.current_step.label(), COLOR_ACCENT_PRIMARY),
+                        };
 
-                    ui.horizontal(|ui| {
-                        ui.label(egui::RichText::new(status_icon).size(18.0).color(status_color));
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new(status_icon).size(16.0).color(status_color));
+                            ui.add_space(6.0);
+                            ui.label(egui::RichText::new(status_text).size(14.0).strong().color(status_color));
+                        });
+                    });
+
+                ui.add_space(16.0);
+
+                // --- Activity Log Card ---
+                egui::Frame::none()
+                    .fill(COLOR_BG_CARD)
+                    .rounding(12.0)
+                    .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
+                    .inner_margin(egui::Margin::symmetric(16.0, 12.0))
+                    .outer_margin(egui::Margin::symmetric(card_margin, 0.0))
+                    .show(ui, |ui| {
+                        ui.set_width(ui.available_width());
+
+                        ui.label(egui::RichText::new("Activity Log").size(12.0).strong().color(COLOR_TEXT_MUTED));
                         ui.add_space(8.0);
-                        ui.label(egui::RichText::new(status_text).size(15.0).strong().color(status_color));
+
+                        let log_height = 60.0_f32.min(ui.available_height() * 0.2).max(40.0);
+                        egui::ScrollArea::vertical().max_height(log_height).show(ui, |ui| {
+                            for log in &self.action_log {
+                                let color = if log.starts_with("✓") {
+                                    COLOR_SUCCESS
+                                } else if log.starts_with("✗") || log.starts_with("⚠") {
+                                    COLOR_WARNING
+                                } else {
+                                    COLOR_TEXT_DIM
+                                };
+                                ui.label(egui::RichText::new(log).size(11.0).color(color));
+                            }
+                        });
                     });
-                });
 
-            ui.add_space(20.0);
+                ui.add_space(20.0);
 
-            // --- Activity Log Card ---
-            egui::Frame::none()
-                .fill(COLOR_BG_CARD)
-                .rounding(14.0)
-                .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
-                .inner_margin(egui::Margin::symmetric(20.0, 16.0))
-                .outer_margin(egui::Margin::symmetric(20.0, 0.0))
-                .show(ui, |ui| {
-                    ui.label(egui::RichText::new("Activity Log").size(13.0).strong().color(COLOR_TEXT_MUTED));
-                    ui.add_space(10.0);
+                // --- Action Button ---
+                ui.vertical_centered(|ui| {
+                    if !self.is_working() {
+                        let (btn_text, btn_color) = match &self.current_step {
+                            ProgressStep::Complete => ("Re-Scan System", COLOR_BG_CARD_HIGHLIGHT),
+                            ProgressStep::Failed(_) => ("Retry Protection", COLOR_WARNING),
+                            _ => ("Secure CapCut Now", COLOR_ACCENT_PRIMARY),
+                        };
 
-                    egui::ScrollArea::vertical().max_height(80.0).show(ui, |ui| {
-                        for log in &self.action_log {
-                            let color = if log.starts_with("✓") {
-                                COLOR_SUCCESS
-                            } else if log.starts_with("✗") || log.starts_with("⚠") {
-                                COLOR_WARNING
+                        let btn_width = 180.0_f32.min(available_width - 40.0);
+                        let btn = egui::Button::new(
+                            egui::RichText::new(btn_text).size(14.0).strong().color(COLOR_TEXT_BRIGHT)
+                        )
+                            .fill(btn_color)
+                            .min_size(egui::vec2(btn_width, 44.0))
+                            .rounding(8.0);
+
+                        if ui.add(btn).clicked() {
+                            if matches!(self.current_step, ProgressStep::Complete) {
+                                self.scan_requested = true;
+                                self.current_step = ProgressStep::Idle;
                             } else {
-                                COLOR_TEXT_DIM
-                            };
-                            ui.label(egui::RichText::new(log).size(12.0).color(color));
+                                self.fix_requested = true;
+                            }
                         }
+                    } else {
+                        ui.add_space(44.0); // Reserve button space
+                    }
+                });
+
+                ui.add_space(16.0);
+
+                // --- Footer (always at bottom of scroll content) ---
+                ui.vertical_centered(|ui| {
+                    ui.horizontal(|ui| {
+                        ui.add_space((ui.available_width() - 80.0).max(0.0) / 2.0);
+                        if ui.link(egui::RichText::new("GitHub").size(10.0).color(COLOR_TEXT_DIM)).clicked() {
+                            let _ = open::that(GITHUB_URL);
+                        }
+                        ui.label(egui::RichText::new("•").size(10.0).color(COLOR_TEXT_DIM));
+                        ui.label(egui::RichText::new("v1.0.0").size(10.0).color(COLOR_TEXT_DIM));
                     });
                 });
 
-            ui.add_space(25.0);
-
-            // --- Action Button ---
-            ui.vertical_centered(|ui| {
-                if !self.is_working() {
-                    let (btn_text, btn_color) = match &self.current_step {
-                        ProgressStep::Complete => ("Re-Scan System", COLOR_BG_CARD_HIGHLIGHT),
-                        ProgressStep::Failed(_) => ("Retry Protection", COLOR_WARNING),
-                        _ => ("Secure CapCut Now", COLOR_ACCENT_PRIMARY),
-                    };
-
-                    let btn = egui::Button::new(
-                        egui::RichText::new(btn_text).size(15.0).strong().color(COLOR_TEXT_BRIGHT)
-                    )
-                        .fill(btn_color)
-                        .min_size(egui::vec2(200.0, 48.0))
-                        .rounding(10.0);
-
-                    if ui.add(btn).clicked() {
-                        if matches!(self.current_step, ProgressStep::Complete) {
-                            self.scan_requested = true;
-                            self.current_step = ProgressStep::Idle;
-                        } else {
-                            self.fix_requested = true;
-                        }
-                    }
-                }
-            });
-
-            // --- Footer ---
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.add_space(12.0);
-                ui.horizontal(|ui| {
-                    ui.add_space((ui.available_width() - 100.0) / 2.0);
-                    if ui.link(egui::RichText::new("GitHub").size(11.0).color(COLOR_TEXT_DIM)).clicked() {
-                        let _ = open::that(GITHUB_URL);
-                    }
-                    ui.label(egui::RichText::new("•").size(11.0).color(COLOR_TEXT_DIM));
-                    ui.label(egui::RichText::new("v1.0.0").size(11.0).color(COLOR_TEXT_DIM));
-                });
             });
         });
 
