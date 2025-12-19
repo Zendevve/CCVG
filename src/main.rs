@@ -297,25 +297,25 @@ impl eframe::App for CapCutGuardApp {
 // --- Screen Renderers ---
 impl CapCutGuardApp {
     fn render_welcome(&mut self, ui: &mut egui::Ui) {
-        ui.add_space(60.0);
+        ui.add_space(30.0);
 
         ui.vertical_centered(|ui| {
-            // Shield icon
-            ui.label(egui::RichText::new(egui_phosphor::fill::SHIELD_CHECK).size(72.0).color(COLOR_ACCENT));
-            ui.add_space(16.0);
-
-            ui.label(egui::RichText::new("CapCut Version Guard").size(28.0).strong().color(COLOR_TEXT));
+            // Shield icon - smaller
+            ui.label(egui::RichText::new(egui_phosphor::fill::SHIELD_CHECK).size(48.0).color(COLOR_ACCENT));
             ui.add_space(8.0);
-            ui.label(egui::RichText::new("Lock your CapCut version and prevent auto-updates").size(14.0).color(COLOR_TEXT_MUTED));
 
-            ui.add_space(40.0);
+            ui.label(egui::RichText::new("CapCut Version Guard").size(24.0).strong().color(COLOR_TEXT));
+            ui.add_space(4.0);
+            ui.label(egui::RichText::new("Lock your CapCut version and prevent auto-updates").size(12.0).color(COLOR_TEXT_MUTED));
 
-            // Feature list
+            ui.add_space(20.0);
+
+            // Feature list - more compact
             egui::Frame::none()
                 .fill(COLOR_BG_CARD)
-                .rounding(12.0)
-                .inner_margin(20.0)
-                .outer_margin(egui::Margin::symmetric(40.0, 0.0))
+                .rounding(10.0)
+                .inner_margin(14.0)
+                .outer_margin(egui::Margin::symmetric(30.0, 0.0))
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
 
@@ -328,38 +328,38 @@ impl CapCutGuardApp {
 
                     for (icon, text) in features {
                         ui.horizontal(|ui| {
-                            ui.label(egui::RichText::new(icon).size(18.0).color(COLOR_ACCENT));
-                            ui.add_space(12.0);
-                            ui.label(egui::RichText::new(text).size(13.0).color(COLOR_TEXT_MUTED));
+                            ui.label(egui::RichText::new(icon).size(14.0).color(COLOR_ACCENT));
+                            ui.add_space(8.0);
+                            ui.label(egui::RichText::new(text).size(12.0).color(COLOR_TEXT_MUTED));
                         });
-                        ui.add_space(8.0);
+                        ui.add_space(4.0);
                     }
                 });
 
-            ui.add_space(30.0);
+            ui.add_space(20.0);
 
-            // Two paths: Download legacy OR Protect existing
+            // Buttons - more compact
             let btn1 = egui::Button::new(
                 egui::RichText::new(format!("{}  Download Legacy Version", egui_phosphor::regular::DOWNLOAD_SIMPLE))
-                    .size(15.0).strong().color(COLOR_TEXT)
+                    .size(13.0).strong().color(COLOR_TEXT)
             )
                 .fill(COLOR_ACCENT)
-                .min_size(egui::vec2(240.0, 44.0))
-                .rounding(10.0);
+                .min_size(egui::vec2(220.0, 38.0))
+                .rounding(8.0);
 
             if ui.add(btn1).clicked() {
                 self.screen = WizardScreen::DownloadManager;
             }
 
-            ui.add_space(12.0);
+            ui.add_space(8.0);
 
             let btn2 = egui::Button::new(
                 egui::RichText::new(format!("{}  Protect Existing Installation", egui_phosphor::regular::SHIELD_CHECK))
-                    .size(15.0).color(COLOR_TEXT)
+                    .size(13.0).color(COLOR_TEXT)
             )
                 .fill(COLOR_SECONDARY)
-                .min_size(egui::vec2(240.0, 44.0))
-                .rounding(10.0);
+                .min_size(egui::vec2(220.0, 38.0))
+                .rounding(8.0);
 
             if ui.add(btn2).clicked() {
                 self.check_requested = true;
