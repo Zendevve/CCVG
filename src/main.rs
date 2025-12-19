@@ -297,27 +297,39 @@ impl eframe::App for CapCutGuardApp {
 // --- Screen Renderers ---
 impl CapCutGuardApp {
     fn render_welcome(&mut self, ui: &mut egui::Ui) {
-        ui.add_space(30.0);
+        let available_height = ui.available_height();
+        let available_width = ui.available_width();
+
+        // Dynamic spacing based on window height
+        let top_space = (available_height * 0.08).max(20.0).min(80.0);
+        let section_space = (available_height * 0.04).max(15.0).min(40.0);
+        let icon_size = (available_height * 0.12).max(40.0).min(72.0);
+
+        // Max content width for larger screens
+        let content_width = available_width.min(500.0);
+        let side_margin = ((available_width - content_width) / 2.0).max(20.0);
+
+        ui.add_space(top_space);
 
         ui.vertical_centered(|ui| {
-            // Shield icon - smaller
-            ui.label(egui::RichText::new(egui_phosphor::fill::SHIELD_CHECK).size(48.0).color(COLOR_ACCENT));
-            ui.add_space(8.0);
+            // Shield icon
+            ui.label(egui::RichText::new(egui_phosphor::fill::SHIELD_CHECK).size(icon_size as f32).color(COLOR_ACCENT));
+            ui.add_space(section_space * 0.3);
 
             ui.label(egui::RichText::new("CapCut Version Guard").size(24.0).strong().color(COLOR_TEXT));
             ui.add_space(4.0);
             ui.label(egui::RichText::new("Lock your CapCut version and prevent auto-updates").size(12.0).color(COLOR_TEXT_MUTED));
 
-            ui.add_space(20.0);
+            ui.add_space(section_space);
 
-            // Feature list - more compact
+            // Feature list with max-width
             egui::Frame::none()
                 .fill(COLOR_BG_CARD)
                 .rounding(10.0)
                 .inner_margin(14.0)
-                .outer_margin(egui::Margin::symmetric(30.0, 0.0))
+                .outer_margin(egui::Margin::symmetric(side_margin as f32, 0.0))
                 .show(ui, |ui| {
-                    ui.set_width(ui.available_width());
+                    ui.set_width(content_width - 40.0);
 
                     let features = [
                         (egui_phosphor::regular::MAGNIFYING_GLASS, "Detects installed CapCut versions"),
@@ -336,15 +348,15 @@ impl CapCutGuardApp {
                     }
                 });
 
-            ui.add_space(20.0);
+            ui.add_space(section_space);
 
-            // Buttons - more compact
+            // Buttons
             let btn1 = egui::Button::new(
                 egui::RichText::new(format!("{}  Download Legacy Version", egui_phosphor::regular::DOWNLOAD_SIMPLE))
                     .size(13.0).strong().color(COLOR_TEXT)
             )
                 .fill(COLOR_ACCENT)
-                .min_size(egui::vec2(220.0, 38.0))
+                .min_size(egui::vec2(240.0, 40.0))
                 .rounding(8.0);
 
             if ui.add(btn1).clicked() {
@@ -358,7 +370,7 @@ impl CapCutGuardApp {
                     .size(13.0).color(COLOR_TEXT)
             )
                 .fill(COLOR_SECONDARY)
-                .min_size(egui::vec2(220.0, 38.0))
+                .min_size(egui::vec2(240.0, 40.0))
                 .rounding(8.0);
 
             if ui.add(btn2).clicked() {
