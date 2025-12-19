@@ -5,30 +5,72 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use sysinfo::System;
-use directories::UserDirs;
 use walkdir::WalkDir;
-use semver::Version;
 
 const APP_TITLE: &str = "CapCut Version Guard";
-const GITHUB_URL: &str = "https://github.com/Start9-Studios/CapCut-Version-Guard";
+const GITHUB_URL: &str = "https://github.com/Zendevve/capcut-version-guard";
 
-// --- Theme Constants ---
-const COLOR_BG: egui::Color32 = egui::Color32::from_rgb(17, 24, 39);      // Gray 900
-const COLOR_SURFACE: egui::Color32 = egui::Color32::from_rgb(31, 41, 55); // Gray 800
-const COLOR_ACCENT: egui::Color32 = egui::Color32::from_rgb(59, 130, 246); // Blue 500
-const COLOR_ACCENT_HOVER: egui::Color32 = egui::Color32::from_rgb(37, 99, 235); // Blue 600
-const COLOR_TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(243, 244, 246); // Gray 100
-const COLOR_TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(156, 163, 175); // Gray 400
-const COLOR_SUCCESS: egui::Color32 = egui::Color32::from_rgb(16, 185, 129); // Emerald 500
-const COLOR_WARNING: egui::Color32 = egui::Color32::from_rgb(245, 158, 11); // Amber 500
-const COLOR_ERROR: egui::Color32 = egui::Color32::from_rgb(239, 68, 68);    // Red 500
+// --- Premium Theme Colors (Cisco/Enterprise-Inspired) ---
+const COLOR_BG_DEEP: egui::Color32 = egui::Color32::from_rgb(10, 12, 18);       // Near-black
+const COLOR_BG_CARD: egui::Color32 = egui::Color32::from_rgb(22, 27, 38);       // Dark card
+const COLOR_BG_CARD_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(30, 38, 55); // Elevated card
+const COLOR_BORDER_SUBTLE: egui::Color32 = egui::Color32::from_rgb(40, 45, 55);
+const COLOR_BORDER_GLOW: egui::Color32 = egui::Color32::from_rgb(0, 100, 140);
+
+const COLOR_ACCENT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(0, 164, 239);   // Cisco Blue
+const COLOR_ACCENT_GRADIENT_END: egui::Color32 = egui::Color32::from_rgb(80, 200, 255);
+const COLOR_SUCCESS: egui::Color32 = egui::Color32::from_rgb(40, 200, 140);        // Teal Green
+const COLOR_WARNING: egui::Color32 = egui::Color32::from_rgb(255, 171, 0);         // Amber
+const COLOR_ERROR: egui::Color32 = egui::Color32::from_rgb(255, 82, 82);           // Red
+
+const COLOR_TEXT_BRIGHT: egui::Color32 = egui::Color32::from_rgb(248, 250, 252);
+const COLOR_TEXT_MUTED: egui::Color32 = egui::Color32::from_rgb(148, 163, 184);
+const COLOR_TEXT_DIM: egui::Color32 = egui::Color32::from_rgb(100, 116, 139);
+
+// --- Step Definitions ---
+#[derive(Clone, PartialEq, Debug)]
+enum ProgressStep {
+    Idle,
+    Scanning,
+    CleaningVersions,
+    LockingConfig,
+    CreatingBlockers,
+    Complete,
+    Failed(String),
+}
+
+impl ProgressStep {
+    fn label(&self) -> &str {
+        match self {
+            ProgressStep::Idle => "Idle",
+            ProgressStep::Scanning => "Scanning System",
+            ProgressStep::CleaningVersions => "Cleaning Old Versions",
+            ProgressStep::LockingConfig => "Locking Configuration",
+            ProgressStep::CreatingBlockers => "Creating Update Blockers",
+            ProgressStep::Complete => "Protection Complete",
+            ProgressStep::Failed(_) => "Protection Failed",
+        }
+    }
+
+    fn index(&self) -> usize {
+        match self {
+            ProgressStep::Idle => 0,
+            ProgressStep::Scanning => 1,
+            ProgressStep::CleaningVersions => 2,
+            ProgressStep::LockingConfig => 3,
+            ProgressStep::CreatingBlockers => 4,
+            ProgressStep::Complete => 5,
+            ProgressStep::Failed(_) => 5,
+        }
+    }
+}
 
 fn main() -> eframe::Result<()> {
     let options = NativeOptions {
         viewport: eframe::egui::ViewportBuilder::default()
-            .with_inner_size([500.0, 500.0]) // Slightly taller for padding
+            .with_inner_size([560.0, 620.0])
             .with_resizable(false)
-            .with_icon(eframe::icon_data::from_png_bytes(&[]).unwrap_or_default()), // Could add real icon later
+            .with_decorations(true),
         ..Default::default()
     };
     eframe::run_native(
@@ -39,24 +81,21 @@ fn main() -> eframe::Result<()> {
 }
 
 struct CapCutGuardApp {
-    status_text: String,
-    status_detail: String,
-    status_color: egui::Color32,
-    icon: String,
-    is_scanning: bool,
-    is_fixing: bool,
+    current_step: ProgressStep,
     capcut_running: bool,
+    action_log: Vec<String>,
+
     scan_requested: bool,
     fix_requested: bool,
 
-    // Thread communication
     tx: std::sync::mpsc::Sender<WorkerMessage>,
     rx: std::sync::mpsc::Receiver<WorkerMessage>,
 }
 
 enum WorkerMessage {
-    ScanResult(bool), // true if running
-    FixStatus(String),
+    StepUpdate(ProgressStep),
+    LogMessage(String),
+    ScanResult(bool),
     FixComplete(Result<(), String>),
 }
 
@@ -66,92 +105,80 @@ impl CapCutGuardApp {
         configure_fonts(&cc.egui_ctx);
 
         let (tx, rx) = std::sync::mpsc::channel();
-        let app = Self {
-            status_text: "Initializing".to_owned(),
-            status_detail: "Preparing environment...".to_owned(),
-            status_color: COLOR_TEXT_SECONDARY,
-            icon: "🛡️".to_owned(),
-            is_scanning: false,
-            is_fixing: false,
+        Self {
+            current_step: ProgressStep::Idle,
             capcut_running: false,
-            scan_requested: true,
+            action_log: vec!["Application initialized.".to_string()],
+            scan_requested: true, // Auto-scan on start
             fix_requested: false,
             tx,
             rx,
-        };
-        app
+        }
     }
 
-    fn check_worker(&mut self) {
+    fn is_working(&self) -> bool {
+        !matches!(self.current_step, ProgressStep::Idle | ProgressStep::Complete | ProgressStep::Failed(_))
+    }
+
+    fn process_messages(&mut self) {
+        // Start scan
         if self.scan_requested {
             self.scan_requested = false;
-            self.is_scanning = true;
-            self.status_text = "Scanning".to_owned();
-            self.status_detail = "Checking system processes...".to_owned();
-            self.status_color = COLOR_TEXT_PRIMARY;
-            self.icon = "🔍".to_owned();
+            self.current_step = ProgressStep::Scanning;
+            self.action_log.push("Scanning for CapCut processes...".to_string());
 
             let tx = self.tx.clone();
             thread::spawn(move || {
-                thread::sleep(Duration::from_millis(600));
+                thread::sleep(Duration::from_millis(800));
                 let mut sys = System::new_all();
                 sys.refresh_all();
-                let running = sys.processes_by_name("CapCut").next().is_some() || sys.processes_by_name("CapCut.exe").next().is_some();
+                let running = sys.processes_by_name("CapCut").next().is_some()
+                    || sys.processes_by_name("CapCut.exe").next().is_some();
                 let _ = tx.send(WorkerMessage::ScanResult(running));
             });
         }
 
+        // Start fix
         if self.fix_requested {
             self.fix_requested = false;
-            self.is_fixing = true;
-            self.status_text = "Securing CapCut".to_owned();
-            self.status_detail = "Starting protection sequence...".to_owned();
-            self.icon = "⚙️".to_owned();
-            self.status_color = COLOR_ACCENT;
+            self.current_step = ProgressStep::Scanning;
+            self.action_log.clear();
+            self.action_log.push("Starting protection sequence...".to_string());
 
             let tx = self.tx.clone();
             thread::spawn(move || {
-                match perform_fix(&tx) {
-                    Ok(_) => { let _ = tx.send(WorkerMessage::FixComplete(Ok(()))); }
-                    Err(e) => { let _ = tx.send(WorkerMessage::FixComplete(Err(e))); }
-                }
+                run_fix_sequence(&tx);
             });
         }
 
+        // Process incoming messages
         while let Ok(msg) = self.rx.try_recv() {
             match msg {
+                WorkerMessage::StepUpdate(step) => {
+                    self.current_step = step;
+                }
+                WorkerMessage::LogMessage(log) => {
+                    self.action_log.push(log);
+                }
                 WorkerMessage::ScanResult(running) => {
-                    self.is_scanning = false;
                     self.capcut_running = running;
                     if running {
-                        self.status_text = "Action Required".to_owned();
-                        self.status_detail = "CapCut is currently running. Please close it first.".to_owned();
-                        self.status_color = COLOR_WARNING;
-                        self.icon = "⚠️".to_owned();
+                        self.current_step = ProgressStep::Failed("CapCut is running. Please close it.".to_string());
+                        self.action_log.push("⚠ CapCut detected running.".to_string());
                     } else {
-                        self.status_text = "Ready to Secure".to_owned();
-                        self.status_detail = "System is ready for version locking.".to_owned();
-                        self.status_color = COLOR_SUCCESS;
-                        self.icon = "🔓".to_owned();
+                        self.current_step = ProgressStep::Idle;
+                        self.action_log.push("✓ No running CapCut instance found.".to_string());
                     }
                 }
-                WorkerMessage::FixStatus(msg) => {
-                    self.status_detail = msg;
-                }
                 WorkerMessage::FixComplete(res) => {
-                    self.is_fixing = false;
                     match res {
                         Ok(_) => {
-                            self.status_text = "Protected".to_owned();
-                            self.status_detail = "CapCut version is locked and guarded.".to_owned();
-                            self.status_color = COLOR_SUCCESS;
-                            self.icon = "🛡️".to_owned();
+                            self.current_step = ProgressStep::Complete;
+                            self.action_log.push("✓ Protection sequence completed successfully.".to_string());
                         }
                         Err(e) => {
-                            self.status_text = "Protection Failed".to_owned();
-                            self.status_detail = e;
-                            self.status_color = COLOR_ERROR;
-                            self.icon = "❌".to_owned();
+                            self.current_step = ProgressStep::Failed(e.clone());
+                            self.action_log.push(format!("✗ Error: {}", e));
                         }
                     }
                 }
@@ -162,186 +189,309 @@ impl CapCutGuardApp {
 
 impl eframe::App for CapCutGuardApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.check_worker();
+        self.process_messages();
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // -- App Header --
-            ui.add_space(20.0);
+            ui.add_space(25.0);
+
+            // --- Header ---
             ui.vertical_centered(|ui| {
-                ui.heading(egui::RichText::new("CapCut Version Guard").size(28.0).strong().color(COLOR_TEXT_PRIMARY));
-                ui.add_space(5.0);
-                ui.label(egui::RichText::new("Automated Version Locking Tool").size(14.0).color(COLOR_TEXT_SECONDARY));
+                ui.label(egui::RichText::new("⬢").size(36.0).color(COLOR_ACCENT_PRIMARY)); // Cisco-style hex icon
+                ui.add_space(8.0);
+                ui.label(egui::RichText::new("CapCut Version Guard").size(26.0).strong().color(COLOR_TEXT_BRIGHT));
+                ui.label(egui::RichText::new("Enterprise Edition").size(12.0).color(COLOR_TEXT_DIM));
             });
-            ui.add_space(30.0);
+            ui.add_space(25.0);
 
-            // -- Card Area --
-            let card_rect = ui.available_rect_before_wrap();
-            let card_width = 400.0;
-            let card_height = 200.0;
-
-
+            // --- Progress Steps Card ---
             egui::Frame::none()
-                .fill(COLOR_SURFACE)
-                .rounding(12.0)
-                .stroke(egui::Stroke::new(1.0, egui::Color32::from_white_alpha(20)))
-                .inner_margin(20.0)
-                .outer_margin(egui::Margin::symmetric((ui.available_width() - card_width).max(0.0) / 2.0, 0.0))
+                .fill(COLOR_BG_CARD)
+                .rounding(14.0)
+                .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
+                .inner_margin(egui::Margin::symmetric(24.0, 20.0))
+                .outer_margin(egui::Margin::symmetric(20.0, 0.0))
                 .show(ui, |ui| {
-                    ui.set_min_size(egui::vec2(card_width, card_height));
-                    ui.vertical_centered(|ui| {
-                        ui.add_space(10.0);
-                        // Icon
-                        ui.label(egui::RichText::new(&self.icon).size(60.0));
-                        ui.add_space(15.0);
+                    ui.label(egui::RichText::new("Protection Status").size(13.0).strong().color(COLOR_TEXT_MUTED));
+                    ui.add_space(16.0);
 
-                        // Main Status
-                        ui.label(egui::RichText::new(&self.status_text).size(22.0).strong().color(self.status_color));
+                    let steps = [
+                        ("1", "System Scan", ProgressStep::Scanning),
+                        ("2", "Version Cleanup", ProgressStep::CleaningVersions),
+                        ("3", "Config Lock", ProgressStep::LockingConfig),
+                        ("4", "Update Blocker", ProgressStep::CreatingBlockers),
+                    ];
+
+                    let current_idx = self.current_step.index();
+                    let is_complete = matches!(self.current_step, ProgressStep::Complete);
+                    let is_failed = matches!(self.current_step, ProgressStep::Failed(_));
+
+                    for (i, (num, label, step)) in steps.iter().enumerate() {
+                        let step_idx = step.index();
+                        let is_active = current_idx == step_idx;
+                        let is_done = current_idx > step_idx || is_complete;
+
+                        ui.horizontal(|ui| {
+                            // Step indicator circle
+                            let circle_color = if is_done {
+                                COLOR_SUCCESS
+                            } else if is_active {
+                                COLOR_ACCENT_PRIMARY
+                            } else {
+                                COLOR_BG_CARD_HIGHLIGHT
+                            };
+
+                            let circle_text_color = if is_done || is_active {
+                                COLOR_TEXT_BRIGHT
+                            } else {
+                                COLOR_TEXT_DIM
+                            };
+
+                            // Draw circle with number
+                            let (rect, _) = ui.allocate_exact_size(egui::vec2(28.0, 28.0), egui::Sense::hover());
+                            ui.painter().circle_filled(rect.center(), 14.0, circle_color);
+                            ui.painter().text(
+                                rect.center(),
+                                egui::Align2::CENTER_CENTER,
+                                if is_done { "✓" } else { *num },
+                                egui::FontId::new(12.0, egui::FontFamily::Proportional),
+                                circle_text_color,
+                            );
+
+                            ui.add_space(12.0);
+
+                            // Step label
+                            let label_color = if is_done || is_active {
+                                COLOR_TEXT_BRIGHT
+                            } else {
+                                COLOR_TEXT_DIM
+                            };
+                            ui.label(egui::RichText::new(*label).size(14.0).color(label_color));
+
+                            // Spinner if active
+                            if is_active && !is_failed {
+                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                    ui.add(egui::Spinner::new().size(16.0).color(COLOR_ACCENT_PRIMARY));
+                                });
+                            }
+                        });
+
+                        // Connector line between steps
+                        if i < steps.len() - 1 {
+                            ui.horizontal(|ui| {
+                                ui.add_space(13.0); // Align with circle center
+                                let line_color = if current_idx > step_idx || is_complete {
+                                    COLOR_SUCCESS
+                                } else {
+                                    COLOR_BG_CARD_HIGHLIGHT
+                                };
+                                let (rect, _) = ui.allocate_exact_size(egui::vec2(2.0, 16.0), egui::Sense::hover());
+                                ui.painter().rect_filled(rect, 1.0, line_color);
+                            });
+                        }
+                    }
+
+                    // Final status
+                    ui.add_space(16.0);
+                    ui.separator();
+                    ui.add_space(12.0);
+
+                    let (status_icon, status_text, status_color) = match &self.current_step {
+                        ProgressStep::Complete => ("🛡️", "System Protected", COLOR_SUCCESS),
+                        ProgressStep::Failed(e) => ("⚠", e.as_str(), COLOR_ERROR),
+                        ProgressStep::Idle => ("●", "Ready", COLOR_TEXT_MUTED),
+                        _ => ("◉", self.current_step.label(), COLOR_ACCENT_PRIMARY),
+                    };
+
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(status_icon).size(18.0).color(status_color));
                         ui.add_space(8.0);
+                        ui.label(egui::RichText::new(status_text).size(15.0).strong().color(status_color));
+                    });
+                });
 
-                        // Detail
-                        ui.label(egui::RichText::new(&self.status_detail).size(15.0).color(COLOR_TEXT_SECONDARY));
+            ui.add_space(20.0);
 
-                        // Spinner if working
-                        if self.is_scanning || self.is_fixing {
-                            ui.add_space(15.0);
-                            ui.add(egui::Spinner::new().size(24.0).color(COLOR_ACCENT));
+            // --- Activity Log Card ---
+            egui::Frame::none()
+                .fill(COLOR_BG_CARD)
+                .rounding(14.0)
+                .stroke(egui::Stroke::new(1.0, COLOR_BORDER_SUBTLE))
+                .inner_margin(egui::Margin::symmetric(20.0, 16.0))
+                .outer_margin(egui::Margin::symmetric(20.0, 0.0))
+                .show(ui, |ui| {
+                    ui.label(egui::RichText::new("Activity Log").size(13.0).strong().color(COLOR_TEXT_MUTED));
+                    ui.add_space(10.0);
+
+                    egui::ScrollArea::vertical().max_height(80.0).show(ui, |ui| {
+                        for log in &self.action_log {
+                            let color = if log.starts_with("✓") {
+                                COLOR_SUCCESS
+                            } else if log.starts_with("✗") || log.starts_with("⚠") {
+                                COLOR_WARNING
+                            } else {
+                                COLOR_TEXT_DIM
+                            };
+                            ui.label(egui::RichText::new(log).size(12.0).color(color));
                         }
                     });
                 });
 
-            // -- Action Area --
-            ui.add_space(40.0);
+            ui.add_space(25.0);
+
+            // --- Action Button ---
             ui.vertical_centered(|ui| {
-                if !self.is_scanning && !self.is_fixing {
-                    let btn_size = egui::vec2(220.0, 50.0);
+                if !self.is_working() {
+                    let (btn_text, btn_color) = match &self.current_step {
+                        ProgressStep::Complete => ("Re-Scan System", COLOR_BG_CARD_HIGHLIGHT),
+                        ProgressStep::Failed(_) => ("Retry Protection", COLOR_WARNING),
+                        _ => ("Secure CapCut Now", COLOR_ACCENT_PRIMARY),
+                    };
 
-                    if self.capcut_running {
-                         let btn = egui::Button::new(egui::RichText::new("Close CapCut & Retry").size(16.0).strong())
-                            .fill(COLOR_WARNING)
-                            .min_size(btn_size)
-                            .rounding(8.0);
+                    let btn = egui::Button::new(
+                        egui::RichText::new(btn_text).size(15.0).strong().color(COLOR_TEXT_BRIGHT)
+                    )
+                        .fill(btn_color)
+                        .min_size(egui::vec2(200.0, 48.0))
+                        .rounding(10.0);
 
-                         if ui.add(btn).clicked() {
+                    if ui.add(btn).clicked() {
+                        if matches!(self.current_step, ProgressStep::Complete) {
                             self.scan_requested = true;
-                         }
-                    } else {
-                        // Main Action
-                        let (text, color) = if self.status_text == "Protected" {
-                            ("Re-Scan Environment", COLOR_SURFACE)
+                            self.current_step = ProgressStep::Idle;
                         } else {
-                            ("Secure CapCut Now", COLOR_ACCENT)
-                        };
-
-                        // If it's pure Success, allow re-scan but emphasize success
-                        let btn = egui::Button::new(egui::RichText::new(text).size(16.0).strong())
-                            .fill(color)
-                            .min_size(btn_size)
-                            .rounding(8.0);
-
-                        if ui.add(btn).clicked() {
-                            if self.status_text == "Protected" {
-                                self.scan_requested = true;
-                            } else {
-                                self.fix_requested = true;
-                            }
+                            self.fix_requested = true;
                         }
                     }
-                } else {
-                    // Placeholder space to prevent jump
-                    ui.add_space(50.0);
                 }
             });
 
-            // -- Footer --
+            // --- Footer ---
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
-                ui.add_space(15.0);
-                let link = ui.add(egui::Hyperlink::from_label_and_url(
-                    egui::RichText::new("Star on GitHub").size(13.0).color(COLOR_TEXT_SECONDARY).underline(),
-                    GITHUB_URL
-                ));
+                ui.add_space(12.0);
+                ui.horizontal(|ui| {
+                    ui.add_space((ui.available_width() - 100.0) / 2.0);
+                    if ui.link(egui::RichText::new("GitHub").size(11.0).color(COLOR_TEXT_DIM)).clicked() {
+                        let _ = open::that(GITHUB_URL);
+                    }
+                    ui.label(egui::RichText::new("•").size(11.0).color(COLOR_TEXT_DIM));
+                    ui.label(egui::RichText::new("v1.0.0").size(11.0).color(COLOR_TEXT_DIM));
+                });
             });
         });
 
-        if self.is_scanning || self.is_fixing {
+        if self.is_working() {
             ctx.request_repaint();
         }
     }
 }
 
-// --- Helpers ---
+// --- Fix Sequence (with step updates) ---
+fn run_fix_sequence(tx: &std::sync::mpsc::Sender<WorkerMessage>) {
+    // Step 1: Scan
+    let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::Scanning));
+    let _ = tx.send(WorkerMessage::LogMessage("Checking for running CapCut processes...".to_string()));
+    thread::sleep(Duration::from_millis(600));
 
+    let mut sys = System::new_all();
+    sys.refresh_all();
+    if sys.processes_by_name("CapCut").next().is_some() || sys.processes_by_name("CapCut.exe").next().is_some() {
+        let _ = tx.send(WorkerMessage::FixComplete(Err("CapCut is running. Please close it first.".to_string())));
+        return;
+    }
+    let _ = tx.send(WorkerMessage::LogMessage("✓ No running instances detected.".to_string()));
+
+    // Get paths
+    let local_app_data = match std::env::var("LOCALAPPDATA") {
+        Ok(p) => p,
+        Err(_) => {
+            let _ = tx.send(WorkerMessage::FixComplete(Err("LOCALAPPDATA not found".to_string())));
+            return;
+        }
+    };
+    let capcut_path = PathBuf::from(&local_app_data).join("CapCut");
+    let apps_path = capcut_path.join("Apps");
+
+    if !apps_path.exists() {
+        let _ = tx.send(WorkerMessage::FixComplete(Err(format!("Apps folder not found at {:?}", apps_path))));
+        return;
+    }
+
+    // Step 2: Clean versions
+    let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::CleaningVersions));
+    let _ = tx.send(WorkerMessage::LogMessage("Analyzing installed versions...".to_string()));
+    thread::sleep(Duration::from_millis(500));
+
+    if let Err(e) = clean_versions(&apps_path) {
+        let _ = tx.send(WorkerMessage::FixComplete(Err(e)));
+        return;
+    }
+    let _ = tx.send(WorkerMessage::LogMessage("✓ Version cleanup complete.".to_string()));
+
+    // Step 3: Lock config
+    let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::LockingConfig));
+    let _ = tx.send(WorkerMessage::LogMessage("Modifying configuration file...".to_string()));
+    thread::sleep(Duration::from_millis(400));
+
+    if let Err(e) = lock_configuration(&apps_path) {
+        let _ = tx.send(WorkerMessage::FixComplete(Err(e)));
+        return;
+    }
+    let _ = tx.send(WorkerMessage::LogMessage("✓ Configuration locked.".to_string()));
+
+    // Step 4: Create blockers
+    let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::CreatingBlockers));
+    let _ = tx.send(WorkerMessage::LogMessage("Creating update blocker files...".to_string()));
+    thread::sleep(Duration::from_millis(400));
+
+    if let Err(e) = create_dummy_files(&capcut_path, &apps_path) {
+        let _ = tx.send(WorkerMessage::FixComplete(Err(e)));
+        return;
+    }
+    let _ = tx.send(WorkerMessage::LogMessage("✓ Update blockers in place.".to_string()));
+
+    // Done
+    let _ = tx.send(WorkerMessage::FixComplete(Ok(())));
+}
+
+// --- Helper Functions ---
 fn configure_visuals(ctx: &egui::Context) {
     let mut visuals = egui::Visuals::dark();
-    visuals.window_rounding = egui::Rounding::same(0.0);
-    visuals.panel_fill = COLOR_BG;
+    visuals.panel_fill = COLOR_BG_DEEP;
+    visuals.window_rounding = egui::Rounding::ZERO;
 
-    visuals.widgets.noninteractive.bg_fill = COLOR_SURFACE;
-    visuals.widgets.noninteractive.fg_stroke = egui::Stroke::new(1.0, COLOR_TEXT_SECONDARY);
+    visuals.widgets.noninteractive.bg_fill = COLOR_BG_CARD;
+    visuals.widgets.noninteractive.fg_stroke = egui::Stroke::new(1.0, COLOR_TEXT_MUTED);
 
-    visuals.widgets.inactive.bg_fill = COLOR_SURFACE;
-    visuals.widgets.inactive.rounding = egui::Rounding::same(8.0);
-    visuals.widgets.inactive.fg_stroke = egui::Stroke::new(1.0, COLOR_TEXT_PRIMARY);
+    visuals.widgets.inactive.bg_fill = COLOR_BG_CARD_HIGHLIGHT;
+    visuals.widgets.inactive.rounding = egui::Rounding::same(10.0);
+    visuals.widgets.inactive.fg_stroke = egui::Stroke::new(1.0, COLOR_TEXT_BRIGHT);
 
-    visuals.widgets.hovered.bg_fill = COLOR_ACCENT_HOVER;
-    visuals.widgets.hovered.rounding = egui::Rounding::same(8.0);
+    visuals.widgets.hovered.bg_fill = COLOR_ACCENT_PRIMARY;
+    visuals.widgets.hovered.rounding = egui::Rounding::same(10.0);
     visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
 
-    visuals.widgets.active.bg_fill = COLOR_ACCENT;
-    visuals.widgets.active.rounding = egui::Rounding::same(8.0);
+    visuals.widgets.active.bg_fill = COLOR_ACCENT_GRADIENT_END;
+    visuals.widgets.active.rounding = egui::Rounding::same(10.0);
     visuals.widgets.active.fg_stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
 
     ctx.set_visuals(visuals);
 }
 
 fn configure_fonts(ctx: &egui::Context) {
-    // Simple font config to ensure clean sizing
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
-        (egui::TextStyle::Heading, egui::FontId::new(28.0, egui::FontFamily::Proportional)),
-        (egui::TextStyle::Body, egui::FontId::new(16.0, egui::FontFamily::Proportional)),
-        (egui::TextStyle::Button, egui::FontId::new(16.0, egui::FontFamily::Proportional)),
-        (egui::TextStyle::Small, egui::FontId::new(12.0, egui::FontFamily::Proportional)),
-        (egui::TextStyle::Monospace, egui::FontId::new(14.0, egui::FontFamily::Monospace)),
+        (egui::TextStyle::Heading, egui::FontId::new(26.0, egui::FontFamily::Proportional)),
+        (egui::TextStyle::Body, egui::FontId::new(14.0, egui::FontFamily::Proportional)),
+        (egui::TextStyle::Button, egui::FontId::new(14.0, egui::FontFamily::Proportional)),
+        (egui::TextStyle::Small, egui::FontId::new(11.0, egui::FontFamily::Proportional)),
+        (egui::TextStyle::Monospace, egui::FontId::new(12.0, egui::FontFamily::Monospace)),
     ].into();
+    style.spacing.button_padding = egui::vec2(16.0, 8.0);
     ctx.set_style(style);
 }
 
-// --- Logic (Identical to previous, kept for completeness) ---
-
-fn perform_fix(tx: &std::sync::mpsc::Sender<WorkerMessage>) -> Result<(), String> {
-    let mut sys = System::new_all();
-    sys.refresh_all();
-    if sys.processes_by_name("CapCut").next().is_some() || sys.processes_by_name("CapCut.exe").next().is_some() {
-        return Err("CapCut is running. Please close it.".to_string());
-    }
-
-    let local_app_data = std::env::var("LOCALAPPDATA").map_err(|_| "LOCALAPPDATA not found")?;
-    let capcut_path = PathBuf::from(&local_app_data).join("CapCut");
-    let apps_path = capcut_path.join("Apps");
-
-    if !apps_path.exists() {
-        return Err(format!("Apps folder not found at {:?}", apps_path));
-    }
-
-    let _ = tx.send(WorkerMessage::FixStatus("Cleaning old versions...".to_string()));
-    clean_versions(&apps_path)?;
-
-    let _ = tx.send(WorkerMessage::FixStatus("Locking configuration...".to_string()));
-    lock_configuration(&apps_path)?;
-
-    let _ = tx.send(WorkerMessage::FixStatus("Creating protection files...".to_string()));
-    create_dummy_files(&capcut_path, &apps_path)?;
-
-    Ok(())
-}
-
+// --- Core Logic (unchanged) ---
 fn clean_versions(apps_path: &Path) -> Result<(), String> {
-
-    // Scan logic...
-    // (Simplification of logic for this snippet, assumes reuse of logic from before)
-    // To ensure this file runs standalone, I will include the full clean_versions logic here.
-
-    // Re-read logic from previous file
     let mut dirs: Vec<PathBuf> = fs::read_dir(apps_path)
         .map_err(|e| e.to_string())?
         .filter_map(|e| e.ok())
