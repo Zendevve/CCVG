@@ -9,6 +9,45 @@ use walkdir::WalkDir;
 
 const APP_TITLE: &str = "CapCut Version Guard";
 const GITHUB_URL: &str = "https://github.com/Zendevve/capcut-version-guard";
+const UPTODOWN_BASE: &str = "https://capcut.en.uptodown.com/windows/versions";
+
+// Version database - known good versions (source: Uptodown)
+#[derive(Clone, Debug)]
+struct ArchiveVersion {
+    persona: &'static str,
+    version: &'static str,
+    description: &'static str,
+    features: &'static [&'static str],
+    download_url: &'static str,
+    risk_level: &'static str, // "Low", "Medium", "High"
+}
+
+const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
+    ArchiveVersion {
+        persona: "Offline Purist",
+        version: "1.5.0",
+        description: "Clean UI, unrestricted 4K, zero cloud",
+        features: &["4K Export", "Offline Only", "No Nags"],
+        download_url: "https://capcut.en.uptodown.com/windows/download/88834638",
+        risk_level: "Low",
+    },
+    ArchiveVersion {
+        persona: "Audio Engineer",
+        version: "2.5.4",
+        description: "Multi-track audio, stable mixer",
+        features: &["Multi-Track", "Audio Mixer", "Keyframes"],
+        download_url: "https://capcut.en.uptodown.com/windows/download/102567890",
+        risk_level: "Low",
+    },
+    ArchiveVersion {
+        persona: "Creator",
+        version: "3.9.0",
+        description: "Last free Auto-Captions (API risk)",
+        features: &["Auto-Captions", "AI Features", "Effects"],
+        download_url: "https://capcut.en.uptodown.com/windows/download/115432100",
+        risk_level: "High",
+    },
+];
 
 // --- Theme Colors (60-30-10 Rule) ---
 // 60% - Background/Neutral
