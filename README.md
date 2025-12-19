@@ -225,7 +225,7 @@ MIT © [Zendevve](https://github.com/Zendevve)
 
 <div align="center">
 
-**Built with Rust 🦀 and instant noodles 🍜**
+**Built with Rust 🦀 and a whole lot of depression**
 
 *Made with love by a broke college student who just wants to help people keep their software.*
 
