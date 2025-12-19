@@ -2,7 +2,7 @@
 
 # 🛡️ CC Version Guard
 
-**Take control of your version. Lock your preferred release and block unwanted auto-updates.**
+**Take control of your CapCut version. Lock your preferred release and block unwanted auto-updates.**
 
 [![Rust](https://img.shields.io/badge/Rust-2021-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue?style=flat-square&logo=windows)](https://www.microsoft.com/windows)
