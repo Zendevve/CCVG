@@ -28,7 +28,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "1.5.0",
         description: "Clean UI, unrestricted 4K, zero cloud",
         features: &["4K Export", "Offline Only", "No Nags"],
-        download_url: "https://capcut.en.uptodown.com/windows/download/88834638",
+        download_url: "https://capcut.en.uptodown.com/windows/download/106998636",
         risk_level: "Low",
     },
     ArchiveVersion {
@@ -36,7 +36,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "2.5.4",
         description: "Multi-track audio, stable mixer",
         features: &["Multi-Track", "Audio Mixer", "Keyframes"],
-        download_url: "https://capcut.en.uptodown.com/windows/download/102567890",
+        download_url: "https://capcut.en.uptodown.com/windows/versions",
         risk_level: "Low",
     },
     ArchiveVersion {
@@ -44,7 +44,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "3.9.0",
         description: "Last free Auto-Captions (API risk)",
         features: &["Auto-Captions", "AI Features", "Effects"],
-        download_url: "https://capcut.en.uptodown.com/windows/download/115432100",
+        download_url: "https://capcut.en.uptodown.com/windows/versions",
         risk_level: "High",
     },
 ];
