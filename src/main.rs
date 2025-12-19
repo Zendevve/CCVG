@@ -201,8 +201,11 @@ impl eframe::App for CapCutGuardApp {
 
                 // --- Header ---
                 ui.vertical_centered(|ui| {
-                    ui.label(egui::RichText::new("⬢").size(32.0).color(COLOR_ACCENT_PRIMARY));
-                    ui.add_space(6.0);
+                    // Draw shield icon as painted shape (no Unicode)
+                    let (icon_rect, _) = ui.allocate_exact_size(egui::vec2(40.0, 40.0), egui::Sense::hover());
+                    draw_shield_icon(ui.painter(), icon_rect.center(), 18.0, COLOR_ACCENT_PRIMARY);
+
+                    ui.add_space(8.0);
                     ui.label(egui::RichText::new("CapCut Version Guard").size(24.0).strong().color(COLOR_TEXT_BRIGHT));
                     ui.label(egui::RichText::new("Enterprise Edition").size(11.0).color(COLOR_TEXT_DIM));
                 });
@@ -254,13 +257,19 @@ impl eframe::App for CapCutGuardApp {
 
                                 let (rect, _) = ui.allocate_exact_size(egui::vec2(24.0, 24.0), egui::Sense::hover());
                                 ui.painter().circle_filled(rect.center(), 12.0, circle_color);
-                                ui.painter().text(
-                                    rect.center(),
-                                    egui::Align2::CENTER_CENTER,
-                                    if is_done { "✓" } else { *num },
-                                    egui::FontId::new(11.0, egui::FontFamily::Proportional),
-                                    circle_text_color,
-                                );
+
+                                if is_done {
+                                    // Draw checkmark as lines (no Unicode)
+                                    draw_checkmark(ui.painter(), rect.center(), 6.0, circle_text_color);
+                                } else {
+                                    ui.painter().text(
+                                        rect.center(),
+                                        egui::Align2::CENTER_CENTER,
+                                        *num,
+                                        egui::FontId::new(11.0, egui::FontFamily::Proportional),
+                                        circle_text_color,
+                                    );
+                                }
 
                                 ui.add_space(10.0);
 
@@ -296,15 +305,21 @@ impl eframe::App for CapCutGuardApp {
                         ui.separator();
                         ui.add_space(10.0);
 
-                        let (status_icon, status_text, status_color) = match &self.current_step {
-                            ProgressStep::Complete => ("🛡️", "System Protected", COLOR_SUCCESS),
-                            ProgressStep::Failed(e) => ("⚠", e.as_str(), COLOR_ERROR),
-                            ProgressStep::Idle => ("●", "Ready", COLOR_TEXT_MUTED),
-                            _ => ("◉", self.current_step.label(), COLOR_ACCENT_PRIMARY),
+                        let (status_text, status_color, show_shield) = match &self.current_step {
+                            ProgressStep::Complete => ("System Protected", COLOR_SUCCESS, true),
+                            ProgressStep::Failed(e) => (e.as_str(), COLOR_ERROR, false),
+                            ProgressStep::Idle => ("Ready", COLOR_TEXT_MUTED, false),
+                            _ => (self.current_step.label(), COLOR_ACCENT_PRIMARY, false),
                         };
 
                         ui.horizontal(|ui| {
-                            ui.label(egui::RichText::new(status_icon).size(16.0).color(status_color));
+                            // Draw status icon as shape
+                            let (icon_rect, _) = ui.allocate_exact_size(egui::vec2(18.0, 18.0), egui::Sense::hover());
+                            if show_shield {
+                                draw_shield_icon(ui.painter(), icon_rect.center(), 8.0, status_color);
+                            } else {
+                                ui.painter().circle_filled(icon_rect.center(), 5.0, status_color);
+                            }
                             ui.add_space(6.0);
                             ui.label(egui::RichText::new(status_text).size(14.0).strong().color(status_color));
                         });
@@ -394,6 +409,33 @@ impl eframe::App for CapCutGuardApp {
             ctx.request_repaint();
         }
     }
+}
+// --- Icon Drawing Helpers (no Unicode dependency) ---
+
+fn draw_checkmark(painter: &egui::Painter, center: egui::Pos2, size: f32, color: egui::Color32) {
+    // Draw a simple checkmark as two lines forming a "V" shape
+    let stroke = egui::Stroke::new(2.0, color);
+    let left = egui::pos2(center.x - size * 0.6, center.y);
+    let bottom = egui::pos2(center.x - size * 0.1, center.y + size * 0.5);
+    let right = egui::pos2(center.x + size * 0.6, center.y - size * 0.4);
+
+    painter.line_segment([left, bottom], stroke);
+    painter.line_segment([bottom, right], stroke);
+}
+
+fn draw_shield_icon(painter: &egui::Painter, center: egui::Pos2, size: f32, color: egui::Color32) {
+    // Draw a simple shield shape as a filled polygon
+    let points = vec![
+        egui::pos2(center.x, center.y - size),           // Top center
+        egui::pos2(center.x + size, center.y - size * 0.5), // Top right
+        egui::pos2(center.x + size, center.y + size * 0.3), // Bottom right
+        egui::pos2(center.x, center.y + size),           // Bottom point
+        egui::pos2(center.x - size, center.y + size * 0.3), // Bottom left
+        egui::pos2(center.x - size, center.y - size * 0.5), // Top left
+    ];
+
+    let shape = egui::Shape::convex_polygon(points, color, egui::Stroke::NONE);
+    painter.add(shape);
 }
 
 // --- Fix Sequence (with step updates) ---
