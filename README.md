@@ -77,21 +77,25 @@ The binary will be at `target/release/capcut_guard_rust.exe`
 
 ## 🔧 How It Works
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────────┐     ┌───────────┐
-│   Welcome   │────▶│  PreCheck   │────▶│ Version Select  │────▶│  Running  │
-└─────────────┘     └─────────────┘     └─────────────────┘     └───────────┘
-       │                   │                                           │
-       ▼                   ▼                                           ▼
-┌─────────────┐     Checks if CapCut               Applies protection:
-│  Download   │     is installed and               • Deletes unselected versions
-│  Manager    │     not running                    • Locks config files (read-only)
-└─────────────┘                                    • Creates blocker files
-       │                                                   │
-       ▼                                                   ▼
-  Opens Uptodown                                   ┌───────────┐
-  versions page                                    │ Complete  │
-                                                   └───────────┘
+```mermaid
+flowchart LR
+    subgraph Main Flow
+        A[Welcome] --> B{PreCheck}
+        B -->|CapCut Found| C[Version Select]
+        C --> D[Running]
+        D --> E[Complete]
+    end
+
+    subgraph Alternative
+        A -->|Download Legacy| F[Download Manager]
+        F -->|Opens Browser| G[Uptodown]
+    end
+
+    subgraph Protection Steps
+        D -->|Step 1| H[Delete Other Versions]
+        D -->|Step 2| I[Lock Config Files]
+        D -->|Step 3| J[Create Blockers]
+    end
 ```
 
 ### Protection Mechanisms
