@@ -54,6 +54,16 @@ CapCut frequently pushes updates that:
 2. Run the executable
 3. Follow the wizard
 
+> **⚠️ Windows SmartScreen Warning**
+>
+> You may see "Windows protected your PC" when running. This is normal for unsigned executables.
+>
+> **To run anyway:**
+> 1. Click **"More info"**
+> 2. Click **"Run anyway"**
+>
+> The app is proprietary — [inspect the code yourself](src/main.rs) if you're concerned.
+
 ### Option 2: Build from Source
 ```bash
 git clone https://github.com/Zendevve/capcut-version-guard.git
