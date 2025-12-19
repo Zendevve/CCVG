@@ -28,7 +28,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "1.5.0",
         description: "Clean UI, unrestricted 4K, zero cloud",
         features: &["4K Export", "Offline Only", "No Nags"],
-        download_url: "https://capcut.en.uptodown.com/windows/download/106998636",
+        download_url: "https://capcut.en.uptodown.com/windows/versions",
         risk_level: "Low",
     },
     ArchiveVersion {
