@@ -1,0 +1,13 @@
+[package]
+name = "capcut_guard_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = "0.29"
+sysinfo = "0.30"
+walkdir = "2.4"
+directories = "5.0"
+open = "5.0"
+semver = "1.0"
+human-sort = "0.2"
