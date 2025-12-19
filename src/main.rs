@@ -32,9 +32,18 @@ const COLOR_TEXT_DIM: egui::Color32 = egui::Color32::from_rgb(100, 116, 139);
 enum WizardScreen {
     Welcome,
     PreCheck,
+    VersionSelect,
     Running,
     Complete,
     Error(String),
+}
+
+// --- Version Info ---
+#[derive(Clone, Debug)]
+struct VersionInfo {
+    name: String,
+    path: PathBuf,
+    size_mb: f64,
 }
 
 // --- Progress Steps (for Running screen) ---
@@ -84,6 +93,10 @@ struct CapCutGuardApp {
     capcut_running: bool,
     capcut_path: Option<PathBuf>,
 
+    // Version selection
+    available_versions: Vec<VersionInfo>,
+    selected_version_idx: Option<usize>,
+
     // Async
     check_requested: bool,
     fix_requested: bool,
@@ -92,7 +105,7 @@ struct CapCutGuardApp {
 }
 
 enum WorkerMessage {
-    PreCheckResult { found: bool, running: bool, path: Option<PathBuf> },
+    PreCheckResult { found: bool, running: bool, path: Option<PathBuf>, versions: Vec<VersionInfo> },
     StepUpdate(ProgressStep),
     LogMessage(String),
     FixComplete(Result<(), String>),
@@ -111,6 +124,8 @@ impl CapCutGuardApp {
             capcut_found: false,
             capcut_running: false,
             capcut_path: None,
+            available_versions: Vec::new(),
+            selected_version_idx: None,
             check_requested: false,
             fix_requested: false,
             tx,
@@ -137,7 +152,14 @@ impl CapCutGuardApp {
                 let path = local_app_data.map(|p| PathBuf::from(p).join("CapCut").join("Apps"));
                 let found = path.as_ref().map(|p| p.exists()).unwrap_or(false);
 
-                let _ = tx.send(WorkerMessage::PreCheckResult { found, running, path });
+                // Scan for versions
+                let versions = if let Some(ref apps_path) = path {
+                    scan_versions(apps_path)
+                } else {
+                    Vec::new()
+                };
+
+                let _ = tx.send(WorkerMessage::PreCheckResult { found, running, path, versions });
             });
         }
 
@@ -150,18 +172,32 @@ impl CapCutGuardApp {
 
             let tx = self.tx.clone();
             let capcut_path = self.capcut_path.clone();
+            let versions_to_delete: Vec<PathBuf> = self.available_versions
+                .iter()
+                .enumerate()
+                .filter(|(idx, _)| Some(*idx) != self.selected_version_idx)
+                .map(|(_, v)| v.path.clone())
+                .collect();
+            let selected_version = self.selected_version_idx
+                .and_then(|idx| self.available_versions.get(idx).cloned());
+
             thread::spawn(move || {
-                run_fix_sequence(&tx, capcut_path);
+                run_fix_sequence(&tx, capcut_path, versions_to_delete, selected_version);
             });
         }
 
         // Process messages
         while let Ok(msg) = self.rx.try_recv() {
             match msg {
-                WorkerMessage::PreCheckResult { found, running, path } => {
+                WorkerMessage::PreCheckResult { found, running, path, versions } => {
                     self.capcut_found = found;
                     self.capcut_running = running;
                     self.capcut_path = path;
+                    self.available_versions = versions;
+                    // Auto-select the oldest version (index 0) by default
+                    if !self.available_versions.is_empty() {
+                        self.selected_version_idx = Some(0);
+                    }
                 }
                 WorkerMessage::StepUpdate(step) => {
                     self.current_step = step;
@@ -199,6 +235,7 @@ impl eframe::App for CapCutGuardApp {
                 match &self.screen.clone() {
                     WizardScreen::Welcome => self.render_welcome(ui),
                     WizardScreen::PreCheck => self.render_precheck(ui),
+                    WizardScreen::VersionSelect => self.render_version_select(ui),
                     WizardScreen::Running => self.render_running(ui),
                     WizardScreen::Complete => self.render_complete(ui),
                     WizardScreen::Error(e) => self.render_error(ui, e),
@@ -329,17 +366,17 @@ impl CapCutGuardApp {
 
         ui.vertical_centered(|ui| {
             if self.capcut_found && !self.capcut_running {
-                // Can proceed
+                // Can proceed to version selection
                 let btn = egui::Button::new(
-                    egui::RichText::new(format!("{}  Apply Protection", egui_phosphor::regular::SHIELD_CHECK))
+                    egui::RichText::new(format!("{}  Select Version", egui_phosphor::regular::LIST_BULLETS))
                         .size(15.0).strong().color(COLOR_TEXT)
                 )
-                    .fill(COLOR_SUCCESS)
+                    .fill(COLOR_ACCENT)
                     .min_size(egui::vec2(180.0, 44.0))
                     .rounding(8.0);
 
                 if ui.add(btn).clicked() {
-                    self.fix_requested = true;
+                    self.screen = WizardScreen::VersionSelect;
                 }
             } else if self.capcut_running {
                 // CapCut running - retry
@@ -561,6 +598,143 @@ impl CapCutGuardApp {
         self.render_footer(ui);
     }
 
+    fn render_version_select(&mut self, ui: &mut egui::Ui) {
+        ui.add_space(40.0);
+
+        ui.vertical_centered(|ui| {
+            ui.label(egui::RichText::new(egui_phosphor::fill::FOLDERS).size(48.0).color(COLOR_ACCENT));
+            ui.add_space(10.0);
+            ui.label(egui::RichText::new("Select Version").size(22.0).strong().color(COLOR_TEXT));
+            ui.label(egui::RichText::new("Choose the version you want to KEEP").size(13.0).color(COLOR_TEXT_MUTED));
+        });
+
+        ui.add_space(24.0);
+
+        // Version list
+        egui::Frame::none()
+            .fill(COLOR_BG_CARD)
+            .rounding(12.0)
+            .inner_margin(16.0)
+            .outer_margin(egui::Margin::symmetric(40.0, 0.0))
+            .show(ui, |ui| {
+                ui.set_width(ui.available_width());
+
+                if self.available_versions.is_empty() {
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(egui_phosphor::regular::WARNING).size(16.0).color(COLOR_WARNING));
+                        ui.add_space(8.0);
+                        ui.label(egui::RichText::new("No versions found").size(14.0).color(COLOR_TEXT_MUTED));
+                    });
+                } else {
+                    ui.label(egui::RichText::new(format!("{} versions detected", self.available_versions.len())).size(11.0).color(COLOR_TEXT_DIM));
+                    ui.add_space(12.0);
+
+                    let mut new_selection = self.selected_version_idx;
+
+                    for (idx, version) in self.available_versions.iter().enumerate() {
+                        let is_selected = self.selected_version_idx == Some(idx);
+                        let is_oldest = idx == 0;
+                        let is_newest = idx == self.available_versions.len() - 1;
+
+                        let bg_color = if is_selected { COLOR_ACCENT } else { COLOR_SECONDARY };
+                        let text_color = if is_selected { COLOR_TEXT } else { COLOR_TEXT_MUTED };
+
+                        egui::Frame::none()
+                            .fill(bg_color)
+                            .rounding(8.0)
+                            .inner_margin(egui::Margin::symmetric(12.0, 10.0))
+                            .show(ui, |ui| {
+                                ui.set_width(ui.available_width());
+
+                                ui.horizontal(|ui| {
+                                    // Radio indicator
+                                    let radio_icon = if is_selected {
+                                        egui_phosphor::fill::RADIO_BUTTON
+                                    } else {
+                                        egui_phosphor::regular::CIRCLE
+                                    };
+                                    ui.label(egui::RichText::new(radio_icon).size(16.0).color(text_color));
+                                    ui.add_space(10.0);
+
+                                    // Version name
+                                    ui.vertical(|ui| {
+                                        ui.horizontal(|ui| {
+                                            ui.label(egui::RichText::new(&version.name).size(14.0).strong().color(text_color));
+                                            if is_oldest {
+                                                ui.label(egui::RichText::new(" (oldest)").size(11.0).color(COLOR_SUCCESS));
+                                            }
+                                            if is_newest {
+                                                ui.label(egui::RichText::new(" (newest)").size(11.0).color(COLOR_WARNING));
+                                            }
+                                        });
+                                        ui.label(egui::RichText::new(format!("{:.1} MB", version.size_mb)).size(11.0).color(text_color));
+                                    });
+                                });
+                            });
+
+                        // Make the whole frame clickable
+                        let response = ui.interact(
+                            ui.min_rect(),
+                            ui.make_persistent_id(format!("version_{}", idx)),
+                            egui::Sense::click()
+                        );
+                        if response.clicked() {
+                            new_selection = Some(idx);
+                        }
+
+                        ui.add_space(6.0);
+                    }
+
+                    self.selected_version_idx = new_selection;
+                }
+            });
+
+        ui.add_space(20.0);
+
+        // Info box
+        if self.available_versions.len() > 1 {
+            egui::Frame::none()
+                .fill(COLOR_BG_CARD)
+                .rounding(8.0)
+                .inner_margin(12.0)
+                .outer_margin(egui::Margin::symmetric(40.0, 0.0))
+                .show(ui, |ui| {
+                    ui.set_width(ui.available_width());
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new(egui_phosphor::regular::INFO).size(14.0).color(COLOR_ACCENT));
+                        ui.add_space(8.0);
+                        ui.label(egui::RichText::new("Other versions will be deleted. Selected version will be locked.").size(11.0).color(COLOR_TEXT_MUTED));
+                    });
+                });
+        }
+
+        ui.add_space(20.0);
+
+        ui.vertical_centered(|ui| {
+            let can_proceed = self.selected_version_idx.is_some();
+
+            let btn = egui::Button::new(
+                egui::RichText::new(format!("{}  Apply Protection", egui_phosphor::regular::SHIELD_CHECK))
+                    .size(15.0).strong().color(COLOR_TEXT)
+            )
+                .fill(if can_proceed { COLOR_SUCCESS } else { COLOR_SECONDARY })
+                .min_size(egui::vec2(180.0, 44.0))
+                .rounding(8.0);
+
+            if ui.add_enabled(can_proceed, btn).clicked() {
+                self.fix_requested = true;
+            }
+
+            ui.add_space(12.0);
+
+            if ui.link(egui::RichText::new(format!("{} Back", egui_phosphor::regular::ARROW_LEFT)).size(13.0).color(COLOR_TEXT_DIM)).clicked() {
+                self.screen = WizardScreen::PreCheck;
+            }
+        });
+
+        self.render_footer(ui);
+    }
+
     fn render_footer(&self, ui: &mut egui::Ui) {
         ui.add_space(20.0);
         ui.vertical_centered(|ui| {
@@ -577,7 +751,12 @@ impl CapCutGuardApp {
 }
 
 // --- Fix Sequence ---
-fn run_fix_sequence(tx: &std::sync::mpsc::Sender<WorkerMessage>, capcut_path: Option<PathBuf>) {
+fn run_fix_sequence(
+    tx: &std::sync::mpsc::Sender<WorkerMessage>,
+    capcut_path: Option<PathBuf>,
+    versions_to_delete: Vec<PathBuf>,
+    selected_version: Option<VersionInfo>,
+) {
     let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::Scanning));
     let _ = tx.send(WorkerMessage::LogMessage(">> Checking system state...".to_string()));
     thread::sleep(Duration::from_millis(500));
@@ -600,18 +779,33 @@ fn run_fix_sequence(tx: &std::sync::mpsc::Sender<WorkerMessage>, capcut_path: Op
 
     let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
 
-    // Step 2
+    // Step 2: Delete unselected versions
     let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::CleaningVersions));
-    let _ = tx.send(WorkerMessage::LogMessage(">> Analyzing versions...".to_string()));
-    thread::sleep(Duration::from_millis(400));
-
-    if let Err(e) = clean_versions(&apps_path) {
-        let _ = tx.send(WorkerMessage::FixComplete(Err(e)));
-        return;
+    if let Some(ref ver) = selected_version {
+        let _ = tx.send(WorkerMessage::LogMessage(format!(">> Keeping version: {}", ver.name)));
     }
-    let _ = tx.send(WorkerMessage::LogMessage("[OK] Version cleanup done".to_string()));
+    thread::sleep(Duration::from_millis(300));
 
-    // Step 3
+    for path in &versions_to_delete {
+        let name = path.file_name().unwrap_or_default().to_string_lossy();
+        let _ = tx.send(WorkerMessage::LogMessage(format!(">> Deleting: {}", name)));
+
+        if let Err(e) = unset_readonly_recursive(path) {
+            let _ = tx.send(WorkerMessage::LogMessage(format!("[!] Warning: {}", e)));
+        }
+        if let Err(e) = fs::remove_dir_all(path) {
+            let _ = tx.send(WorkerMessage::FixComplete(Err(format!("Failed to delete {}: {}", name, e))));
+            return;
+        }
+    }
+
+    if versions_to_delete.is_empty() {
+        let _ = tx.send(WorkerMessage::LogMessage("[OK] No versions to delete".to_string()));
+    } else {
+        let _ = tx.send(WorkerMessage::LogMessage(format!("[OK] Deleted {} version(s)", versions_to_delete.len())));
+    }
+
+    // Step 3: Lock config
     let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::LockingConfig));
     let _ = tx.send(WorkerMessage::LogMessage(">> Modifying config...".to_string()));
     thread::sleep(Duration::from_millis(300));
@@ -622,7 +816,7 @@ fn run_fix_sequence(tx: &std::sync::mpsc::Sender<WorkerMessage>, capcut_path: Op
     }
     let _ = tx.send(WorkerMessage::LogMessage("[OK] Configuration locked".to_string()));
 
-    // Step 4
+    // Step 4: Create blockers
     let _ = tx.send(WorkerMessage::StepUpdate(ProgressStep::CreatingBlockers));
     let _ = tx.send(WorkerMessage::LogMessage(">> Creating blockers...".to_string()));
     thread::sleep(Duration::from_millis(300));
@@ -668,6 +862,44 @@ fn configure_fonts(ctx: &egui::Context) {
         (egui::TextStyle::Monospace, egui::FontId::new(12.0, egui::FontFamily::Monospace)),
     ].into();
     ctx.set_style(style);
+}
+
+// --- Version Scanning ---
+fn scan_versions(apps_path: &Path) -> Vec<VersionInfo> {
+    if !apps_path.exists() {
+        return Vec::new();
+    }
+
+    let mut versions: Vec<VersionInfo> = fs::read_dir(apps_path)
+        .ok()
+        .into_iter()
+        .flatten()
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .filter(|p| p.is_dir())
+        .map(|p| {
+            let name = p.file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
+            let size_mb = calculate_dir_size(&p) as f64 / (1024.0 * 1024.0);
+            VersionInfo { name, path: p, size_mb }
+        })
+        .collect();
+
+    // Sort by version name (oldest first)
+    versions.sort_by(|a, b| human_sort::compare(&a.name, &b.name));
+    versions
+}
+
+fn calculate_dir_size(path: &Path) -> u64 {
+    WalkDir::new(path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+        .filter_map(|e| e.metadata().ok())
+        .map(|m| m.len())
+        .sum()
 }
 
 // --- Core Logic ---
