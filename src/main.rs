@@ -384,14 +384,15 @@ impl CapCutGuardApp {
         // Persona cards
         for (idx, archive) in ARCHIVE_VERSIONS.iter().enumerate() {
             let is_selected = self.selected_archive_idx == Some(idx);
-            let card_color = if is_selected { COLOR_ACCENT } else { COLOR_BG_CARD };
+            // Keep dark background, use accent BORDER for selection (better contrast)
+            let card_color = COLOR_BG_CARD;
             let border = if is_selected {
                 egui::Stroke::new(2.0, COLOR_ACCENT)
             } else {
                 egui::Stroke::new(1.0, COLOR_SECONDARY)
             };
 
-            egui::Frame::none()
+            let frame_response = egui::Frame::none()
                 .fill(card_color)
                 .rounding(12.0)
                 .stroke(border)
@@ -407,12 +408,14 @@ impl CapCutGuardApp {
                             1 => egui_phosphor::fill::SPEAKER_HIGH,
                             _ => egui_phosphor::fill::SPARKLE,
                         };
-                        ui.label(egui::RichText::new(icon).size(28.0).color(if is_selected { COLOR_TEXT } else { COLOR_ACCENT }));
+                        let icon_color = if is_selected { COLOR_SUCCESS } else { COLOR_ACCENT };
+                        ui.label(egui::RichText::new(icon).size(28.0).color(icon_color));
                         ui.add_space(12.0);
 
                         ui.vertical(|ui| {
                             ui.horizontal(|ui| {
-                                ui.label(egui::RichText::new(archive.persona).size(15.0).strong().color(COLOR_TEXT));
+                                let title_color = if is_selected { COLOR_TEXT } else { COLOR_TEXT };
+                                ui.label(egui::RichText::new(archive.persona).size(15.0).strong().color(title_color));
                                 ui.label(egui::RichText::new(format!("v{}", archive.version)).size(11.0).color(COLOR_TEXT_DIM));
 
                                 if archive.risk_level == "High" {
@@ -424,16 +427,16 @@ impl CapCutGuardApp {
                             ui.add_space(6.0);
                             ui.horizontal(|ui| {
                                 for feature in archive.features {
-                                    ui.label(egui::RichText::new(format!("{} {}", egui_phosphor::regular::CHECK, feature)).size(10.0).color(COLOR_TEXT_DIM));
+                                    let badge_color = if is_selected { COLOR_SUCCESS } else { COLOR_TEXT_DIM };
+                                    ui.label(egui::RichText::new(format!("{} {}", egui_phosphor::regular::CHECK, feature)).size(10.0).color(badge_color));
                                 }
                             });
                         });
                     });
                 });
 
-            // Make card clickable
-            let rect = ui.min_rect();
-            let response = ui.interact(rect, ui.make_persistent_id(format!("archive_{}", idx)), egui::Sense::click());
+            // Fix: Use the frame's response rect for click detection
+            let response = ui.interact(frame_response.response.rect, egui::Id::new(format!("card_{}", idx)), egui::Sense::click());
             if response.clicked() {
                 self.selected_archive_idx = Some(idx);
             }
