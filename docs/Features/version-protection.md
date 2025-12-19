@@ -22,7 +22,7 @@ Protect a user's preferred CapCut version from being overwritten by automatic up
 - Create blocker files/folders to prevent updates
 
 ### Out of scope
-- Downloading CapCut installers directly (links to Uptodown instead)
+- Downloading CapCut installers directly (links to ProjectBukkit/CapcutVersions instead)
 - macOS support
 
 ---

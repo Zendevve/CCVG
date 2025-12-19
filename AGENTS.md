@@ -1,6 +1,6 @@
 # AGENTS.md
 
-CapCut Version Guard — Rust/eframe Desktop Application
+CC Version Guard — Rust/eframe Desktop Application
 
 Follows [MCAF](https://mcaf.managed-code.com/)
 
@@ -56,6 +56,10 @@ If no new rule is detected → do not update the file.
 - No magic literals — extract to constants
 - Use egui-phosphor icons, never ASCII/Unicode symbols
 - Follow 60-30-10 color rule for UI theming
+
+### External Resources (Mandatory)
+
+- **Download Source**: ALWAYS use `https://github.com/ProjectBukkit/CapcutVersions` for legacy downloads. Do NOT use Uptodown.
 
 ### UI/UX Rules (CRITICAL)
 

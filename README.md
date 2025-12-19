@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛡️ CapCut Version Guard
+# 🛡️ CC Version Guard
 
-**Take control of your CapCut installation. Lock your preferred version and block unwanted auto-updates.**
+**Take control of your version. Lock your preferred release and block unwanted auto-updates.**
 
 [![Rust](https://img.shields.io/badge/Rust-2021-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue?style=flat-square&logo=windows)](https://www.microsoft.com/windows)
@@ -17,7 +17,7 @@
 
 ## 🎯 The Problem
 
-CapCut frequently pushes updates that:
+Automatic updates frequently:
 - Remove features (free Auto-Captions → paid subscription)
 - Add paywalls to previously free exports
 - Increase cloud dependency and telemetry
@@ -33,7 +33,7 @@ CapCut frequently pushes updates that:
 |---------|-------------|
 | **Version Detection** | Automatically scans your system for all installed CapCut versions |
 | **Version Selection** | Choose exactly which version to keep — the rest are safely removed |
-| **Download Manager** | Curated links to legacy versions (v1.5.0, v2.5.4, v3.9.0) based on your workflow |
+| **Download Manager** | Curated links to legacy versions from [ProjectBukkit](https://github.com/ProjectBukkit/CapcutVersions) |
 | **Update Blocking** | Locks configuration files and creates blocker files to prevent auto-updates |
 | **Guided Wizard** | Step-by-step flow — no technical knowledge required |
 
@@ -88,7 +88,7 @@ flowchart LR
 
     subgraph Alternative
         A -->|Download Legacy| F[Download Manager]
-        F -->|Opens Browser| G[Uptodown]
+        F -->|Opens Browser| G[ProjectBukkit]
     end
 
     subgraph Protection Steps

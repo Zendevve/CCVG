@@ -8,7 +8,7 @@ Created: 2024-12-19
 
 ## Purpose
 
-Guide users to download legacy CapCut versions from Uptodown by presenting curated "persona" options.
+Guide users to download legacy CapCut versions from ProjectBukkit by presenting curated "persona" options.
 
 ---
 
@@ -16,7 +16,7 @@ Guide users to download legacy CapCut versions from Uptodown by presenting curat
 
 ### In scope
 - Display 3 persona cards with recommended versions
-- Link to Uptodown versions page
+- Link to ProjectBukkit versions page
 - Show version features and risk levels
 
 ### Out of scope
@@ -31,7 +31,7 @@ Guide users to download legacy CapCut versions from Uptodown by presenting curat
   - **Offline Purist** (v1.5.0): Clean UI, 4K export, zero cloud
   - **Audio Engineer** (v2.5.4): Multi-track audio, stable mixer
   - **Creator** (v3.9.0): Last free Auto-Captions (API risk)
-- All download buttons link to: `https://capcut.en.uptodown.com/windows/versions`
+- All download buttons link to: `https://github.com/ProjectBukkit/CapcutVersions`
 - High-risk versions show warning icon
 
 ---
@@ -43,8 +43,8 @@ Guide users to download legacy CapCut versions from Uptodown by presenting curat
 1. User clicks "Download Legacy Version" on Welcome screen
 2. Download Manager shows 3 persona cards
 3. User clicks a card to select it
-4. User clicks "Download from Uptodown"
-5. Browser opens to Uptodown versions page
+4. User clicks "Download from ProjectBukkit"
+5. Browser opens to ProjectBukkit releases page
 6. User downloads and installs desired version
 7. User returns to app and uses "Skip - Protect existing installation"
 

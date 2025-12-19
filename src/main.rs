@@ -9,11 +9,11 @@ use std::time::Duration;
 use sysinfo::System;
 use walkdir::WalkDir;
 
-const APP_TITLE: &str = "CapCut Version Guard";
+const APP_TITLE: &str = "CC Version Guard";
 const GITHUB_URL: &str = "https://github.com/Zendevve/capcut-version-guard";
-const UPTODOWN_BASE: &str = "https://capcut.en.uptodown.com/windows/versions";
+const UPTODOWN_BASE: &str = "https://github.com/ProjectBukkit/CapcutVersions/releases";
 
-// Version database - known good versions (source: Uptodown)
+// Version database - known good versions (source: ProjectBukkit)
 #[derive(Clone, Debug)]
 struct ArchiveVersion {
     persona: &'static str,
@@ -30,7 +30,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "1.5.0",
         description: "Clean UI, unrestricted 4K, zero cloud",
         features: &["4K Export", "Offline Only", "No Nags"],
-        download_url: "https://capcut.en.uptodown.com/windows/versions",
+        download_url: "https://github.com/ProjectBukkit/CapcutVersions/releases/tag/v1.5.0",
         risk_level: "Low",
     },
     ArchiveVersion {
@@ -38,7 +38,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "2.5.4",
         description: "Multi-track audio, stable mixer",
         features: &["Multi-Track", "Audio Mixer", "Keyframes"],
-        download_url: "https://capcut.en.uptodown.com/windows/versions",
+        download_url: "https://github.com/ProjectBukkit/CapcutVersions/releases/tag/v2.5.4",
         risk_level: "Low",
     },
     ArchiveVersion {
@@ -46,7 +46,7 @@ const ARCHIVE_VERSIONS: &[ArchiveVersion] = &[
         version: "3.9.0",
         description: "Last free Auto-Captions (API risk)",
         features: &["Auto-Captions", "AI Features", "Effects"],
-        download_url: "https://capcut.en.uptodown.com/windows/versions",
+        download_url: "https://github.com/ProjectBukkit/CapcutVersions/releases/tag/v3.9.0",
         risk_level: "High",
     },
 ];
