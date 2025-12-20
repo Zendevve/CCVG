@@ -9,109 +9,262 @@
 </head>
 <body>
 
-  <!-- Window Chrome (Draggable Region) -->
+  <!-- Window Chrome (Tahoe Glass Menu Bar) -->
   <div class="window-drag-region">
     <div class="win-controls">
-      <button class="win-btn minimize" onclick="window.app.minimize()">&#8722;</button>
-      <button class="win-btn maximize" onclick="window.app.toggleMaximize()">&#9633;</button>
-      <button class="win-btn close" onclick="window.app.close()">&#10005;</button>
+      <button class="win-btn close" onclick="window.app.close()"></button>
+      <button class="win-btn minimize" onclick="window.app.minimize()"></button>
+      <button class="win-btn maximize" onclick="window.app.toggleMaximize()"></button>
     </div>
   </div>
 
-  <!-- Main Application Stage -->
+  <!-- Main Stage -->
   <main id="main-stage">
 
-    <!-- View 1: Welcome -->
+    <!-- View: Welcome -->
     <section id="view-welcome" class="view active">
-      <div class="center-content">
-        <i class="ph-fill ph-shield-check" style="font-size: 80px; color: var(--tint-blue); margin-bottom: var(--space-3);"></i>
-
+      <div class="hero">
+        <i class="ph-fill ph-shield-check hero-icon" style="color: var(--tint-blue);"></i>
         <h1>Version Guard</h1>
-        <p>Secure your CapCut workspace.<br>Lock your version and prevent unsolicited updates.</p>
+        <p>Lock your CapCut version and prevent unsolicited updates.</p>
+      </div>
 
-        <div class="spacer"></div>
+      <div class="spacer"></div>
 
-        <button class="btn btn-primary" onclick="window.wizard.next()">
-          <span>Start Protection</span>
-          <i class="ph-bold ph-arrow-right"></i>
+      <div class="button-stack" style="align-self: center;">
+        <button class="btn btn-primary" onclick="window.wizard.startCheck()">
+          Get Started
         </button>
-
-        <button class="btn btn-secondary" onclick="window.wizard.goToLegacy()">
+        <button class="btn-plain" onclick="window.wizard.goToLegacy()">
           <i class="ph ph-download-simple"></i>
-          <span>Download Legacy Versions</span>
+          Download Legacy Version
+        </button>
+      </div>
+
+      <footer class="app-footer">
+        <a href="#" onclick="window.__TAURI__.opener.openUrl('https://github.com/Zendevve/capcut-version-guard')">
+          <i class="ph ph-github-logo"></i> GitHub
+        </a>
+        <span>v2.2.0</span>
+      </footer>
+    </section>
+
+    <!-- View: PreCheck -->
+    <section id="view-precheck" class="view">
+      <nav class="nav-bar">
+        <button class="nav-back" onclick="window.wizard.back()">
+          <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <span class="nav-title">System Check</span>
+        <div style="width: 44px;"></div>
+      </nav>
+
+      <div class="hero" style="padding-top: 0;">
+        <i class="ph-fill ph-folder-notch-open hero-icon" style="color: var(--tint-blue); font-size: 64px;"></i>
+        <h2>Checking Environment</h2>
+        <p>Verifying your system configuration.</p>
+      </div>
+
+      <div class="list-section">
+        <div class="list-group">
+          <div class="list-row">
+            <i id="check-install-icon" class="ph-fill ph-circle-notch status-icon pending pulse"></i>
+            <div class="row-content">
+              <span id="check-install-text" class="row-title">Checking installation...</span>
+            </div>
+          </div>
+          <div class="list-row">
+            <i id="check-running-icon" class="ph-fill ph-circle-notch status-icon pending pulse"></i>
+            <div class="row-content">
+              <span id="check-running-text" class="row-title">Checking processes...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="button-stack" style="align-self: center;">
+        <button id="btn-precheck-next" class="btn btn-primary" disabled onclick="window.wizard.next()">
+          Continue
         </button>
       </div>
     </section>
 
     <!-- View: Legacy Downloads -->
     <section id="view-legacy" class="view">
-      <header style="margin-bottom: var(--space-2); text-align: center;">
-        <h2>Legacy Archive</h2>
-        <p>Curated stable versions.</p>
-      </header>
+      <nav class="nav-bar">
+        <button class="nav-back" onclick="window.wizard.back()">
+          <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <span class="nav-title">Legacy Archive</span>
+        <div style="width: 44px;"></div>
+      </nav>
 
-      <div id="legacy-list-container" class="card-group" style="overflow-y: auto; max-height: 400px;">
+      <p class="subheadline" style="text-align: center; margin-bottom: var(--space-2);">Curated versions from ByteDance CDN.</p>
+
+      <div id="legacy-list-container" class="list-group" style="overflow-y: auto; max-height: 360px; flex: 1;">
         <!-- Injected via JS -->
       </div>
-
-      <div class="spacer"></div>
-
-      <button class="btn btn-secondary" onclick="window.wizard.back()">
-        Back
-      </button>
     </section>
 
-    <!-- View 2: Select Version -->
+    <!-- View: Select Version -->
     <section id="view-select" class="view">
-      <header style="margin-bottom: var(--space-2); text-align: center;">
-        <h2>Select Version</h2>
-        <p>Choose the installation to lock.</p>
-      </header>
+      <nav class="nav-bar">
+        <button class="nav-back" onclick="window.wizard.back()">
+          <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <span class="nav-title">Select Version</span>
+        <div style="width: 44px;"></div>
+      </nav>
 
-      <!-- Dynamic List -->
-      <div id="version-list-container" class="card-group">
-        <!-- Injected via JS -->
+      <p class="subheadline" style="text-align: center; margin-bottom: var(--space-2);">Choose the version to protect.</p>
+
+      <div class="list-section" style="flex: 1; overflow-y: auto;">
+        <div id="version-list-container" class="list-group">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <div class="button-stack" style="align-self: center; margin-top: var(--space-2);">
+        <button id="btn-lock-ver" class="btn btn-primary" disabled onclick="window.wizard.goToCleanup()">
+          Continue
+        </button>
+      </div>
+    </section>
+
+    <!-- View: Cache Cleanup -->
+    <section id="view-cleanup" class="view">
+      <nav class="nav-bar">
+        <button class="nav-back" onclick="window.wizard.back()">
+          <i class="ph-bold ph-caret-left"></i>
+        </button>
+        <span class="nav-title">Options</span>
+        <div style="width: 44px;"></div>
+      </nav>
+
+      <div class="list-section" style="margin-top: var(--space-1);">
+        <div class="list-header">Cleanup</div>
+        <div class="list-group">
+          <div class="list-row">
+            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-orange), var(--tint-red));">
+              <i class="ph-fill ph-trash"></i>
+            </div>
+            <div class="row-content">
+              <span class="row-title">Clean Temporary Files</span>
+              <span id="cache-size-text" class="row-subtitle">Calculating...</span>
+            </div>
+            <div id="cache-toggle" class="toggle on" onclick="window.wizard.toggleCache()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-section">
+        <div class="list-header">Protection</div>
+        <div class="list-group">
+          <div class="list-row">
+            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-blue), var(--tint-indigo));">
+              <i class="ph-fill ph-lock-key"></i>
+            </div>
+            <div class="row-content">
+              <span class="row-title">Lock Configuration</span>
+              <span class="row-subtitle">Prevents automatic updates</span>
+            </div>
+            <div class="toggle on" style="pointer-events: none;"></div>
+          </div>
+          <div class="list-row">
+            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-green), var(--tint-teal));">
+              <i class="ph-fill ph-shield-slash"></i>
+            </div>
+            <div class="row-content">
+              <span class="row-title">Create Blockers</span>
+              <span class="row-subtitle">Blocks updater executable</span>
+            </div>
+            <div class="toggle on" style="pointer-events: none;"></div>
+          </div>
+        </div>
       </div>
 
       <div class="spacer"></div>
 
-      <button id="btn-lock-ver" class="btn btn-primary" disabled onclick="window.wizard.lockVersion()">
-        <i class="ph-bold ph-lock-key"></i>
-        <span>Lock Selected Version</span>
-      </button>
-
-      <button class="btn btn-secondary" onclick="window.wizard.back()">
-        Back
-      </button>
+      <div class="button-stack" style="align-self: center;">
+        <button class="btn btn-primary" onclick="window.wizard.runProtection()">
+          <i class="ph-bold ph-lock-key"></i>
+          Apply Protection
+        </button>
+      </div>
     </section>
 
-    <!-- View 3: Process & Clean -->
+    <!-- View: Processing -->
     <section id="view-process" class="view">
       <div class="center-content">
-        <i class="ph-duotone ph-gear-six" class="spin-animation" style="font-size: 64px; color: var(--tint-gray); margin-bottom: var(--space-3);"></i>
+        <i class="ph-duotone ph-gear-six spin" style="font-size: 64px; color: var(--label-tertiary); margin-bottom: var(--space-3);"></i>
 
-        <h3>Processing</h3>
+        <h2>Applying Protection</h2>
+        <p>Please wait...</p>
 
-        <div class="progress-bar-container">
+        <div class="progress-bar" style="width: 80%; max-width: 260px;">
           <div id="progress-bar" class="progress-bar-fill"></div>
         </div>
 
-        <p id="process-status" class="status-text">Initializing...</p>
+        <p id="process-status" class="footnote">Initializing...</p>
+
+        <div id="activity-log" class="activity-log" style="width: 100%; max-width: 300px; margin-top: var(--space-3);">
+          <!-- Injected via JS -->
+        </div>
       </div>
     </section>
 
-    <!-- View 4: Success -->
+    <!-- View: Success -->
     <section id="view-success" class="view">
-      <div class="center-content">
-        <i class="ph-fill ph-check-circle" style="font-size: 80px; color: var(--tint-green); margin-bottom: var(--space-3);"></i>
+      <div class="hero">
+        <i class="ph-fill ph-check-circle hero-icon" style="color: var(--tint-green);"></i>
+        <h1>Protected</h1>
+        <p>Your installation is now secured.</p>
+      </div>
 
-        <h1>Secured</h1>
-        <p>Your CapCut version is locked.<br>Automatic updates have been disabled.</p>
+      <div class="list-section" style="width: 100%; max-width: 300px; align-self: center;">
+        <div class="list-group">
+          <div class="list-row">
+            <i class="ph-fill ph-check-circle status-icon success"></i>
+            <span class="row-title">Cleaned extra versions</span>
+          </div>
+          <div class="list-row">
+            <i class="ph-fill ph-check-circle status-icon success"></i>
+            <span class="row-title">Locked configuration</span>
+          </div>
+          <div class="list-row">
+            <i class="ph-fill ph-check-circle status-icon success"></i>
+            <span class="row-title">Created update blockers</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="spacer"></div>
+      <div class="spacer"></div>
 
+      <div class="button-stack" style="align-self: center;">
         <button class="btn btn-primary" onclick="window.app.close()">
           Done
+        </button>
+      </div>
+    </section>
+
+    <!-- View: Error -->
+    <section id="view-error" class="view">
+      <div class="hero">
+        <i class="ph-fill ph-warning-octagon hero-icon" style="color: var(--tint-red);"></i>
+        <h1>Error</h1>
+        <p id="error-message" style="color: var(--tint-red);">Something went wrong.</p>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="button-stack" style="align-self: center;">
+        <button class="btn btn-primary" onclick="window.location.reload()">
+          Try Again
+        </button>
+        <button class="btn-plain" onclick="window.app.close()">
+          Close
         </button>
       </div>
     </section>

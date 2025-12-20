@@ -1,134 +1,135 @@
 /* ==========================================================================
-   UNIVERSAL INTERFACE - STYLE SYSTEM
-   Based on Apple Human Interface Guidelines (HIG)
+   macOS TAHOE - LIQUID GLASS DESIGN SYSTEM
+   Based on Apple's Liquid Glass UI Language (WWDC 2025)
    ========================================================================== */
 
 :root {
   /* ------------------------------------------------------------------
-     SPACE: 8-Point Grid System (Strict)
+     SPACE: 8-Point Grid (Apple HIG Standard)
      ------------------------------------------------------------------ */
   --space-0_5: 4px;
   --space-1: 8px;
-  /* Base Unit */
   --space-1_5: 12px;
   --space-2: 16px;
-  /* Standard Padding */
   --space-3: 24px;
-  /* Card Internal Padding */
   --space-4: 32px;
-  /* Section Gap */
   --space-5: 40px;
   --space-6: 48px;
-  --space-8: 64px;
-  /* Layout Gap */
 
   /* ------------------------------------------------------------------
-     COLOR: Semantic System (Dark Mode Default for "Midnight Obsidian")
-     Adhering to "Elevation by Lightness"
+     LIQUID GLASS: Core Material System
+     ------------------------------------------------------------------ */
+
+  /* Glass Tints (Dark Mode) */
+  --glass-clear: rgba(255, 255, 255, 0.08);
+  --glass-tinted: rgba(120, 120, 128, 0.16);
+  --glass-thick: rgba(40, 40, 44, 0.72);
+  --glass-ultra-thick: rgba(30, 30, 34, 0.88);
+
+  /* Glass Blur Values */
+  --blur-subtle: 12px;
+  --blur-regular: 20px;
+  --blur-prominent: 40px;
+  --blur-ultra: 80px;
+
+  /* Glass Borders (Refraction Edge) */
+  --glass-border-light: rgba(255, 255, 255, 0.18);
+  --glass-border-dark: rgba(255, 255, 255, 0.06);
+  --glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* ------------------------------------------------------------------
+     COLOR: Tahoe Semantic Palette (Dark Mode)
      ------------------------------------------------------------------ */
 
   /* Backgrounds */
-  --system-bg-base: #000000;
-  /* Level 0: Pure Black (OLED friendly) */
-  --system-bg-secondary: #1C1C1E;
-  /* Level 1: Cards, Grouped Content */
-  --system-bg-tertiary: #2C2C2E;
-  /* Level 2: Modals, Elevated Controls */
-  --system-bg-grouped: #000000;
-  /* Base for grouped lists */
+  --bg-base: #000000;
+  --bg-primary: #1C1C1E;
+  --bg-secondary: #2C2C2E;
+  --bg-tertiary: #3A3A3C;
 
-  /* Labels (Text) */
+  /* Labels */
   --label-primary: #FFFFFF;
   --label-secondary: rgba(235, 235, 245, 0.60);
-  /* ~60% */
   --label-tertiary: rgba(235, 235, 245, 0.30);
-  /* ~30% */
-  --label-quaternary: rgba(235, 235, 245, 0.18);
-  /* ~18% */
+  --label-quaternary: rgba(235, 235, 245, 0.16);
 
-  /* Separators/Fills */
+  /* Fills */
+  --fill-primary: rgba(120, 120, 128, 0.36);
+  --fill-secondary: rgba(120, 120, 128, 0.32);
+  --fill-tertiary: rgba(120, 120, 128, 0.24);
+  --fill-quaternary: rgba(120, 120, 128, 0.18);
+
+  /* Separators */
   --separator: rgba(84, 84, 88, 0.65);
-  /* Non-opaque */
-  --separator-opaque: #38383A;
-  --fill-tertiary: rgba(118, 118, 128, 0.24);
-  /* Search bars, inputs */
+  --separator-opaque: #3D3D41;
 
-  /* Tints (Action Colors) */
+  /* System Tints */
   --tint-blue: #0A84FF;
-  /* iOS Dark Mode Blue */
-  --tint-red: #FF453A;
   --tint-green: #30D158;
+  --tint-indigo: #5E5CE6;
   --tint-orange: #FF9F0A;
-  --tint-gray: #98989D;
-
-  /* Material (Glass) */
-  --material-thick: rgba(30, 30, 30, 0.85);
-
-  /* ------------------------------------------------------------------
-     TYPOGRAPHY: Dynamic Type Scale (Approximated for Desktop)
-     Font Stack: Native System
-     ------------------------------------------------------------------ */
-  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
-  /* Weights */
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
-
-  /* Styles (Size / Line-Height) */
-  /* Large Title: 34pt */
-  --type-large-title: 700 34px/41px var(--font-stack);
-  /* Title 1: 28pt */
-  --type-title-1: 700 28px/34px var(--font-stack);
-  /* Title 2: 22pt */
-  --type-title-2: 600 22px/28px var(--font-stack);
-  /* Headline: 17pt (Semibold) */
-  --type-headline: 600 17px/22px var(--font-stack);
-  /* Body: 17pt (Regular) */
-  --type-body: 400 17px/22px var(--font-stack);
-  /* Callout: 16pt */
-  --type-callout: 400 16px/21px var(--font-stack);
-  /* Subhead: 15pt */
-  --type-subhead: 400 15px/20px var(--font-stack);
-  /* Footnote/Caption: 13pt/12pt */
-  --type-caption: 400 13px/18px var(--font-stack);
+  --tint-pink: #FF375F;
+  --tint-purple: #BF5AF2;
+  --tint-red: #FF453A;
+  --tint-teal: #40C8E0;
+  --tint-yellow: #FFD60A;
+  --tint-gray: #8E8E93;
 
   /* ------------------------------------------------------------------
-     PHYSICS & GEOMETRY
+     TYPOGRAPHY: SF Pro (System Font Stack)
      ------------------------------------------------------------------ */
-  --radius-screen: 0px;
-  /* Fullscreen app */
-  --radius-card: 16px;
-  /* G2 optimized */
-  --radius-btn: 12px;
-  /* Smooth corners */
-  --radius-pill: 999px;
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  --font-rounded: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, monospace;
 
-  /* Motion */
-  --ease-spring: cubic-bezier(0.25, 1, 0.5, 1);
-  /* "Soft Spring" */
-  --duration-short: 0.2s;
-  /* Micro-interactions */
-  --duration-medium: 0.4s;
-  /* Navigation */
-  --duration-long: 0.6s;
-  /* Context shifts */
+  /* Type Scale */
+  --text-large-title: 600 34px/40px var(--font-system);
+  --text-title-1: 600 28px/34px var(--font-system);
+  --text-title-2: 600 22px/28px var(--font-system);
+  --text-title-3: 600 20px/24px var(--font-system);
+  --text-headline: 600 17px/22px var(--font-system);
+  --text-body: 400 17px/22px var(--font-system);
+  --text-callout: 400 16px/21px var(--font-system);
+  --text-subheadline: 400 15px/20px var(--font-system);
+  --text-footnote: 400 13px/18px var(--font-system);
+  --text-caption-1: 400 12px/16px var(--font-system);
+  --text-caption-2: 500 11px/13px var(--font-system);
 
-  /* Touch Safety */
-  --touch-min: 44px;
+  /* ------------------------------------------------------------------
+     GEOMETRY: Tahoe Rounded Corners (More Aggressive)
+     ------------------------------------------------------------------ */
+  --radius-small: 10px;
+  --radius-medium: 14px;
+  --radius-large: 20px;
+  --radius-xlarge: 26px;
+  --radius-window: 12px;
+  --radius-capsule: 999px;
+
+  /* ------------------------------------------------------------------
+     MOTION: Tahoe Animations (Fluid, Bouncy)
+     ------------------------------------------------------------------ */
+  --ease-default: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-instant: 0.1s;
+  --duration-fast: 0.2s;
+  --duration-normal: 0.35s;
+  --duration-slow: 0.5s;
+
+  /* Touch Targets */
+  --min-tap: 44px;
 }
 
-/* Base Reset */
-* {
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-user-select: none;
-  /* App-like behavior */
-  user-select: none;
-  cursor: default;
-  -webkit-font-smoothing: antialiased;
 }
 
 html,
@@ -136,205 +137,340 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--system-bg-base);
+  background: var(--bg-base);
   color: var(--label-primary);
-  font-family: var(--font-stack);
+  font: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  cursor: default;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  /* Tahoe-style subtle gradient background */
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(100, 100, 120, 0.15) 0%, transparent 50%),
+    var(--bg-base);
 }
 
 /* ==========================================================================
-   LAYOUT STRUCTURE (SAFE AREAS)
+   WINDOW CHROME (Tahoe Traffic Lights)
    ========================================================================== */
-body {
-  /* Native Safe Areas (Critical for rounded displays/notches) */
-  padding-top: env(safe-area-inset-top);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-
-  display: flex;
-  flex-direction: column;
-}
-
 .window-drag-region {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 38px;
-  z-index: 999;
+  height: 52px;
+  z-index: 1000;
   -webkit-app-region: drag;
   display: flex;
-  justify-content: flex-end;
-  /* Controls on right (Windows friendly) */
   align-items: center;
-  padding-right: var(--space-2);
+  padding: 0 var(--space-2);
+  /* Liquid Glass menu bar */
+  background: var(--glass-clear);
+  backdrop-filter: blur(var(--blur-prominent)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur-prominent)) saturate(180%);
+  border-bottom: 0.5px solid var(--glass-border-dark);
 }
 
-/* Window Controls (Deference: Neutral Chrome) */
 .win-controls {
   -webkit-app-region: no-drag;
   display: flex;
-  gap: var(--space-1);
+  gap: 8px;
+  margin-left: 8px;
 }
 
+/* macOS Traffic Light Style */
 .win-btn {
-  width: 32px;
-  height: 24px;
-  background: transparent;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
   border: none;
-  color: var(--label-tertiary);
-  /* Highly deferred */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: all 0.1s;
+  font-size: 0;
+  cursor: pointer;
+  transition: all var(--duration-instant);
+  position: relative;
 }
 
-.win-btn:hover {
-  background-color: var(--fill-tertiary);
-  color: var(--label-primary);
+.win-btn.close {
+  background: #FF5F57;
 }
 
-.win-btn.close:hover {
-  background-color: var(--tint-red);
-  color: white;
+.win-btn.minimize {
+  background: #FEBC2E;
 }
 
-/* Main Application Container */
+.win-btn.maximize {
+  background: #28C840;
+}
+
+/* Show symbols on hover (like real macOS) */
+.win-controls:hover .win-btn::after {
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.win-controls:hover .win-btn.close::after {
+  content: "✕";
+}
+
+.win-controls:hover .win-btn.minimize::after {
+  content: "−";
+}
+
+.win-controls:hover .win-btn.maximize::after {
+  content: "+";
+  font-size: 10px;
+}
+
+/* ==========================================================================
+   MAIN STAGE
+   ========================================================================== */
 #main-stage {
   flex: 1;
   position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 680px;
-  /* Readable Content Guide */
+  max-width: 480px;
   margin: 0 auto;
   width: 100%;
   padding: var(--space-3);
-  z-index: 10;
+  padding-top: 64px;
+  /* Account for glass menu bar */
 }
 
-/* Wizard Screens */
+/* ==========================================================================
+   NAVIGATION BAR (Tahoe Style)
+   ========================================================================== */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  margin-bottom: var(--space-2);
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--tint-blue);
+  font: var(--text-body);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  min-height: var(--min-tap);
+  transition: opacity var(--duration-instant);
+}
+
+.nav-back:active {
+  opacity: 0.5;
+}
+
+.nav-back i {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font: var(--text-headline);
+  color: var(--label-primary);
+}
+
+/* ==========================================================================
+   VIEWS (Screen Transitions)
+   ========================================================================== */
 .view {
   display: none;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  animation: fadeScaleIn var(--duration-medium) var(--ease-spring);
+  animation: viewEnter var(--duration-normal) var(--ease-default);
 }
 
 .view.active {
   display: flex;
 }
 
-@keyframes fadeScaleIn {
+@keyframes viewEnter {
   from {
     opacity: 0;
-    transform: scale(0.98);
+    transform: translateX(30px) scale(0.98);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateX(0) scale(1);
   }
 }
 
 /* ==========================================================================
-   COMPONENTS
+   TYPOGRAPHY
    ========================================================================== */
-
-/* Typography Helpers */
 h1 {
-  font: var(--type-large-title);
+  font: var(--text-large-title);
   color: var(--label-primary);
   margin-bottom: var(--space-1);
 }
 
 h2 {
-  font: var(--type-title-1);
+  font: var(--text-title-1);
   color: var(--label-primary);
   margin-bottom: var(--space-1);
 }
 
 h3 {
-  font: var(--type-title-2);
+  font: var(--text-title-2);
   color: var(--label-primary);
   margin-bottom: var(--space-1);
 }
 
 p {
-  font: var(--type-body);
+  font: var(--text-body);
   color: var(--label-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
   margin-bottom: var(--space-2);
 }
 
+.headline {
+  font: var(--text-headline);
+}
+
+.subheadline {
+  font: var(--text-subheadline);
+  color: var(--label-secondary);
+}
+
+.footnote {
+  font: var(--text-footnote);
+  color: var(--label-secondary);
+}
+
 .caption {
-  font: var(--type-caption);
+  font: var(--text-caption-1);
   color: var(--label-tertiary);
 }
 
-/* Buttons */
+/* ==========================================================================
+   LIQUID GLASS CARD
+   ========================================================================== */
+.glass-card {
+  background: var(--glass-thick);
+  backdrop-filter: blur(var(--blur-regular)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-regular)) saturate(150%);
+  border-radius: var(--radius-large);
+  border: 0.5px solid var(--glass-border-light);
+  box-shadow:
+    var(--glass-inner-shadow),
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   BUTTONS (Tahoe Liquid Glass Style)
+   ========================================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 52px;
-  /* Generous touch target */
-  min-width: 140px;
+  min-height: var(--min-tap);
   padding: 0 var(--space-3);
   border: none;
-  border-radius: var(--radius-pill);
-  /* Pill shape for primary actions */
-  font: var(--type-headline);
+  border-radius: var(--radius-medium);
+  font: var(--text-headline);
   cursor: pointer;
-  transition: transform var(--duration-short) var(--ease-spring), filter var(--duration-short);
   gap: var(--space-1);
+  transition:
+    transform var(--duration-instant) var(--ease-bounce),
+    opacity var(--duration-instant);
 }
 
 .btn:active {
   transform: scale(0.96);
-  /* Tactile feedback */
-  filter: brightness(0.9);
-}
-
-.btn-primary {
-  background-color: var(--tint-blue);
-  color: white;
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--tint-blue);
-  font: var(--type-body);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   pointer-events: none;
-  filter: grayscale(1);
 }
 
-/* Cards & Lists */
-.card-group {
-  background-color: var(--system-bg-secondary);
-  border-radius: var(--radius-card);
-  overflow: hidden;
+/* Primary: Filled Tint */
+.btn-primary {
+  background: var(--tint-blue);
+  color: white;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+}
+
+/* Secondary: Glass */
+.btn-secondary {
+  background: var(--glass-tinted);
+  backdrop-filter: blur(var(--blur-subtle));
+  -webkit-backdrop-filter: blur(var(--blur-subtle));
+  color: var(--tint-blue);
+  border: 0.5px solid var(--glass-border-light);
+}
+
+/* Plain: Text Only */
+.btn-plain {
+  background: none;
+  border: none;
+  color: var(--tint-blue);
+  font: var(--text-body);
+  padding: var(--space-1);
+  cursor: pointer;
+  min-height: var(--min-tap);
+}
+
+.btn-plain:active {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   GROUPED LIST (Tahoe Inset Grouped Style)
+   ========================================================================== */
+.list-section {
   margin-bottom: var(--space-3);
+}
+
+.list-header {
+  font: var(--text-footnote);
+  color: var(--label-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.list-group {
+  background: var(--glass-thick);
+  backdrop-filter: blur(var(--blur-regular)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-regular)) saturate(150%);
+  border-radius: var(--radius-medium);
+  border: 0.5px solid var(--glass-border-light);
+  overflow: hidden;
+  box-shadow: var(--glass-inner-shadow);
 }
 
 .list-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) var(--space-3);
-  min-height: 60px;
-  /* Comfortable touch area */
+  min-height: 50px;
+  padding: var(--space-1_5) var(--space-2);
+  background: transparent;
   border-bottom: 0.5px solid var(--separator);
-  background-color: var(--system-bg-secondary);
-  transition: background-color 0.2s;
+  transition: background var(--duration-instant);
 }
 
 .list-row:last-child {
@@ -346,79 +482,278 @@ p {
 }
 
 .list-row.selectable:active {
-  background-color: var(--system-bg-tertiary);
+  background: var(--fill-tertiary);
 }
 
-.list-icon {
-  font-size: 24px;
-  color: var(--tint-blue);
-  margin-right: var(--space-2);
+/* Row Icon (Rounded Square) */
+.row-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-1_5);
+  font-size: 18px;
+  color: white;
+  flex-shrink: 0;
 }
 
-.list-info {
+/* Row Content */
+.row-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  gap: 1px;
+  min-width: 0;
 }
 
-.list-title {
-  font: var(--type-body);
+.row-title {
+  font: var(--text-body);
   color: var(--label-primary);
 }
 
-.list-detail {
-  font: var(--type-caption);
+.row-subtitle {
+  font: var(--text-footnote);
   color: var(--label-secondary);
 }
 
-/* Inputs */
-.input-field {
-  width: 100%;
-  height: 44px;
-  background-color: var(--fill-tertiary);
-  border-radius: 10px;
-  border: none;
-  padding: 0 var(--space-2);
-  color: var(--label-primary);
-  font: var(--type-body);
-  margin-bottom: var(--space-2);
+/* Row Accessory */
+.row-accessory {
+  color: var(--label-quaternary);
+  font-size: 16px;
+  margin-left: var(--space-1);
 }
 
-/* Progress */
-.progress-bar-container {
+.row-value {
+  font: var(--text-body);
+  color: var(--label-secondary);
+  margin-left: auto;
+}
+
+/* ==========================================================================
+   TOGGLE SWITCH (iOS 26 Style)
+   ========================================================================== */
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  background: var(--fill-secondary);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-smooth);
+  flex-shrink: 0;
+}
+
+.toggle.on {
+  background: var(--tint-green);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: white;
+  border-radius: 50%;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform var(--duration-fast) var(--ease-bounce);
+}
+
+.toggle.on::after {
+  transform: translateX(20px);
+}
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+.hero-icon {
+  font-size: 80px;
+  margin-bottom: var(--space-3);
+  /* Liquid Glass icon glow */
+  filter: drop-shadow(0 4px 20px rgba(10, 132, 255, 0.3));
+}
+
+.hero h1,
+.hero h2 {
+  margin-bottom: var(--space-1);
+}
+
+.hero p {
+  max-width: 280px;
+}
+
+/* ==========================================================================
+   PROGRESS BAR
+   ========================================================================== */
+.progress-bar {
   width: 100%;
   height: 4px;
-  background-color: var(--fill-tertiary);
+  background: var(--fill-tertiary);
   border-radius: 2px;
   overflow: hidden;
-  margin: var(--space-3) 0;
+  margin: var(--space-2) 0;
 }
 
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background-color: var(--tint-blue);
+  background: linear-gradient(90deg, var(--tint-blue), var(--tint-teal));
+  border-radius: 2px;
   transition: width 0.3s linear;
-  /* Progress is usually linear data */
 }
 
-/* Centering Utilities */
+/* ==========================================================================
+   ACTIVITY LOG (Console Style)
+   ========================================================================== */
+.activity-log {
+  background: var(--glass-tinted);
+  backdrop-filter: blur(var(--blur-subtle));
+  -webkit-backdrop-filter: blur(var(--blur-subtle));
+  border-radius: var(--radius-small);
+  border: 0.5px solid var(--glass-border-dark);
+  padding: var(--space-1_5);
+  max-height: 140px;
+  overflow-y: auto;
+  font: var(--text-caption-1);
+}
+
+.log-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: 3px 0;
+  color: var(--label-tertiary);
+}
+
+.log-entry i {
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.log-entry.success {
+  color: var(--tint-green);
+}
+
+.log-entry.warning {
+  color: var(--tint-orange);
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+.spacer {
+  flex: 1;
+}
+
 .center-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   justify-content: center;
-  height: 100%;
-}
-
-.spacer {
   flex: 1;
 }
 
-/* Status Text */
-.status-text {
-  font: var(--type-subhead);
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+  width: 100%;
+  max-width: 260px;
+  margin-top: var(--space-3);
+}
+
+/* Status Icons */
+.status-icon {
+  font-size: 20px;
+  margin-right: var(--space-1_5);
+}
+
+.status-icon.success {
+  color: var(--tint-green);
+}
+
+.status-icon.warning {
+  color: var(--tint-orange);
+}
+
+.status-icon.error {
+  color: var(--tint-red);
+}
+
+.status-icon.pending {
+  color: var(--tint-blue);
+}
+
+/* Footer */
+.app-footer {
+  position: absolute;
+  bottom: var(--space-2);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-caption-1);
+  color: var(--label-quaternary);
+}
+
+.app-footer a {
+  color: var(--label-tertiary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--duration-fast);
+}
+
+.app-footer a:hover {
   color: var(--label-secondary);
-  margin-top: var(--space-1);
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.spin {
+  animation: spin 1.5s linear infinite;
+}
+
+.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
 }
