@@ -90,16 +90,25 @@ capcut_guard_tauri/
 - **Download Source**: ALWAYS use official ByteDance CDN URLs for legacy downloads
 - **Icons**: Use Phosphor Icons from `unpkg.com/@phosphor-icons/web`
 
-### UI/UX Rules (CRITICAL)
 
-- **Wizard-only pattern** — step-by-step guided flow (NO dashboard for now)
-- **Feature parity with legacy** — match original eframe/egui app exactly
-- **Hick's Law** — ONE action per screen, minimize choices
-- **Jakob's Law** — Follow familiar setup wizard patterns
-- **Large touch targets** — Buttons min 44px height
-- **Responsive layouts** — max content width 480px
-- **Visual feedback** — hover states, transitions, loading spinners
-- **Progress tracking** — clear indication of current step
+### UI/UX Rules (CRITICAL: UNIVERSAL INTERFACE LAW)
+
+- **Philosophy** — Adhere strictly to the "Philosophical Triad":
+    1.  **Clarity**: Eliminate ambiguity. Legibility > Style. Negative space > Borders.
+    2.  **Deference**: Content is the protagonist. UI recedes (neutral chrome, translucency).
+    3.  **Depth**: Use Z-axis layering (background -> content -> controls -> modals).
+- **Spatial Architecture**:
+    - **8-Point Grid**: All spacing/sizing must be multiples of 8 (8, 16, 24, 32...).
+    - **Touch Targets**: MINIMUM 44x44pt for all interactive elements.
+    - **Safe Areas**: Use `env(safe-area-inset-*)` for all padding. Content must not be obscured.
+    - **Squircle**: Use continuous curvature logic (approx. 12-16px radii for cards/buttons).
+- **Visuals & Typography**:
+    - **System Stack**: Use generic system fonts (`-apple-system`, `Segoe UI`, etc.).
+    - **Dark Mode Elevation**: Elevation is indicated by LIGHTNESS, not shadow.
+    - **Semantics**: Use semantic roles (`label-primary`, `system-background`) over hex codes.
+    - **Icons**: Stroke weight MUST match adjacent text weight.
+- **Motion**:
+    - **Springs**: Use snappy, interruptible spring physics (or robust CSS approximations) over linear eases.
 
 ### Tauri-Specific Rules
 

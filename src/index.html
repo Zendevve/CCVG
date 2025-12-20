@@ -2,297 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>CC Version Guard</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1"></script>
 </head>
 <body>
-  <!-- Window Controls -->
-  <div class="window-titlebar">
-    <div class="window-drag-region"></div>
-    <div class="window-controls">
-      <button class="win-btn minimize" id="win-minimize" title="Minimize">
-        <i class="ph ph-minus"></i>
-      </button>
-      <button class="win-btn maximize" id="win-maximize" title="Maximize">
-        <i class="ph ph-squares-four"></i>
-      </button>
-      <button class="win-btn close" id="win-close" title="Close">
-        <i class="ph ph-x"></i>
-      </button>
+
+  <!-- Window Chrome (Draggable Region) -->
+  <div class="window-drag-region">
+    <div class="win-controls">
+      <button class="win-btn minimize" onclick="window.app.minimize()">&#8722;</button>
+      <button class="win-btn maximize" onclick="window.app.toggleMaximize()">&#9633;</button>
+      <button class="win-btn close" onclick="window.app.close()">&#10005;</button>
     </div>
   </div>
 
-  <div id="app">
+  <!-- Main Application Stage -->
+  <main id="main-stage">
 
-    <!-- Progress Bar -->
-    <div class="progress-bar">
-      <div class="progress-step" data-step="1">
-        <div class="step-dot"></div>
-        <span>Start</span>
-      </div>
-      <div class="progress-line"></div>
-      <div class="progress-step" data-step="2">
-        <div class="step-dot"></div>
-        <span>Select</span>
-      </div>
-      <div class="progress-line"></div>
-      <div class="progress-step" data-step="3">
-        <div class="step-dot"></div>
-        <span>Options</span>
-      </div>
-      <div class="progress-line"></div>
-      <div class="progress-step" data-step="4">
-        <div class="step-dot"></div>
-        <span>Done</span>
-      </div>
-    </div>
+    <!-- View 1: Welcome -->
+    <section id="view-welcome" class="view active">
+      <div class="center-content">
+        <i class="ph-fill ph-shield-check" style="font-size: 80px; color: var(--tint-blue); margin-bottom: var(--space-3);"></i>
 
-    <!-- Screen: Welcome -->
-    <div id="screen-welcome" class="screen active">
-      <div class="screen-content">
-        <div class="icon-glow-ring accent">
-          <i class="ph-fill ph-shield-check"></i>
-        </div>
-        <h1>CC Version Guard</h1>
-        <p class="subtitle">Lock your CapCut version and prevent auto-updates.</p>
+        <h1>Version Guard</h1>
+        <p>Secure your CapCut workspace.<br>Lock your version and prevent unsolicited updates.</p>
 
-        <div class="feature-grid">
-          <div class="feature-chip">
-            <div class="chip-icon"><i class="ph-fill ph-lock-key"></i></div>
-            <span>Block Updates</span>
-          </div>
-          <div class="feature-chip">
-            <div class="chip-icon"><i class="ph-fill ph-trash"></i></div>
-            <span>Clean Cache</span>
-          </div>
-          <div class="feature-chip">
-            <div class="chip-icon"><i class="ph-fill ph-download-simple"></i></div>
-            <span>Archive</span>
-          </div>
-        </div>
+        <div class="spacer"></div>
 
-        <button class="btn-primary" onclick="startCheck()">
-          <i class="ph-bold ph-play"></i> Start Protection
+        <button class="btn btn-primary" onclick="window.wizard.next()">
+          <span>Start Protection</span>
+          <i class="ph-bold ph-arrow-right"></i>
         </button>
 
-        <a class="link-secondary" onclick="showScreen('download-manager')">
-          <i class="ph ph-download-simple"></i> Download a Legacy Version
-        </a>
-      </div>
-    </div>
-
-    <!-- Screen: Download Manager -->
-    <div id="screen-download-manager" class="screen">
-      <div class="screen-content wide">
-        <h2>Download Legacy Version</h2>
-        <p class="subtitle">Choose from official ByteDance archives.</p>
-
-        <div id="version-grid" class="version-grid">
-          <!-- Populated by JS -->
-        </div>
-
-        <button class="btn-secondary" onclick="showScreen('welcome')">
-          <i class="ph ph-arrow-left"></i> Back
+        <button class="btn btn-secondary" onclick="window.wizard.goToLegacy()">
+          <i class="ph ph-download-simple"></i>
+          <span>Download Legacy Versions</span>
         </button>
       </div>
-    </div>
+    </section>
 
-    <!-- Screen: PreCheck -->
-    <div id="screen-precheck" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring">
-          <i class="ph-fill ph-magnifying-glass spinning"></i>
-        </div>
-        <h2>Scanning System</h2>
-        <p class="subtitle" id="precheck-status">Looking for CapCut installations...</p>
+    <!-- View: Legacy Downloads -->
+    <section id="view-legacy" class="view">
+      <header style="margin-bottom: var(--space-2); text-align: center;">
+        <h2>Legacy Archive</h2>
+        <p>Curated stable versions.</p>
+      </header>
+
+      <div id="legacy-list-container" class="card-group" style="overflow-y: auto; max-height: 400px;">
+        <!-- Injected via JS -->
       </div>
-    </div>
 
-    <!-- Screen: CapCut Running -->
-    <div id="screen-running-warning" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring warning">
-          <i class="ph-fill ph-warning"></i>
-        </div>
-        <h2>CapCut is Running</h2>
-        <p class="subtitle">Please close CapCut before continuing.</p>
+      <div class="spacer"></div>
 
-        <button class="btn-primary" onclick="startCheck()">
-          <i class="ph-bold ph-arrow-clockwise"></i> Check Again
-        </button>
-      </div>
-    </div>
+      <button class="btn btn-secondary" onclick="window.wizard.back()">
+        Back
+      </button>
+    </section>
 
-    <!-- Screen: Not Found -->
-    <div id="screen-not-found" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring">
-          <i class="ph-fill ph-folder-notch-open"></i>
-        </div>
-        <h2>CapCut Not Found</h2>
-        <p class="subtitle">No installation detected on this system.</p>
-
-        <button class="btn-primary" onclick="showScreen('download-manager')">
-          <i class="ph-bold ph-download-simple"></i> Download a Version
-        </button>
-
-        <a class="link-secondary" onclick="startCheck()">
-          <i class="ph ph-arrow-clockwise"></i> Scan Again
-        </a>
-      </div>
-    </div>
-
-    <!-- Screen: Version Select -->
-    <div id="screen-version-select" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring accent">
-            <i class="ph-fill ph-circles-four"></i>
-        </div>
+    <!-- View 2: Select Version -->
+    <section id="view-select" class="view">
+      <header style="margin-bottom: var(--space-2); text-align: center;">
         <h2>Select Version</h2>
-        <p class="subtitle">Choose which version to preserve.</p>
+        <p>Choose the installation to lock.</p>
+      </header>
 
-        <div class="instruction-row">
-            <i class="ph-fill ph-info"></i>
-            <span>All other versions will be removed.</span>
-        </div>
-
-        <div id="installed-versions" class="version-list">
-          <!-- Populated by JS -->
-        </div>
-
-        <button id="btn-continue-select" class="btn-primary" disabled onclick="goToCacheScreen()">
-          <i class="ph-bold ph-arrow-right"></i> Continue
-        </button>
-
-        <a class="link-secondary" onclick="showScreen('welcome')">
-          <i class="ph ph-arrow-left"></i> Back
-        </a>
+      <!-- Dynamic List -->
+      <div id="version-list-container" class="card-group">
+        <!-- Injected via JS -->
       </div>
-    </div>
 
-    <!-- Screen: Cache Clean Options -->
-    <div id="screen-cache-clean" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring accent">
-            <i class="ph-fill ph-broom"></i>
-        </div>
-        <h2>Cache Cleanup</h2>
-        <p class="subtitle">Free up disk space by removing temporary files.</p>
+      <div class="spacer"></div>
 
-        <div class="cache-card">
-          <div class="cache-header">
-            <div class="icon-glow-ring small accent">
-                <i class="ph-fill ph-broom"></i>
-            </div>
-            <div class="cache-text">
-                <span class="cache-label">Recoverable Space</span>
-                <span class="cache-value" id="cache-size">0 MB</span>
-            </div>
-          </div>
+      <button id="btn-lock-ver" class="btn btn-primary" disabled onclick="window.wizard.lockVersion()">
+        <i class="ph-bold ph-lock-key"></i>
+        <span>Lock Selected Version</span>
+      </button>
 
-          <label class="toggle-row">
-            <div class="toggle-text">
-                <span class="toggle-title">Clean Cache</span>
-                <span class="toggle-desc">Remove temporary files during protection</span>
-            </div>
-            <div class="toggle-wrapper">
-                <input type="checkbox" id="cache-toggle" checked />
-                <span class="toggle-switch"></span>
-            </div>
-          </label>
+      <button class="btn btn-secondary" onclick="window.wizard.back()">
+        Back
+      </button>
+    </section>
+
+    <!-- View 3: Process & Clean -->
+    <section id="view-process" class="view">
+      <div class="center-content">
+        <i class="ph-duotone ph-gear-six" class="spin-animation" style="font-size: 64px; color: var(--tint-gray); margin-bottom: var(--space-3);"></i>
+
+        <h3>Processing</h3>
+
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar-fill"></div>
         </div>
 
-        <button class="btn-primary" onclick="startProtection()">
-          <i class="ph-bold ph-shield-check"></i> Apply Protection
-        </button>
-
-        <a class="link-secondary" onclick="showScreen('version-select')">
-          <i class="ph ph-arrow-left"></i> Back
-        </a>
+        <p id="process-status" class="status-text">Initializing...</p>
       </div>
-    </div>
+    </section>
 
-    <!-- Screen: Running -->
-    <div id="screen-running" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring">
-          <i class="ph-fill ph-gear spinning"></i>
-        </div>
-        <h2>Applying Protection</h2>
-        <p class="subtitle" id="running-status">Preparing...</p>
+    <!-- View 4: Success -->
+    <section id="view-success" class="view">
+      <div class="center-content">
+        <i class="ph-fill ph-check-circle" style="font-size: 80px; color: var(--tint-green); margin-bottom: var(--space-3);"></i>
 
-        <div class="progress-container">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
+        <h1>Secured</h1>
+        <p>Your CapCut version is locked.<br>Automatic updates have been disabled.</p>
 
-        <div id="action-log" class="action-log">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
+        <div class="spacer"></div>
 
-    <!-- Screen: Complete -->
-    <div id="screen-complete" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring success big">
-          <i class="ph-fill ph-shield-check"></i>
-        </div>
-        <h2>Protection Complete!</h2>
-        <p class="subtitle" id="complete-text">Your CapCut installation is now protected.</p>
-
-        <div class="success-grid">
-          <div class="success-item">
-            <i class="ph-fill ph-check-circle"></i>
-            <span>Versions Cleaned</span>
-          </div>
-          <div class="success-item">
-            <i class="ph-fill ph-lock-key"></i>
-            <span>Config Locked</span>
-          </div>
-          <div class="success-item">
-            <i class="ph-fill ph-prohibit"></i>
-            <span>Updates Blocked</span>
-          </div>
-          <div class="success-item" id="cache-cleaned-row">
-            <i class="ph-fill ph-trash"></i>
-            <span>Cache Cleaned</span>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn-secondary" onclick="window.location.reload()">
-            <i class="ph-bold ph-arrow-counter-clockwise"></i> Start Over
-          </button>
-          <button class="btn-primary" onclick="window.close()">
-            <i class="ph-bold ph-x"></i> Close
-          </button>
-        </div>
-
-        <a class="link-secondary" onclick="openGitHub()">
-          <i class="ph ph-github-logo"></i> View on GitHub
-        </a>
-      </div>
-    </div>
-
-    <!-- Screen: Error -->
-    <div id="screen-error" class="screen">
-      <div class="screen-content">
-        <div class="icon-glow-ring error">
-          <i class="ph-fill ph-warning-octagon"></i>
-        </div>
-        <h2>Something Went Wrong</h2>
-        <p class="subtitle" id="error-text">An error occurred.</p>
-
-        <button class="btn-primary" onclick="showScreen('welcome')">
-          <i class="ph-bold ph-arrow-clockwise"></i> Try Again
+        <button class="btn btn-primary" onclick="window.app.close()">
+          Done
         </button>
       </div>
-    </div>
+    </section>
 
-  </div>
+  </main>
 
   <script src="main.js"></script>
 </body>

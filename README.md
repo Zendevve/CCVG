@@ -154,11 +154,11 @@ capcut_guard_tauri/
 ```
 
 ### Design Decisions
-
-- **Tauri v2** — Smaller bundle (~5MB vs ~15MB), native webview, better security
-- **Vanilla JS** — No npm dependencies for frontend, simple and fast
+- **Universal Interface (HIG)**: strict adherence to Apple's Human Interface Guidelines (Clarity, Deference, Depth) to ensure a premium, native feel across platforms.
+- **Tauri**: Chosen for small bundle size and native WebView capabilities.
+- **Vanilla JS**: No framework overhead needed for this simple wizard logic.fast
 - **Modular Rust** — Each feature in its own file for maintainability
-- **60-30-10 color rule** — Professional enterprise aesthetic
+- **Universal Interface (HIG)** — Strict adherence to Apple's Human Interface Guidelines (Clarity, Deference, Depth)
 
 ---
 
