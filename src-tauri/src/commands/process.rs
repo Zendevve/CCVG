@@ -6,8 +6,8 @@ use sysinfo::System;
 /// Check if CapCut is currently running
 #[tauri::command]
 pub fn is_capcut_running() -> bool {
-    let mut sys = System::new_all();
-    sys.refresh_all();
+    let mut sys = System::new();
+    sys.refresh_processes();
 
     sys.processes_by_name("CapCut".as_ref()).next().is_some()
         || sys.processes_by_name("CapCut.exe".as_ref()).next().is_some()

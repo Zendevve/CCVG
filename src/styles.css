@@ -129,10 +129,23 @@ body {
   display: flex;
 }
 
+/* Action Buttons Group */
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+.actions button {
+  flex: 1;
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(4px);
   }
 
   to {
