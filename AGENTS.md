@@ -91,131 +91,100 @@ capcut_guard_tauri/
 - **Icons**: Use Phosphor Icons from `unpkg.com/@phosphor-icons/web`
 
 
-### UI/UX Rules (CRITICAL: macOS TAHOE LIQUID GLASS)
+### UI/UX Framework: Laws of UX + design.json
 
-> Based on Apple WWDC 2025 Liquid Glass Design System specifications.
+> **Design System**: All visual tokens are defined in `design.json` (macOS 26 Tahoe).
+> **Psychology Framework**: Laws of UX governs user experience decisions.
 
-#### Philosophy (The Philosophical Triad)
-1.  **Clarity**: Eliminate ambiguity. Legibility > Style. Negative space > Borders.
-2.  **Deference**: Content is the protagonist. UI recedes (neutral chrome, translucency).
-3.  **Depth**: Use Z-axis layering (background → content → controls → modals).
+#### Design Token Source
+- **Single Source of Truth**: `design.json` defines all colors, typography, spacing, radii, shadows, and animations
+- **DO NOT** hardcode values — always reference CSS variables derived from design.json
+- **DO NOT** deviate from design.json specifications
 
-#### Liquid Glass Material System
-The material is NOT a single blur — it's a multi-layer composite:
+#### Laws of UX (Governing Principles)
 
-| Layer | Effect | Purpose |
-|-------|--------|---------|
-| Base | `rgba(255,255,255, 0.08-0.18)` | Frosted foundation |
-| Backdrop | `blur(20-50px) saturate(180%)` | Obscures detail, adds vibrancy |
-| Noise | 5-10% opacity overlay | Prevents banding |
-| Refraction | Inner shadows (top light, bottom dark) | Simulates light bending |
-| Specular Border | Gradient stroke (top-left white → transparent) | Rim light simulation |
+**Perception & Aesthetics:**
+- **Aesthetic-Usability Effect**: Users perceive beautiful design as more usable. Invest in visual polish.
+- **Law of Prägnanz**: Simplify complex interfaces to their simplest form.
 
-**Material Variants:**
-- `--glass-clear`: 8% white — Immersive overlays, video controls
-- `--glass-regular`: 12% white — Default windows, sidebars
-- `--glass-thick`: 18% white — High-contrast areas, modals
-- `--glass-ultra-thick`: 85% dark gray — Maximum legibility
+**Decision Making:**
+- **Hick's Law**: Minimize choices per view. One primary CTA per screen.
+- **Choice Overload**: Never present more than 5-7 options without filtering.
 
-#### Spatial Architecture
-- **8-Point Grid**: All spacing/sizing MUST be multiples of 8 (8, 16, 24, 32...).
-- **Touch Targets**: MINIMUM 44×44pt for all interactive elements.
-- **Safe Areas**: Use `env(safe-area-inset-*)` for all padding.
-- **Squircle Geometry**: Use continuous curvature (G2 continuity).
-  - Windows: `26-32px` radius
-  - Cards: `20px` radius
-  - Buttons: `12px` radius
-  - Icon containers: `8px` radius
+**Interaction Design:**
+- **Fitts's Law**: Touch targets minimum 44×44px. CTAs should be large and easily acquired.
+- **Doherty Threshold**: Provide feedback within 400ms to maintain user engagement.
 
-#### Typography (SF Pro / System Stack)
-- **Font Stack**: `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif`
-- **Dynamic Type Scale** (non-linear scaling):
-  - Large Title: 34px/41px, Semibold
-  - Title 1: 28px/34px, Semibold
-  - Body: 17px/22px, Regular
-  - Caption: 12px/16px, Regular
-- **Dark Mode Elevation**: Lighter backgrounds = closer to user (not shadows).
-- **Semantic Colors**: Use CSS variables (`--label-primary`, `--tint-blue`) over hex.
-- **Icon Weights**: Stroke weight MUST match adjacent text weight.
+**Grouping & Organization:**
+- **Chunking**: Break content into digestible groups using glass panels.
+- **Law of Proximity**: Related elements close together, unrelated elements apart.
+- **Law of Common Region**: Use container borders to define content groups.
+- **Law of Similarity**: Consistent styling for similar functions.
 
-#### Motion (Spring Physics)
-- **Prefer Springs**: Use `cubic-bezier(0.175, 0.885, 0.32, 1.275)` for bouncy, interruptible animations.
-- **Duration Standards**:
-  - Instant feedback: 0.1s
-  - Fast transitions: 0.2s
-  - Normal animations: 0.35s
-  - Slow/dramatic: 0.5s
-- **Reduced Motion**: Respect `prefers-reduced-motion` — replace springs with cross-fades.
+**Memory & Attention:**
+- **Miller's Law**: Working memory holds 7±2 items. Don't overload.
+- **Von Restorff Effect**: Make primary actions visually distinctive.
+- **Serial Position Effect**: Important items at start and end of lists.
+- **Selective Attention**: Guide focus, prevent distraction.
 
-#### Victor Ponamariov's 50 UI Tips (MANDATORY)
+**Motivation & Progress:**
+- **Zeigarnik Effect**: Show incomplete tasks/progress to drive completion.
+- **Goal-Gradient Effect**: Progress indicators motivate action as users approach goals.
+- **Peak-End Rule**: Endings matter. Polish success/error states.
 
-**Typography:**
-- Put headlines closer to their respective content (proximity law)
-- Avoid justifying text — align left to prevent "rivers"
-- Use lists instead of long paragraphs
-- Make links visually distinct (not just color)
-- Line height: 1-1.4× for headlines, 1.3-1.6× for body
-- Don't stretch text containers to full width
+**Familiarity:**
+- **Jakob's Law**: Follow macOS native patterns users already know.
+- **Mental Models**: Match design to user expectations.
 
-**Forms:**
-- Never hide form tips — show hints below inputs
-- Place labels near their inputs (not across columns)
-- Use progress indicators for multi-step forms
-- Show password rules immediately, highlight as satisfied
-- Require fewer fields — delay non-essential validation
-- Input width should match expected content length
-- Use labels, never rely on placeholders alone
-- Don't use dropdowns if options ≤ 5-7 (use radio/buttons)
-- Replace default file inputs with custom styled ones
-- Autofocus first input
-- Autoscroll to first error on large forms
+**Efficiency:**
+- **Tesler's Law**: Absorb complexity into the system, not the user.
+- **Occam's Razor**: Remove unnecessary elements.
+- **Pareto Principle**: 80% of users use 20% of features. Optimize the critical path.
 
-**Validation:**
-- Help users fill forms correctly the first time
-- Show positive feedback (green checks) not just errors
-- Place validation errors next to the relevant input
+#### design.json Component Specifications
 
-**Focus & Contrast:**
-- Only ONE primary button per logical section
-- Overlay dark filter on images with text
-- Check contrast: minimum AA level (4.5:1)
+| Component | Key Specs |
+|-----------|-----------|
+| **Window** | `rgba(30,30,32,0.78)`, blur 80px, radius 12px |
+| **Titlebar** | Height 52px, traffic lights 12px with 8px gap |
+| **Buttons** | Primary: #007AFF, height 32px, radius 8px, NO gradients |
+| **List Rows** | Min-height 44px, 0.5px separator |
+| **Glass Panels** | `rgba(60,60,65,0.50)`, blur 40px, radius 10px |
+| **Toggle** | 38×22px, green #30D158 when on |
 
-**Grouping:**
-- Group form elements — labels closer to their inputs
-- Keep dangerous actions (delete) visually apart
-- Use whitespace to create logical groups
+#### Typography (from design.json)
+```
+Font Stack: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui
+Body: 13px / 18px, weight 400
+Title2: 17px / 22px, weight 600
+LargeTitle: 26px / 32px, weight 700
+```
 
-**Visuals:**
-- Consider removing borders — use backgrounds/shadows
-- Subtle table striping/borders (barely visible)
-- Soft shadows only, avoid shadow + border combo
-- Show partial content in dropdowns to hint scrollability
+#### Motion (from design.json)
+```
+--ease-out: cubic-bezier(0.0, 0.0, 0.2, 1)
+--ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275)
+--duration-fast: 100ms
+--duration-normal: 200ms
+--duration-slow: 300ms
+```
 
-**Usability:**
-- Put frequently used options on top
-- Add "copy to clipboard" for links/tokens
-- Avoid complex forms in modals
-- Increase clickable areas (use padding)
-- Don't rely on dots for gallery navigation
-- Consider undo instead of confirmation modals
-- Label all icons
-- Always provide "what to do next" instructions
-- Indicate current location (nav highlights, breadcrumbs)
+#### Critical Rules (from design.json)
+**DO NOT:**
+- Apply gradients to buttons (macOS 26 uses flat colors)
+- Put backdrop-filter on individual list rows
+- Use bright colors for window backgrounds
+- Use more than 3 font weights per view
+- Exceed 55% opacity for secondary text
+- Use colored borders (always white with low opacity)
 
-**Empty/Loading States:**
-- Use empty states for engagement, not just "no data"
-- Use skeletons for layout, spinners for buttons
-- Keep button width consistent during loading (transparent text)
-- Don't show loader immediately — wait 0.5-1s
-- Smart loaders: "Taking longer than usual..." after 5s
-
-**Misc:**
-- Icon consistency: same stroke width, style, fill
-- Prefer horizontal nav for simple apps
-- Auto-submit short verification codes
-- Handle large/long content (truncate, limit, "show more")
-- Give visual hints when more content exists (cut-off items)
-- Always show post/update dates
+**ALWAYS:**
+- Use rgba for backgrounds to enable layering
+- Apply backdrop-filter with BOTH blur AND saturate
+- Use 0.5px borders (hairline) for subtle separators
+- Maintain 44px minimum touch targets
+- Apply inner shadow to glass containers
+- Use proper text hierarchy: primary > secondary > tertiary
 
 ### Tauri-Specific Rules
 

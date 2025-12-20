@@ -1,7 +1,7 @@
 {
   "name": "capcut_guard_tauri",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.3.0",
   "type": "module",
   "scripts": {
     "tauri": "tauri",

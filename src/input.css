@@ -3,13 +3,16 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   macOS 26 TAHOE DESIGN SYSTEM
-   Extracted from official reference images
+   VERSION GUARD - macOS 26 TAHOE DESIGN SYSTEM
+   Source: design.json (macOS 26 Tahoe Design Tokens)
+   Framework: Laws of UX
+
+   DO NOT hardcode values — reference CSS variables from design.json
    ========================================================================== */
 
 @layer base {
   :root {
-    /* === BACKGROUNDS === */
+    /* === BACKGROUNDS (from design.json foundations.colors.backgrounds) === */
     --bg-window: rgba(30, 30, 32, 0.78);
     --bg-window-solid: #1E1E20;
     --bg-titlebar: rgba(38, 38, 40, 0.95);
@@ -18,23 +21,23 @@
     --bg-elevated: #2C2C2E;
     --bg-modal: rgba(44, 44, 46, 0.95);
 
-    /* === FILLS === */
+    /* === FILLS (from design.json foundations.colors.fills) === */
     --fill-primary: rgba(255, 255, 255, 0.10);
     --fill-secondary: rgba(255, 255, 255, 0.06);
     --fill-tertiary: rgba(255, 255, 255, 0.04);
     --fill-quaternary: rgba(255, 255, 255, 0.02);
 
-    /* === GLASS PANELS === */
+    /* === GLASS PANELS (from design.json components.list.group) === */
     --glass-panel: rgba(60, 60, 65, 0.50);
     --glass-menu: rgba(50, 50, 52, 0.92);
 
-    /* === LABELS === */
+    /* === LABELS (from design.json foundations.colors.labels) === */
     --label-primary: #FFFFFF;
     --label-secondary: rgba(255, 255, 255, 0.55);
     --label-tertiary: rgba(255, 255, 255, 0.25);
     --label-quaternary: rgba(255, 255, 255, 0.10);
 
-    /* === ACCENTS === */
+    /* === ACCENTS (from design.json foundations.colors.accents) === */
     --accent-blue: #007AFF;
     --accent-blue-hover: #0071EB;
     --accent-blue-active: #005BC4;
@@ -47,24 +50,73 @@
     --accent-teal: #40C8E0;
     --accent-indigo: #5856D6;
 
-    /* === BORDERS === */
+    /* === BORDERS (from design.json foundations.colors.borders) === */
     --border-glass: rgba(255, 255, 255, 0.18);
     --border-separator: rgba(255, 255, 255, 0.08);
     --border-opaque: rgba(255, 255, 255, 0.12);
     --border-focus: rgba(0, 122, 255, 0.50);
 
-    /* === RADII === */
+    /* === RADII (from design.json foundations.radii) === */
+    --radius-none: 0px;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
     --radius-window: 12px;
     --radius-panel: 10px;
     --radius-button: 8px;
     --radius-field: 6px;
     --radius-badge: 4px;
+    --radius-full: 9999px;
 
-    /* === SHADOWS === */
+    /* === SHADOWS (from design.json foundations.shadows) === */
     --shadow-window: 0 25px 80px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.12), inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
     --shadow-elevated: 0 10px 40px rgba(0, 0, 0, 0.30), 0 0 0 0.5px rgba(255, 255, 255, 0.10);
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.15);
     --shadow-button: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+    /* === SPACING (from design.json foundations.spacing - 4px unit) === */
+    --space-0: 0px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* === BLUR & SATURATION (from design.json foundations.blur/saturation) === */
+    --blur-window: 80px;
+    --blur-sidebar: 50px;
+    --blur-panel: 40px;
+    --blur-menu: 25px;
+    --blur-toolbar: 30px;
+    --saturation-window: 190%;
+    --saturation-panel: 150%;
+    --saturation-menu: 180%;
+
+    /* === ANIMATIONS (from design.json animations) === */
+    --duration-instant: 50ms;
+    --duration-fast: 100ms;
+    --duration-normal: 200ms;
+    --duration-slow: 300ms;
+    --duration-very-slow: 500ms;
+    --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+    --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* === TYPOGRAPHY (from design.json foundations.typography) === */
+    --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+    --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
   }
 
   *,
@@ -80,14 +132,14 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+    font-family: var(--font-system);
     font-size: 13px;
     line-height: 1.38;
     color: var(--label-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     user-select: none;
-    /* Colorful gradient background for backdrop-filter to blur */
+    /* Colorful gradient background for backdrop-filter blur effect */
     background:
       radial-gradient(ellipse 120% 100% at 80% 0%, rgba(0, 122, 255, 0.35) 0%, transparent 50%),
       radial-gradient(ellipse 100% 80% at 20% 100%, rgba(191, 90, 242, 0.30) 0%, transparent 50%),
@@ -96,7 +148,7 @@
     background-attachment: fixed;
   }
 
-  /* macOS-style Scrollbar */
+  /* === SCROLLBAR (from design.json components.scrollbar) === */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -104,15 +156,12 @@
 
   ::-webkit-scrollbar-track {
     background: transparent;
-    margin: 4px 0;
-    /* Creates space at top/bottom to avoid sharp corners */
   }
 
   ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 4px;
     border: 2px solid transparent;
-    /* Creates inset effect */
     background-clip: padding-box;
   }
 
@@ -130,7 +179,8 @@
 @layer components {
 
   /* ========================================================================
-     WINDOW - Liquid Glass Container
+     WINDOW (from design.json components.window)
+     RULE: DO NOT apply window blur/saturation to inner content
      ======================================================================== */
   .tahoe-window {
     display: flex;
@@ -139,40 +189,33 @@
     width: 100%;
     overflow: hidden;
     background: var(--bg-window);
-    backdrop-filter: blur(80px) saturate(190%);
-    -webkit-backdrop-filter: blur(80px) saturate(190%);
+    backdrop-filter: blur(var(--blur-window)) saturate(var(--saturation-window));
+    -webkit-backdrop-filter: blur(var(--blur-window)) saturate(var(--saturation-window));
     border: 0.5px solid var(--border-glass);
     border-radius: var(--radius-window);
-    box-shadow: var(--shadow-window), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-window);
   }
 
-  /* P3: Focus styles for keyboard navigation */
+  /* === FOCUS STATES === */
   *:focus-visible {
     outline: 2px solid var(--accent-blue);
     outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  .selectable:focus-visible,
-  .btn-primary:focus-visible,
-  .btn-secondary:focus-visible,
-  .btn-plain:focus-visible {
-    outline: 2px solid var(--accent-blue);
-    outline-offset: 2px;
+    border-radius: var(--radius-badge);
   }
 
   /* ========================================================================
-     TITLEBAR
+     TITLEBAR (from design.json components.titlebar)
+     Height: 52px, Traffic lights: 12px with 8px gap
      ======================================================================== */
   .tahoe-titlebar {
     display: flex;
     align-items: center;
     height: 52px;
-    padding: 0 16px;
+    padding: 0 var(--space-4);
     flex-shrink: 0;
     background: var(--bg-titlebar);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(var(--blur-toolbar)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-toolbar)) saturate(180%);
     border-bottom: 0.5px solid var(--border-separator);
     -webkit-app-region: drag;
     box-shadow: inset 0 -0.5px 0 rgba(0, 0, 0, 0.3);
@@ -187,17 +230,18 @@
   .traffic-light {
     width: 12px;
     height: 12px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 0.5px solid rgba(0, 0, 0, 0.15);
     cursor: default;
     position: relative;
-    transition: filter 0.15s ease;
+    transition: filter var(--duration-fast) var(--ease-out);
   }
 
   .traffic-light:hover {
     filter: brightness(0.88);
   }
 
+  /* Traffic light gradients from design.json */
   .traffic-light.close {
     background: linear-gradient(180deg, #FF6058 0%, #FF5147 100%);
   }
@@ -215,8 +259,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: -apple-system, sans-serif;
-    font-weight: 700;
+    font-family: var(--font-system);
+    font-weight: var(--font-weight-bold);
     color: rgba(0, 0, 0, 0.5);
   }
 
@@ -243,7 +287,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 20px;
+    padding: var(--space-5);
     max-width: 480px;
     margin: 0 auto;
     width: 100%;
@@ -256,7 +300,7 @@
     display: flex;
     align-items: center;
     height: 28px;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
   }
 
   .tahoe-nav-back {
@@ -265,13 +309,14 @@
     gap: 2px;
     color: var(--accent-blue);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     min-height: 44px;
-    transition: opacity 0.1s ease;
+    /* Fitts's Law: 44px minimum touch target */
+    transition: opacity var(--duration-fast) var(--ease-out);
   }
 
   .tahoe-nav-back:active {
@@ -286,38 +331,41 @@
     flex: 1;
     text-align: center;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--label-primary);
     margin-right: 50px;
   }
 
   /* ========================================================================
-     GLASS PANEL - Lists and grouped content
+     GLASS PANEL (from design.json components.list.group)
+     Law of Common Region: Container borders define content groups
      ======================================================================== */
   .glass-panel {
     background: var(--glass-panel);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
+    -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
     border-radius: var(--radius-panel);
     border: 0.5px solid var(--border-opaque);
     overflow: hidden;
+    /* ALWAYS: Apply inner shadow to glass containers */
     box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.06), var(--shadow-card);
   }
 
   /* ========================================================================
-     LIST COMPONENTS
+     LIST COMPONENTS (from design.json components.list)
+     Chunking: Break content into digestible groups
      ======================================================================== */
   .list-section {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
   }
 
   .list-header {
     font-size: 11px;
-    font-weight: 500;
-    color: var(--label-secondary);
+    font-weight: var(--font-weight-medium);
+    color: rgba(255, 255, 255, 0.50);
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    padding: 0 12px;
+    padding: 0 var(--space-3);
     margin-bottom: 6px;
   }
 
@@ -325,10 +373,11 @@
     display: flex;
     align-items: center;
     min-height: 44px;
-    padding: 8px 12px;
+    /* Fitts's Law: 44px minimum */
+    padding: var(--space-2) var(--space-3);
     background: transparent;
     border-bottom: 0.5px solid var(--border-separator);
-    transition: background 0.08s ease;
+    transition: background var(--duration-fast) var(--ease-out);
   }
 
   .list-row:last-child {
@@ -347,6 +396,22 @@
     background: var(--fill-primary);
   }
 
+  /* Von Restorff Effect: Selected items are distinctively different */
+  .list-row.selected {
+    background: rgba(0, 122, 255, 0.20) !important;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--accent-blue);
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: all var(--duration-normal) var(--ease-spring);
+  }
+
+  .list-row.selected .row-icon {
+    background: var(--accent-blue) !important;
+    color: white !important;
+  }
+
   .row-icon {
     width: 28px;
     height: 28px;
@@ -354,9 +419,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     font-size: 14px;
-    color: #FFFFFF;
+    color: var(--label-primary);
     flex-shrink: 0;
   }
 
@@ -370,51 +435,68 @@
 
   .row-title {
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     color: var(--label-primary);
   }
 
   .row-subtitle {
     font-size: 11px;
-    font-weight: 400;
-    color: var(--label-secondary);
+    font-weight: var(--font-weight-regular);
+    color: rgba(255, 255, 255, 0.50);
   }
 
   .row-accessory {
     font-size: 13px;
     color: var(--label-tertiary);
-    margin-left: 8px;
+    margin-left: var(--space-2);
   }
 
   /* ========================================================================
-     BUTTONS
+     BUTTONS (from design.json components.buttons)
+     RULE: DO NOT apply gradients - macOS 26 uses FLAT colors
+     Fitts's Law: Large, easily acquired CTAs
      ======================================================================== */
   .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    padding: 0 16px;
+    height: 44px;
+    /* Fitts's Law minimum */
+    padding: 0 var(--space-4);
     border-radius: var(--radius-button);
     background: var(--accent-blue);
-    color: #FFFFFF;
+    color: var(--label-primary);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     border: none;
     cursor: pointer;
     min-width: 100px;
-    gap: 6px;
-    transition: all 0.1s ease;
+    gap: var(--space-2);
+    width: 100%;
+    transition: all var(--duration-normal) var(--ease-out);
+    box-shadow: var(--shadow-button);
+  }
+
+  /* Von Restorff Effect: Distinctively larger primary CTA */
+  .btn-primary-large {
+    height: 56px;
+    font-size: 16px;
+    font-weight: var(--font-weight-semibold);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
   }
 
   .btn-primary:hover {
     background: var(--accent-blue-hover);
-    box-shadow: 0 2px 10px rgba(0, 122, 255, 0.40);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.30);
   }
 
-  .btn-primary:active {
-    background: var(--accent-blue-active);
-    transform: scale(0.98);
+  /* Doherty Threshold: Instant visual feedback (<400ms) */
+  .btn-primary:active,
+  button:active,
+  .list-row:active {
+    transform: scale(0.97);
+    transition: transform var(--duration-instant) var(--ease-out);
   }
 
   .btn-primary:disabled {
@@ -427,16 +509,16 @@
     align-items: center;
     justify-content: center;
     height: 32px;
-    padding: 0 16px;
+    padding: 0 var(--space-4);
     border-radius: var(--radius-button);
     background: var(--fill-primary);
     border: 0.5px solid var(--border-opaque);
     color: var(--label-primary);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     cursor: pointer;
     gap: 6px;
-    transition: all 0.1s ease;
+    transition: background var(--duration-fast) var(--ease-out);
   }
 
   .btn-secondary:hover {
@@ -449,11 +531,11 @@
     gap: 4px;
     color: var(--accent-blue);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 8px;
+    padding: var(--space-2);
     min-height: 44px;
   }
 
@@ -465,8 +547,24 @@
     opacity: 0.5;
   }
 
+  .btn-destructive {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-button);
+    background: var(--accent-red);
+    color: var(--label-primary);
+    font-size: 13px;
+    font-weight: var(--font-weight-medium);
+    border: none;
+    cursor: pointer;
+  }
+
   /* ========================================================================
-     TOGGLE SWITCH
+     TOGGLE SWITCH (from design.json components.toggle)
+     38x22px, green #30D158 when on
      ======================================================================== */
   .toggle-switch {
     position: relative;
@@ -476,7 +574,7 @@
     background: rgba(120, 120, 128, 0.32);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background var(--duration-normal) var(--ease-in-out);
   }
 
   .toggle-switch.on {
@@ -490,10 +588,10 @@
     left: 2px;
     width: 18px;
     height: 18px;
-    background: #FFFFFF;
-    border-radius: 50%;
+    background: var(--label-primary);
+    border-radius: var(--radius-full);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.10);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--duration-normal) var(--ease-in-out);
   }
 
   .toggle-switch.on::after {
@@ -502,41 +600,98 @@
 
   /* ========================================================================
      HERO SECTION
+     Peak-End Rule: Polish success/error states
      ======================================================================== */
   .hero {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 32px 0 24px;
+    padding: var(--space-8) 0 var(--space-6);
   }
 
   .hero-icon {
     font-size: 56px;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: var(--accent-blue);
     filter: drop-shadow(0 4px 16px rgba(0, 122, 255, 0.35));
   }
 
   .hero h1,
   .hero h2 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: var(--font-weight-semibold);
     color: var(--label-primary);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     letter-spacing: -0.01em;
   }
 
   .hero p {
     font-size: 13px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     color: var(--label-secondary);
     max-width: 280px;
     line-height: 1.4;
   }
 
   /* ========================================================================
-     PROGRESS BAR
+     STATUS CARD
+     Zeigarnik Effect: Show incomplete tasks to drive completion
+     ======================================================================== */
+  .status-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--glass-panel);
+    backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
+    -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
+    border-radius: var(--radius-xl);
+    border: 0.5px solid var(--border-opaque);
+    box-shadow: var(--shadow-card);
+  }
+
+  .status-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-panel);
+    font-size: 24px;
+    transition: all var(--duration-slow) var(--ease-spring);
+  }
+
+  .status-icon-wrapper.unprotected {
+    background: rgba(255, 149, 0, 0.15);
+    color: var(--accent-orange);
+  }
+
+  .status-icon-wrapper.protected {
+    background: rgba(48, 209, 88, 0.15);
+    color: var(--accent-green);
+  }
+
+  .status-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .status-title {
+    font-size: 15px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--label-primary);
+  }
+
+  .status-subtitle {
+    font-size: 12px;
+    color: var(--label-secondary);
+  }
+
+  /* ========================================================================
+     PROGRESS BAR (from design.json components.progressBar)
+     Goal-Gradient Effect: Progress indicators motivate completion
      ======================================================================== */
   .progress-bar {
     width: 100%;
@@ -544,7 +699,7 @@
     border-radius: 2px;
     background: var(--fill-primary);
     overflow: hidden;
-    margin: 16px 0;
+    margin: var(--space-4) 0;
   }
 
   .progress-fill {
@@ -552,7 +707,7 @@
     border-radius: 2px;
     background: var(--accent-blue);
     width: 0%;
-    transition: width 0.25s ease;
+    transition: width var(--duration-slow) var(--ease-out);
   }
 
   /* ========================================================================
@@ -562,18 +717,18 @@
     background: var(--fill-tertiary);
     border-radius: var(--radius-panel);
     border: 0.5px solid var(--border-separator);
-    padding: 12px;
+    padding: var(--space-3);
     max-height: 140px;
     overflow-y: auto;
     overflow-x: hidden;
     font-size: 11px;
-    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+    font-family: var(--font-mono);
   }
 
   .log-entry {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--space-2);
     padding: 2px 0;
     color: var(--label-tertiary);
   }
@@ -591,12 +746,16 @@
     color: var(--accent-orange);
   }
 
+  .log-entry.error {
+    color: var(--accent-red);
+  }
+
   /* ========================================================================
      STATUS ICONS
      ======================================================================== */
   .status-icon {
     font-size: 16px;
-    margin-right: 12px;
+    margin-right: var(--space-3);
   }
 
   .status-icon.success {
@@ -622,8 +781,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    padding: 12px 0;
+    gap: var(--space-5);
+    padding: var(--space-3) 0;
     font-size: 11px;
     color: var(--label-tertiary);
     border-top: 0.5px solid var(--border-separator);
@@ -636,7 +795,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    transition: color 0.15s ease;
+    transition: color var(--duration-fast) var(--ease-out);
   }
 
   .app-footer a:hover {
@@ -645,12 +804,13 @@
 
   /* ========================================================================
      VIEWS
+     Spring physics for view transitions
      ======================================================================== */
   .view {
     display: none;
     flex-direction: column;
     flex: 1;
-    animation: viewEnter 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: viewEnter var(--duration-slow) var(--ease-spring);
   }
 
   .view.active {
@@ -669,39 +829,39 @@
     }
   }
 
-  /* ========================================================================
-     STATUS BADGE
-     ======================================================================== */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 16px;
-    margin: 0 auto 16px;
-    border-radius: var(--radius-button);
-    background: rgba(48, 209, 88, 0.15);
-    border: 1px solid rgba(48, 209, 88, 0.30);
-    color: var(--accent-green);
-    font-size: 13px;
-    font-weight: 500;
-    animation: badgePulse 2s ease-in-out infinite;
-  }
-
-  .status-badge i {
-    font-size: 16px;
-  }
-
-  @keyframes badgePulse {
-
-    0%,
-    100% {
-      opacity: 1;
+  /* Peak-End Rule: Celebration animation on success */
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
     }
 
     50% {
-      opacity: 0.7;
+      transform: scale(1.05);
     }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ========================================================================
+     TOOLS CONTAINER
+     Hick's Law: Group secondary actions to minimize choice per view
+     ======================================================================== */
+  .tools-container .btn-tool {
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .tools-container .btn-tool:hover {
+    background: var(--fill-secondary) !important;
+    border-radius: var(--radius-panel);
+  }
+
+  .tools-container .btn-tool:active {
+    transform: scale(0.96);
+    opacity: 0.7;
   }
 
   /* ========================================================================
@@ -723,76 +883,24 @@
   .button-stack {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
     width: 100%;
     max-width: 200px;
-    margin-top: 20px;
-  }
-}
-
-@layer utilities {
-  .bg-accent-blue {
-    background: var(--accent-blue);
+    margin-top: var(--space-5);
   }
 
-  .bg-accent-green {
-    background: var(--accent-green);
-  }
-
-  .bg-accent-red {
-    background: var(--accent-red);
-  }
-
-  .bg-accent-orange {
-    background: var(--accent-orange);
-  }
-
-  .bg-accent-purple {
-    background: var(--accent-purple);
-  }
-
-  .bg-accent-indigo {
-    background: var(--accent-indigo);
-  }
-
-  .text-label-secondary {
-    color: var(--label-secondary);
-  }
-
-  .text-label-tertiary {
-    color: var(--label-tertiary);
-  }
-
-  .text-13 {
-    font-size: 13px;
-  }
-
-  .spin {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  /* Skeleton Loader (Victor's Tips: use skeletons for layout) */
+  /* Skeleton loading rows */
   .skeleton-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
   }
 
   .skeleton-icon {
     width: 32px;
     height: 32px;
-    border-radius: var(--radius-icon);
+    border-radius: var(--radius-field);
     background: linear-gradient(90deg, var(--fill-tertiary) 25%, var(--fill-secondary) 50%, var(--fill-tertiary) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -807,7 +915,7 @@
 
   .skeleton-line {
     height: 12px;
-    border-radius: 4px;
+    border-radius: var(--radius-badge);
     background: linear-gradient(90deg, var(--fill-tertiary) 25%, var(--fill-secondary) 50%, var(--fill-tertiary) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -831,53 +939,132 @@
     }
   }
 
-  /* Smart Loader Text */
-  .loader-hint {
-    color: var(--label-tertiary);
-    font-size: 12px;
-    text-align: center;
-    margin-top: 8px;
-    opacity: 0;
-    animation: fadeInHint 0.3s ease forwards;
-    animation-delay: 5s;
+  .spin {
+    animation: spin 1s linear infinite;
   }
 
-  @keyframes fadeInHint {
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+
     to {
-      opacity: 1;
+      transform: rotate(360deg);
     }
   }
+}
 
-  /* ========================================================================
-     REDUCED MOTION (Accessibility)
-     Respect user's motion preferences - replace animations with cross-fades
-     ======================================================================== */
-  @media (prefers-reduced-motion: reduce) {
+@layer utilities {
 
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+  /* Accent backgrounds */
+  .bg-accent-blue {
+    background: var(--accent-blue);
+  }
 
-    .view {
-      animation: none;
-    }
+  .bg-accent-green {
+    background: var(--accent-green);
+  }
 
-    .skeleton-icon,
-    .skeleton-line {
-      animation: none;
-      background: var(--fill-tertiary);
-    }
+  .bg-accent-red {
+    background: var(--accent-red);
+  }
 
-    .status-badge {
-      animation: none;
-    }
+  .bg-accent-orange {
+    background: var(--accent-orange);
+  }
 
-    .spin {
-      animation: none;
-    }
+  .bg-accent-purple {
+    background: var(--accent-purple);
+  }
+
+  .bg-accent-pink {
+    background: var(--accent-pink);
+  }
+
+  .bg-accent-teal {
+    background: var(--accent-teal);
+  }
+
+  .bg-accent-indigo {
+    background: var(--accent-indigo);
+  }
+
+  .bg-accent-yellow {
+    background: var(--accent-yellow);
+  }
+
+  /* Label colors */
+  .text-label-primary {
+    color: var(--label-primary);
+  }
+
+  .text-label-secondary {
+    color: var(--label-secondary);
+  }
+
+  .text-label-tertiary {
+    color: var(--label-tertiary);
+  }
+
+  /* Typography */
+  .text-13 {
+    font-size: 13px;
+    line-height: 16px;
+  }
+
+  .text-11 {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  /* Layout utilities */
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .mb-4 {
+    margin-bottom: var(--space-4);
+  }
+
+  .mt-2 {
+    margin-top: var(--space-2);
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .max-w-280 {
+    max-width: 280px;
+  }
+}
+
+/* ========================================================================
+   REDUCED MOTION
+   Respect prefers-reduced-motion
+   ======================================================================== */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .view {
+    animation: none;
+  }
+
+  .skeleton-icon,
+  .skeleton-line {
+    animation: none;
+    background: var(--fill-tertiary);
+  }
+
+  .spin {
+    animation: none;
   }
 }

@@ -4,19 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Version Guard</title>
+  <meta name="description" content="Protect your CapCut version from automatic updates">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3/src/regular/style.min.css">
 </head>
 <body class="tahoe-window">
 
   <!-- ====================================================================
-       TITLEBAR - macOS Traffic Lights
+       TITLEBAR - macOS Traffic Lights (design.json components.titlebar)
+       Height: 52px, Traffic lights: 12px with 8px gap
        ==================================================================== -->
   <header class="tahoe-titlebar">
     <div class="traffic-lights">
-      <button class="traffic-light close" id="btn-close"></button>
-      <button class="traffic-light minimize" id="btn-minimize"></button>
-      <button class="traffic-light maximize" id="btn-maximize"></button>
+      <button class="traffic-light close" id="btn-close" aria-label="Close"></button>
+      <button class="traffic-light minimize" id="btn-minimize" aria-label="Minimize"></button>
+      <button class="traffic-light maximize" id="btn-maximize" aria-label="Maximize"></button>
     </div>
   </header>
 
@@ -27,40 +29,61 @@
 
     <!-- ================================================================
          VIEW: WELCOME
+         Laws of UX Applied:
+         - Von Restorff Effect: Distinctive primary CTA
+         - Zeigarnik Effect: Status card shows protection state
+         - Hick's Law: One primary action, minimal secondary choices
+         - Fitts's Law: Large 56px CTA button
          ================================================================ -->
     <section id="view-welcome" class="view active">
-      <div class="hero">
+      <!-- Hero: Minimal branding (Law of Prägnanz - simplest form) -->
+      <div class="hero" style="padding-bottom: var(--space-4);">
         <i class="ph ph-shield-check hero-icon"></i>
         <h1>Version Guard</h1>
-        <p>Lock your CapCut version and prevent unsolicited updates.</p>
       </div>
 
-      <!-- Protection Status Badge -->
-      <div id="protection-status" class="status-badge" style="display: none;">
-        <i class="ph ph-shield-checkered"></i>
-        <span>Protected</span>
+      <!-- Status Card: Zeigarnik Effect - Show protection state -->
+      <div class="status-card" id="status-card">
+        <div class="status-icon-wrapper unprotected" id="status-icon-wrapper">
+          <i class="ph ph-shield-warning" id="status-icon"></i>
+        </div>
+        <div class="status-content">
+          <span class="status-title" id="status-title">Not Protected</span>
+          <span class="status-subtitle" id="status-subtitle">CapCut can update automatically</span>
+        </div>
       </div>
 
+      <!-- Spacer for layout -->
       <div class="spacer"></div>
 
-      <div class="button-stack mx-auto">
-        <button class="btn-primary" id="btn-start">Get Started</button>
-        <button class="btn-secondary" id="btn-remove-protection" style="display: none;">
+      <!-- Primary CTA: Von Restorff + Fitts's Law (Large, Distinct) -->
+      <div class="button-stack mx-auto" style="max-width: 100%;">
+        <button class="btn-primary btn-primary-large" id="btn-start">
+          <i class="ph ph-shield-check"></i>
+          Protect My Version
+        </button>
+        <button class="btn-secondary" id="btn-remove-protection" style="display: none; width: 100%;">
           <i class="ph ph-shield-slash"></i>
           Remove Protection
         </button>
-        <button class="btn-secondary" id="btn-switch">
-          <i class="ph ph-swap"></i>
-          Quick Switch
+      </div>
+
+      <!-- Tools: Law of Common Region (Grouped secondary actions) -->
+      <!-- Hick's Law: Only 2 secondary options to minimize choice -->
+      <div class="tools-container glass-panel" style="display: flex; gap: 1px; padding: 2px; margin-top: var(--space-5);">
+        <button class="btn-tool" id="btn-switch" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
+          <i class="ph ph-swap" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
+          <span style="font-size: 11px;">Switch</span>
         </button>
-        <button class="btn-plain" id="btn-legacy">
-          <i class="ph ph-download-simple"></i>
-          Download Legacy Version
+        <div style="width: 1px; background: var(--border-opaque);"></div>
+        <button class="btn-tool" id="btn-legacy" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
+          <i class="ph ph-download-simple" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
+          <span style="font-size: 11px;">Legacy</span>
         </button>
       </div>
 
       <footer class="app-footer">
-        <a href="https://github.com/Zendevve/capcut-version-guard" target="_blank">
+        <a href="https://github.com/Zendevve/capcut-version-guard" target="_blank" rel="noopener">
           <i class="ph ph-github-logo"></i> GitHub
         </a>
         <span id="app-version">v2.2.0</span>
@@ -69,22 +92,35 @@
 
     <!-- ================================================================
          VIEW: PRECHECK - System Environment Check
+         Laws of UX Applied:
+         - Peak-End Rule: Celebration on success
+         - Goal-Gradient Effect: Progress through checks
+         - Chunking: Grouped checks in glass panel
          ================================================================ -->
     <section id="view-precheck" class="view">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="precheck-back">
-          <i class="ph ph-caret-left"></i>
+          <i class="ph ph-caret-left"></i> Back
         </button>
         <span class="tahoe-nav-title">System Check</span>
       </nav>
 
-      <div class="hero">
+      <!-- Initial state -->
+      <div class="hero" id="precheck-hero">
         <i class="ph ph-folder-open hero-icon"></i>
         <h2>Checking Environment</h2>
         <p>Verifying your system configuration.</p>
       </div>
 
-      <div class="list-section">
+      <!-- Success state: Peak-End Rule (Positive emotional peak) -->
+      <div class="hero" id="precheck-success" style="display: none; animation: popIn 0.5s var(--ease-spring);">
+        <i class="ph ph-rocket-launch hero-icon" style="color: var(--accent-green);"></i>
+        <h2>All Systems Go</h2>
+        <p style="color: var(--accent-green);">Your environment is ready.</p>
+      </div>
+
+      <!-- Chunking: Checks grouped in glass panel -->
+      <div class="list-section" id="precheck-list">
         <div class="glass-panel">
           <div class="list-row">
             <i class="status-icon success ph ph-check-circle" id="check-install"></i>
@@ -110,24 +146,27 @@
 
     <!-- ================================================================
          VIEW: VERSION SELECT
+         Laws of UX Applied:
+         - Von Restorff Effect: Selected version distinctly highlighted
+         - Serial Position Effect: Current version at top
+         - Law of Common Region: Versions in glass panel
          ================================================================ -->
     <section id="view-versions" class="view">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="versions-back">
-          <i class="ph ph-caret-left"></i>
+          <i class="ph ph-caret-left"></i> Back
         </button>
         <span class="tahoe-nav-title">Select Version</span>
       </nav>
 
       <p class="text-center text-label-secondary text-13 mb-4">Choose the version to protect.</p>
 
-      <div class="list-section">
+      <!-- Law of Common Region: Versions grouped -->
+      <div class="list-section" style="flex: 1; overflow-y: auto;">
         <div class="glass-panel" id="version-list">
           <!-- Versions populated by JS -->
         </div>
       </div>
-
-      <div class="spacer"></div>
 
       <div class="button-stack mx-auto">
         <button class="btn-primary" id="btn-continue-version" disabled>Continue</button>
@@ -136,15 +175,20 @@
 
     <!-- ================================================================
          VIEW: OPTIONS - Cache Clean & Protection
+         Laws of UX Applied:
+         - Chunking: Related options grouped (Cleanup vs Protection)
+         - Law of Proximity: Toggle near its label
+         - Tesler's Law: Complexity absorbed, simple toggles exposed
          ================================================================ -->
     <section id="view-options" class="view">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="options-back">
-          <i class="ph ph-caret-left"></i>
+          <i class="ph ph-caret-left"></i> Back
         </button>
         <span class="tahoe-nav-title">Options</span>
       </nav>
 
+      <!-- Chunk 1: Cleanup -->
       <div class="list-section">
         <span class="list-header">Cleanup</span>
         <div class="glass-panel">
@@ -156,11 +200,12 @@
               <span class="row-title">Clean Temporary Files</span>
               <span class="row-subtitle" id="cache-size">0.0 MB can be freed</span>
             </div>
-            <div class="toggle-switch on" id="toggle-cache"></div>
+            <div class="toggle-switch on" id="toggle-cache" role="switch" aria-checked="true" tabindex="0"></div>
           </div>
         </div>
       </div>
 
+      <!-- Chunk 2: Protection -->
       <div class="list-section">
         <span class="list-header">Protection</span>
         <div class="glass-panel">
@@ -172,7 +217,7 @@
               <span class="row-title">Lock Configuration</span>
               <span class="row-subtitle">Prevents automatic updates</span>
             </div>
-            <div class="toggle-switch on" id="toggle-lock"></div>
+            <div class="toggle-switch on" id="toggle-lock" role="switch" aria-checked="true" tabindex="0"></div>
           </div>
           <div class="list-row">
             <div class="row-icon bg-accent-green">
@@ -182,13 +227,14 @@
               <span class="row-title">Create Blockers</span>
               <span class="row-subtitle">Blocks updater executable</span>
             </div>
-            <div class="toggle-switch on" id="toggle-blocker"></div>
+            <div class="toggle-switch on" id="toggle-blocker" role="switch" aria-checked="true" tabindex="0"></div>
           </div>
         </div>
       </div>
 
       <div class="spacer"></div>
 
+      <!-- Hick's Law: One primary action -->
       <div class="button-stack mx-auto">
         <button class="btn-primary" id="btn-apply">
           <i class="ph ph-lock"></i>
@@ -199,6 +245,9 @@
 
     <!-- ================================================================
          VIEW: PROCESSING
+         Laws of UX Applied:
+         - Goal-Gradient Effect: Animated progress bar
+         - Doherty Threshold: Real-time log updates
          ================================================================ -->
     <section id="view-processing" class="view">
       <div class="hero">
@@ -207,12 +256,14 @@
         <p>Please wait...</p>
       </div>
 
+      <!-- Goal-Gradient Effect: Progress indicator -->
       <div class="progress-bar">
         <div class="progress-fill" id="progress-bar"></div>
       </div>
 
-      <p class="text-center text-label-secondary text-13 mb-4" id="status-text">Initializing...</p>
+      <p class="text-center text-label-secondary text-13" id="status-text">Initializing...</p>
 
+      <!-- Real-time activity log -->
       <div class="activity-log" id="activity-log">
         <!-- Log entries populated by JS -->
       </div>
@@ -220,12 +271,15 @@
 
     <!-- ================================================================
          VIEW: COMPLETE
+         Laws of UX Applied:
+         - Peak-End Rule: Positive ending with celebration
+         - Aesthetic-Usability: Polished success state
          ================================================================ -->
     <section id="view-complete" class="view">
       <div class="center-content">
-        <i class="ph ph-check-circle hero-icon" style="color: #30D158;"></i>
+        <i class="ph ph-check-circle hero-icon" style="color: var(--accent-green); animation: popIn 0.5s var(--ease-spring);"></i>
         <h2>Protection Applied</h2>
-        <p class="text-label-secondary text-13 mt-2 max-w-[280px]">
+        <p class="text-label-secondary text-13 mt-2" style="max-width: 280px;">
           Your CapCut version is now locked and protected from automatic updates.
         </p>
       </div>
@@ -237,36 +291,48 @@
 
     <!-- ================================================================
          VIEW: ERROR
+         Laws of UX Applied:
+         - Peak-End Rule: Helpful recovery, not frustrating
+         - Postel's Law: Flexible about user's actions
          ================================================================ -->
     <section id="view-error" class="view">
       <div class="center-content">
-        <i class="ph ph-warning-circle hero-icon" style="color: #FF453A;"></i>
+        <i class="ph ph-warning-circle hero-icon" style="color: var(--accent-red);"></i>
         <h2>Something went wrong</h2>
-        <p class="text-label-secondary text-13 mt-2 max-w-[280px]" id="error-message">
+        <p class="text-label-secondary text-13 mt-2" style="max-width: 280px;" id="error-message">
           An unexpected error occurred.
         </p>
       </div>
 
       <div class="button-stack mx-auto">
-        <button class="btn-secondary" id="btn-retry">Try Again</button>
-        <button class="btn-plain" id="btn-back-error">Go Back</button>
+        <button class="btn-primary" id="btn-retry">
+          <i class="ph ph-arrow-clockwise"></i>
+          Start Over
+        </button>
+        <button class="btn-plain" id="btn-back-error">
+          <i class="ph ph-sliders-horizontal"></i>
+          Change Options
+        </button>
       </div>
     </section>
 
     <!-- ================================================================
          VIEW: LEGACY DOWNLOADS
+         Laws of UX Applied:
+         - Serial Position Effect: Most popular versions at top
+         - Law of Common Region: Grouped in glass panel
          ================================================================ -->
     <section id="view-legacy" class="view">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="legacy-back">
-          <i class="ph ph-caret-left"></i>
+          <i class="ph ph-caret-left"></i> Back
         </button>
         <span class="tahoe-nav-title">Legacy Versions</span>
       </nav>
 
       <p class="text-center text-label-secondary text-13 mb-4">Download previous CapCut versions.</p>
 
-      <div class="list-section">
+      <div class="list-section" style="flex: 1; overflow-y: auto;">
         <div class="glass-panel" id="legacy-list">
           <!-- Legacy versions populated by JS -->
         </div>
@@ -275,24 +341,25 @@
 
     <!-- ================================================================
          VIEW: QUICK SWITCH
+         Laws of UX Applied:
+         - Von Restorff: Selected version distinctively styled
+         - Hick's Law: Simple selection, one action
          ================================================================ -->
     <section id="view-switch" class="view">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="switch-back">
-          <i class="ph ph-caret-left"></i>
+          <i class="ph ph-caret-left"></i> Back
         </button>
         <span class="tahoe-nav-title">Quick Switch</span>
       </nav>
 
       <p class="text-center text-label-secondary text-13 mb-4">Select a version to activate without re-protecting.</p>
 
-      <div class="list-section">
+      <div class="list-section" style="flex: 1; overflow-y: auto;">
         <div class="glass-panel" id="switch-list">
           <!-- Versions populated by JS -->
         </div>
       </div>
-
-      <div class="spacer"></div>
 
       <div class="button-stack mx-auto">
         <button class="btn-primary" id="btn-switch-apply" disabled>

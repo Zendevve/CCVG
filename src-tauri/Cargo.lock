@@ -355,7 +355,7 @@ dependencies = [
 
 [[package]]
 name = "capcut_guard_tauri"
-version = "2.2.0"
+version = "2.3.0"
 dependencies = [
  "serde",
  "serde_json",

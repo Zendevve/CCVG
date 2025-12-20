@@ -9,8 +9,9 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue?style=flat-square&logo=windows)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-Proprietary-blue?style=flat-square)](LICENSE)
 [![MCAF](https://img.shields.io/badge/Follows-MCAF-purple?style=flat-square)](https://mcaf.managed-code.com/)
+[![Laws of UX](https://img.shields.io/badge/Design-Laws%20of%20UX-blueviolet?style=flat-square)](https://lawsofux.com/)
 
-[Download](#-quick-start) • [Features](#-features) • [How It Works](#-how-it-works) • [Build](#-building-from-source) • [Documentation](#-documentation)
+[Download](#-quick-start) • [Features](#-features) • [Design](#-design-philosophy) • [Build](#-building-from-source) • [Docs](#-documentation)
 
 </div>
 
@@ -153,12 +154,20 @@ capcut_guard_tauri/
 └── README.md
 ```
 
-### Design Decisions
-- **Universal Interface (HIG)**: strict adherence to Apple's Human Interface Guidelines (Clarity, Deference, Depth) to ensure a premium, native feel across platforms.
-- **Tauri**: Chosen for small bundle size and native WebView capabilities.
-- **Vanilla JS**: No framework overhead needed for this simple wizard logic.fast
-- **Modular Rust** — Each feature in its own file for maintainability
-- **Universal Interface (HIG)** — Strict adherence to Apple's Human Interface Guidelines (Clarity, Deference, Depth)
+### Design Philosophy
+
+This application follows **Laws of UX** — a collection of psychological principles that optimize user experience:
+
+| Principle | Application |
+|-----------|-------------|
+| **Fitts's Law** | 44px+ touch targets, full-width CTAs |
+| **Hick's Law** | One primary action per screen |
+| **Von Restorff** | Distinctive blue primary buttons |
+| **Peak-End Rule** | Celebration animations on success |
+| **Zeigarnik Effect** | Progress indicators drive completion |
+| **Jakob's Law** | macOS-native patterns users know |
+
+All visual tokens come from `design.json` (macOS 26 Tahoe Design System). See [ADR-003](docs/ADR/003-laws-of-ux.md) for details.
 
 ---
 
@@ -166,9 +175,12 @@ capcut_guard_tauri/
 
 | Document | Description |
 |----------|-------------|
+| [CHANGELOG](CHANGELOG.md) | Version history and release notes |
 | [AGENTS.md](AGENTS.md) | AI coding rules and project conventions |
-| [Version Protection](../capcut_guard_rust/docs/Features/version-protection.md) | Core feature specification |
-| [Download Manager](../capcut_guard_rust/docs/Features/download-manager.md) | Legacy version download flow |
+| [ADR-003: Laws of UX](docs/ADR/003-laws-of-ux.md) | UI/UX framework decision |
+| [Design System](docs/Reference/design-system.md) | Visual tokens reference |
+| [Version Protection](docs/Features/version-protection.md) | Core feature specification |
+| [Download Manager](docs/Features/download-manager.md) | Legacy version download flow |
 
 ---
 

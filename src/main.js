@@ -56,10 +56,15 @@ function goBack() {
   }
 }
 
+// Expose navigation functions for inline handlers
+window.goBack = goBack;
+window.navigateTo = navigateTo;
+
 // ============================================
 // Welcome View Handlers
 // ============================================
 document.getElementById('btn-start')?.addEventListener('click', () => navigateTo('precheck'));
+document.getElementById('btn-switch')?.addEventListener('click', () => navigateTo('switch'));
 document.getElementById('btn-legacy')?.addEventListener('click', () => navigateTo('legacy'));
 document.getElementById('btn-remove-protection')?.addEventListener('click', removeProtection);
 
@@ -67,20 +72,40 @@ document.getElementById('btn-remove-protection')?.addEventListener('click', remo
 (async function checkProtectionOnLoad() {
   try {
     const status = await invoke('check_protection_status');
-    const badge = document.getElementById('protection-status');
-    const removeBtn = document.getElementById('btn-remove-protection');
-
-    if (status.is_protected) {
-      badge.style.display = 'inline-flex';
-      removeBtn.style.display = 'inline-flex';
-    }
+    updateStatusCard(status.is_protected);
   } catch (e) {
     console.warn('Could not check protection status:', e);
   }
 })();
 
+function updateStatusCard(isProtected) {
+  const wrapper = document.getElementById('status-icon-wrapper');
+  const icon = document.getElementById('status-icon');
+  const title = document.getElementById('status-title');
+  const subtitle = document.getElementById('status-subtitle');
+  const removeBtn = document.getElementById('btn-remove-protection');
+
+  if (!wrapper || !icon || !title) return;
+
+  if (isProtected) {
+    wrapper.className = 'status-icon-wrapper protected';
+    icon.className = 'ph ph-shield-check';
+    title.innerText = 'Protected';
+    subtitle.innerText = 'Your version is locked safe';
+    if (removeBtn) removeBtn.style.display = 'inline-flex';
+  } else {
+    wrapper.className = 'status-icon-wrapper unprotected';
+    icon.className = 'ph ph-shield-warning';
+    title.innerText = 'Not Protected';
+    subtitle.innerText = 'CapCut can update automatically';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
 async function removeProtection() {
   const btn = document.getElementById('btn-remove-protection');
+  const originalText = btn.innerHTML;
+
   btn.disabled = true;
   btn.innerHTML = '<i class="ph ph-circle-notch spin"></i> Removing...';
 
@@ -91,11 +116,16 @@ async function removeProtection() {
       btn.innerHTML = '<i class="ph ph-check"></i> Removed!';
       btn.style.background = 'var(--accent-green)';
 
-      // Hide status badge
-      document.getElementById('protection-status').style.display = 'none';
+      // Update status card
+      updateStatusCard(false);
 
       await sleep(1500);
       btn.style.display = 'none';
+
+      // Reset button state for next time
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+      btn.style.background = '';
     } else {
       throw new Error(result.error);
     }
@@ -123,14 +153,22 @@ async function runPreCheck() {
   const processText = document.getElementById('check-process-text');
   const nextBtn = document.getElementById('btn-continue-precheck');
 
-  // Reset
+  // Peak-End Rule: Elements
+  const heroCheck = document.getElementById('precheck-hero');
+  const heroSuccess = document.getElementById('precheck-success');
+  const list = document.getElementById('precheck-list');
+
+  // Reset View State
+  heroCheck.style.display = 'block';
+  heroSuccess.style.display = 'none';
+  list.style.display = 'block';
   setStatusIcon(installIcon, 'pending');
   installText.textContent = 'Checking installation...';
   setStatusIcon(processIcon, 'pending');
   processText.textContent = 'Checking processes...';
   nextBtn.disabled = true;
 
-  await sleep(400);
+  await sleep(600); // Doherty Threshold: Perceptible delay
 
   try {
     const result = await invoke('perform_precheck');
@@ -152,6 +190,15 @@ async function runPreCheck() {
     }
 
     if (result.capcut_found && !result.capcut_running) {
+      // Peak-End Rule: Delightful success state
+      await sleep(500);
+      heroCheck.style.display = 'none';
+      list.style.display = 'none';
+      heroSuccess.style.display = 'flex'; // Show success hero
+
+      // Auto-continue or enable button? Let's leave button for control but make it obvious.
+      // Actually, standard wizard flow usually auto-advances or enables button.
+      // User must click continue to acknowledge functionality.
       nextBtn.disabled = false;
     }
   } catch (e) {
@@ -193,11 +240,15 @@ async function loadVersions() {
     state.versions = vers;
 
     if (vers.length === 0) {
+      // Empty state with actionable CTA (Laws of UX: Zeigarnik Effect - guide user to next step)
       container.innerHTML = `
         <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
           <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
           <span class="row-title">No installations found</span>
-          <span class="row-subtitle">Try downloading a legacy version first</span>
+          <span class="row-subtitle" style="margin-bottom: 12px;">Download a legacy version to get started</span>
+          <button class="btn-plain" onclick="goBack(); setTimeout(() => navigateTo('legacy'), 100);">
+            <i class="ph ph-download-simple"></i> Download Legacy Version
+          </button>
         </div>
       `;
       return;
@@ -228,10 +279,10 @@ window.selectVersion = function (idx) {
   document.querySelectorAll('#version-list .list-row').forEach((el, i) => {
     const check = el.querySelector('.row-accessory');
     if (i === idx) {
-      el.style.backgroundColor = 'var(--fill-tertiary)';
+      el.classList.add('selected');
       if (check) check.style.opacity = '1';
     } else {
-      el.style.backgroundColor = '';
+      el.classList.remove('selected');
       if (check) check.style.opacity = '0';
     }
   });
@@ -243,20 +294,29 @@ window.selectVersion = function (idx) {
 document.getElementById('options-back')?.addEventListener('click', goBack);
 document.getElementById('btn-apply')?.addEventListener('click', () => runProtectionSequence());
 
-document.getElementById('toggle-cache')?.addEventListener('click', function () {
-  state.cacheEnabled = !state.cacheEnabled;
-  this.classList.toggle('on', state.cacheEnabled);
-});
+// Toggle handlers with keyboard support (Accessibility)
+function setupToggle(id, stateKey) {
+  const toggle = document.getElementById(id);
+  if (!toggle) return;
 
-document.getElementById('toggle-lock')?.addEventListener('click', function () {
-  state.lockEnabled = !state.lockEnabled;
-  this.classList.toggle('on', state.lockEnabled);
-});
+  const handler = function () {
+    state[stateKey] = !state[stateKey];
+    this.classList.toggle('on', state[stateKey]);
+    this.setAttribute('aria-checked', state[stateKey]);
+  };
 
-document.getElementById('toggle-blocker')?.addEventListener('click', function () {
-  state.blockerEnabled = !state.blockerEnabled;
-  this.classList.toggle('on', state.blockerEnabled);
-});
+  toggle.addEventListener('click', handler);
+  toggle.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handler.call(this);
+    }
+  });
+}
+
+setupToggle('toggle-cache', 'cacheEnabled');
+setupToggle('toggle-lock', 'lockEnabled');
+setupToggle('toggle-blocker', 'blockerEnabled');
 
 async function loadCacheSize() {
   const sizeText = document.getElementById('cache-size');
@@ -351,16 +411,31 @@ async function runProtectionSequence() {
 // ============================================
 // Complete View Handlers
 // ============================================
-document.getElementById('btn-done')?.addEventListener('click', () => getCurrentWindow().close());
+document.getElementById('btn-done')?.addEventListener('click', () => {
+  state.history = ['welcome'];
+  showView('welcome');
+  // Refresh protection status on welcome screen
+  (async () => {
+    try {
+      const status = await invoke('check_protection_status');
+      updateStatusCard(status.is_protected);
+    } catch (e) { }
+  })();
+});
 
 // ============================================
 // Error View Handlers
 // ============================================
 document.getElementById('btn-retry')?.addEventListener('click', () => {
+  // Start fresh from precheck (where the protection flow begins)
   state.history = ['welcome'];
-  showView('welcome');
+  navigateTo('precheck');
 });
-document.getElementById('btn-back-error')?.addEventListener('click', goBack);
+document.getElementById('btn-back-error')?.addEventListener('click', () => {
+  // Go back to options so user can try again with different settings
+  state.history = ['welcome', 'precheck', 'versions', 'options'];
+  showView('options');
+});
 
 // ============================================
 // Legacy View Handlers
@@ -415,12 +490,15 @@ async function loadSwitchVersions() {
     state.switchTarget = null;
 
     if (vers.length === 0) {
+      // Empty state with actionable guidance
       container.innerHTML = `
         <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
           <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
           <span class="row-title">No installations found</span>
+          <span class="row-subtitle">Download a legacy version first</span>
         </div>
       `;
+      document.getElementById('btn-switch-apply').disabled = true;
       return;
     }
 
@@ -454,10 +532,10 @@ window.selectSwitchVersion = function (idx) {
   document.querySelectorAll('#switch-list .list-row').forEach((el, i) => {
     const check = el.querySelector('.row-accessory');
     if (i === idx) {
-      el.style.backgroundColor = 'var(--fill-tertiary)';
+      el.classList.add('selected');
       if (check) check.style.opacity = '1';
     } else {
-      el.style.backgroundColor = '';
+      el.classList.remove('selected');
       if (check) check.style.opacity = '0';
     }
   });
@@ -479,8 +557,10 @@ async function applySwitch() {
       await sleep(1000);
       state.history = ['welcome'];
       showView('welcome');
+      // Reset button for next use
       btn.innerHTML = '<i class="ph ph-swap"></i> Switch Version';
       btn.style.background = '';
+      btn.disabled = true; // Reset to disabled state
     } else {
       throw new Error(result.message);
     }
