@@ -5,6 +5,7 @@
 
 const { invoke } = window.__TAURI__.core;
 const { openUrl } = window.__TAURI__.opener;
+const { getCurrentWindow } = window.__TAURI__.window; // Import window API
 
 // ============================================
 // State
@@ -23,6 +24,11 @@ const state = {
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // Window Controls Logic
+  const appWindow = getCurrentWindow();
+  document.getElementById('win-minimize').addEventListener('click', () => appWindow.minimize());
+  document.getElementById('win-maximize').addEventListener('click', () => appWindow.toggleMaximize());
+  document.getElementById('win-close').addEventListener('click', () => appWindow.close());
   // Load archive versions for download manager
   try {
     state.archiveVersions = await invoke('get_archive_versions');
@@ -37,11 +43,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 // Screen Navigation
 // ============================================
+// ============================================
+// Screen Navigation
+// ============================================
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
   const target = document.getElementById(`screen-${screenId}`);
   if (target) target.classList.add('active');
   state.currentScreen = screenId;
+
+  // Toggle progress bar visibility
+  const progressBar = document.querySelector('.progress-bar');
+  if (screenId === 'download-manager') {
+    progressBar.style.display = 'none';
+  } else {
+    progressBar.style.display = 'flex';
+  }
 
   // Update progress bar step
   if (screenId === 'welcome') state.currentStep = 1;
@@ -72,10 +89,24 @@ function renderDownloadManager() {
   const grid = document.getElementById('version-grid');
   if (!grid) return;
 
+  const getIcon = (persona) => {
+    if (persona.includes('Audio')) return 'ph-waves';
+    if (persona.includes('Classic')) return 'ph-film-strip';
+    if (persona.includes('Stable')) return 'ph-shield-check';
+    return 'ph-download-simple';
+  };
+
   grid.innerHTML = state.archiveVersions.map(v => `
     <div class="version-card">
-      <div class="persona">${v.persona}</div>
-      <div class="ver">v${v.version}</div>
+      <div class="card-header">
+        <div class="icon-glow-ring small accent">
+            <i class="ph-fill ${getIcon(v.persona)}"></i>
+        </div>
+        <div>
+            <div class="persona">${v.persona}</div>
+            <div class="ver">v${v.version}</div>
+        </div>
+      </div>
       <div class="desc">${v.description}</div>
       <button class="dl-btn" onclick="downloadVersion('${v.download_url}')">
         <i class="ph-bold ph-download-simple"></i> Download

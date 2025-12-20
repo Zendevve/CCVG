@@ -9,6 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Window Controls -->
+  <div class="window-titlebar">
+    <div class="window-drag-region"></div>
+    <div class="window-controls">
+      <button class="win-btn minimize" id="win-minimize" title="Minimize">
+        <i class="ph ph-minus"></i>
+      </button>
+      <button class="win-btn maximize" id="win-maximize" title="Maximize">
+        <i class="ph ph-squares-four"></i>
+      </button>
+      <button class="win-btn close" id="win-close" title="Close">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+  </div>
+
   <div id="app">
 
     <!-- Progress Bar -->
@@ -37,24 +53,24 @@
     <!-- Screen: Welcome -->
     <div id="screen-welcome" class="screen active">
       <div class="screen-content">
-        <div class="icon-wrap accent">
+        <div class="icon-glow-ring accent">
           <i class="ph-fill ph-shield-check"></i>
         </div>
         <h1>CC Version Guard</h1>
         <p class="subtitle">Lock your CapCut version and prevent auto-updates.</p>
 
-        <div class="info-card">
-          <div class="info-row">
-            <i class="ph ph-check-circle"></i>
-            <span>Protect against forced updates</span>
+        <div class="feature-grid">
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="ph-fill ph-lock-key"></i></div>
+            <span>Block Updates</span>
           </div>
-          <div class="info-row">
-            <i class="ph ph-check-circle"></i>
-            <span>Clean cache to free disk space</span>
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="ph-fill ph-trash"></i></div>
+            <span>Clean Cache</span>
           </div>
-          <div class="info-row">
-            <i class="ph ph-check-circle"></i>
-            <span>Download legacy versions</span>
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="ph-fill ph-download-simple"></i></div>
+            <span>Archive</span>
           </div>
         </div>
 
@@ -87,7 +103,7 @@
     <!-- Screen: PreCheck -->
     <div id="screen-precheck" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap">
+        <div class="icon-glow-ring">
           <i class="ph-fill ph-magnifying-glass spinning"></i>
         </div>
         <h2>Scanning System</h2>
@@ -98,7 +114,7 @@
     <!-- Screen: CapCut Running -->
     <div id="screen-running-warning" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap warning">
+        <div class="icon-glow-ring warning">
           <i class="ph-fill ph-warning"></i>
         </div>
         <h2>CapCut is Running</h2>
@@ -113,7 +129,7 @@
     <!-- Screen: Not Found -->
     <div id="screen-not-found" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap">
+        <div class="icon-glow-ring">
           <i class="ph-fill ph-folder-notch-open"></i>
         </div>
         <h2>CapCut Not Found</h2>
@@ -132,8 +148,16 @@
     <!-- Screen: Version Select -->
     <div id="screen-version-select" class="screen">
       <div class="screen-content">
-        <h2>Select Version to Keep</h2>
-        <p class="subtitle">All other versions will be removed.</p>
+        <div class="icon-glow-ring accent">
+            <i class="ph-fill ph-circles-four"></i>
+        </div>
+        <h2>Select Version</h2>
+        <p class="subtitle">Choose which version to preserve.</p>
+
+        <div class="instruction-row">
+            <i class="ph-fill ph-info"></i>
+            <span>All other versions will be removed.</span>
+        </div>
 
         <div id="installed-versions" class="version-list">
           <!-- Populated by JS -->
@@ -152,18 +176,32 @@
     <!-- Screen: Cache Clean Options -->
     <div id="screen-cache-clean" class="screen">
       <div class="screen-content">
+        <div class="icon-glow-ring accent">
+            <i class="ph-fill ph-broom"></i>
+        </div>
         <h2>Cache Cleanup</h2>
         <p class="subtitle">Free up disk space by removing temporary files.</p>
 
         <div class="cache-card">
-          <div class="cache-info">
-            <span class="cache-label">Recoverable Space</span>
-            <span class="cache-value" id="cache-size">0 MB</span>
+          <div class="cache-header">
+            <div class="icon-glow-ring small accent">
+                <i class="ph-fill ph-broom"></i>
+            </div>
+            <div class="cache-text">
+                <span class="cache-label">Recoverable Space</span>
+                <span class="cache-value" id="cache-size">0 MB</span>
+            </div>
           </div>
+
           <label class="toggle-row">
-            <input type="checkbox" id="cache-toggle" checked />
-            <span class="toggle-switch"></span>
-            <span>Clean cache during protection</span>
+            <div class="toggle-text">
+                <span class="toggle-title">Clean Cache</span>
+                <span class="toggle-desc">Remove temporary files during protection</span>
+            </div>
+            <div class="toggle-wrapper">
+                <input type="checkbox" id="cache-toggle" checked />
+                <span class="toggle-switch"></span>
+            </div>
           </label>
         </div>
 
@@ -180,7 +218,7 @@
     <!-- Screen: Running -->
     <div id="screen-running" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap">
+        <div class="icon-glow-ring">
           <i class="ph-fill ph-gear spinning"></i>
         </div>
         <h2>Applying Protection</h2>
@@ -199,17 +237,29 @@
     <!-- Screen: Complete -->
     <div id="screen-complete" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap success">
+        <div class="icon-glow-ring success big">
           <i class="ph-fill ph-shield-check"></i>
         </div>
         <h2>Protection Complete!</h2>
         <p class="subtitle" id="complete-text">Your CapCut installation is now protected.</p>
 
-        <div class="success-summary">
-          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Versions cleaned</div>
-          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Configuration locked</div>
-          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Update blocker active</div>
-          <div class="summary-row" id="cache-cleaned-row"><i class="ph-fill ph-check-circle"></i> Cache cleaned</div>
+        <div class="success-grid">
+          <div class="success-item">
+            <i class="ph-fill ph-check-circle"></i>
+            <span>Versions Cleaned</span>
+          </div>
+          <div class="success-item">
+            <i class="ph-fill ph-lock-key"></i>
+            <span>Config Locked</span>
+          </div>
+          <div class="success-item">
+            <i class="ph-fill ph-prohibit"></i>
+            <span>Updates Blocked</span>
+          </div>
+          <div class="success-item" id="cache-cleaned-row">
+            <i class="ph-fill ph-trash"></i>
+            <span>Cache Cleaned</span>
+          </div>
         </div>
 
         <div class="actions">
@@ -230,7 +280,7 @@
     <!-- Screen: Error -->
     <div id="screen-error" class="screen">
       <div class="screen-content">
-        <div class="icon-wrap error">
+        <div class="icon-glow-ring error">
           <i class="ph-fill ph-warning-octagon"></i>
         </div>
         <h2>Something Went Wrong</h2>
