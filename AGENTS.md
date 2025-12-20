@@ -56,9 +56,9 @@ If no new rule is detected → do not update the file.
 ```
 capcut_guard_tauri/
 ├── src/                         # Frontend (Vanilla JS)
-│   ├── index.html              # Wizard overlay + Dashboard
+│   ├── index.html              # Wizard screens
 │   ├── styles.css              # Midnight Obsidian theme
-│   ├── main.js                 # Hybrid Wizard + Dashboard logic
+│   ├── main.js                 # Wizard logic & Tauri IPC
 │   └── assets/                 # Static assets
 ├── src-tauri/                  # Backend (Rust)
 │   ├── src/
@@ -70,7 +70,7 @@ capcut_guard_tauri/
 │   │       ├── process.rs      # Process detection
 │   │       ├── cleaner.rs      # Cache cleaning
 │   │       ├── protector.rs    # File locking
-│   │       └── switcher.rs     # Non-destructive version switching
+│   │       └── switcher.rs     # Version switching
 │   ├── Cargo.toml
 │   └── tauri.conf.json
 ├── package.json
@@ -92,13 +92,12 @@ capcut_guard_tauri/
 
 ### UI/UX Rules (CRITICAL)
 
-- **Progressive Disclosure** — Quick Fix Wizard for first-time users, Dashboard for power users
-- **Hick's Law** — ONE action per wizard screen, minimize choices
+- **Wizard-only pattern** — step-by-step guided flow (NO dashboard for now)
+- **Feature parity with legacy** — match original eframe/egui app exactly
+- **Hick's Law** — ONE action per screen, minimize choices
 - **Jakob's Law** — Follow familiar setup wizard patterns
-- **Peak-End Rule** — Delightful success animation at completion
 - **Large touch targets** — Buttons min 44px height
-- **Miller's Law** — Max 4-7 items visible at once
-- **Responsive layouts** — max content width 520px
+- **Responsive layouts** — max content width 480px
 - **Visual feedback** — hover states, transitions, loading spinners
 - **Progress tracking** — clear indication of current step
 
