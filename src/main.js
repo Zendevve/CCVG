@@ -61,6 +61,54 @@ function goBack() {
 // ============================================
 document.getElementById('btn-start')?.addEventListener('click', () => navigateTo('precheck'));
 document.getElementById('btn-legacy')?.addEventListener('click', () => navigateTo('legacy'));
+document.getElementById('btn-remove-protection')?.addEventListener('click', removeProtection);
+
+// Load protection status on start
+(async function checkProtectionOnLoad() {
+  try {
+    const status = await invoke('check_protection_status');
+    const badge = document.getElementById('protection-status');
+    const removeBtn = document.getElementById('btn-remove-protection');
+
+    if (status.is_protected) {
+      badge.style.display = 'inline-flex';
+      removeBtn.style.display = 'inline-flex';
+    }
+  } catch (e) {
+    console.warn('Could not check protection status:', e);
+  }
+})();
+
+async function removeProtection() {
+  const btn = document.getElementById('btn-remove-protection');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-circle-notch spin"></i> Removing...';
+
+  try {
+    const result = await invoke('remove_protection');
+
+    if (result.success) {
+      btn.innerHTML = '<i class="ph ph-check"></i> Removed!';
+      btn.style.background = 'var(--accent-green)';
+
+      // Hide status badge
+      document.getElementById('protection-status').style.display = 'none';
+
+      await sleep(1500);
+      btn.style.display = 'none';
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (e) {
+    btn.innerHTML = '<i class="ph ph-x"></i> Failed';
+    btn.style.background = 'var(--accent-red)';
+    console.error(e);
+    await sleep(2000);
+    btn.innerHTML = '<i class="ph ph-shield-slash"></i> Remove Protection';
+    btn.style.background = '';
+    btn.disabled = false;
+  }
+}
 
 // ============================================
 // Precheck View Handlers
@@ -137,14 +185,21 @@ async function loadVersions() {
   state.selectedVersion = null;
   continueBtn.disabled = true;
 
-  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
+  // Show skeleton loader (Victor's Tips: use skeletons for layout)
+  container.innerHTML = createSkeletonRows(3);
 
   try {
     const vers = await invoke('scan_versions');
     state.versions = vers;
 
     if (vers.length === 0) {
-      container.innerHTML = '<div class="list-row"><span class="row-title">No installations found</span></div>';
+      container.innerHTML = `
+        <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
+          <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
+          <span class="row-title">No installations found</span>
+          <span class="row-subtitle">Try downloading a legacy version first</span>
+        </div>
+      `;
       return;
     }
 
@@ -314,7 +369,7 @@ document.getElementById('legacy-back')?.addEventListener('click', goBack);
 
 async function loadArchiveVersions() {
   const container = document.getElementById('legacy-list');
-  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Loading...</span></div>';
+  container.innerHTML = createSkeletonRows(4);
 
   try {
     const archives = await invoke('get_archive_versions');
@@ -352,7 +407,7 @@ document.getElementById('btn-switch-apply')?.addEventListener('click', applySwit
 
 async function loadSwitchVersions() {
   const container = document.getElementById('switch-list');
-  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
+  container.innerHTML = createSkeletonRows(2);
 
   try {
     const vers = await invoke('scan_versions');
@@ -360,7 +415,12 @@ async function loadSwitchVersions() {
     state.switchTarget = null;
 
     if (vers.length === 0) {
-      container.innerHTML = '<div class="list-row"><span class="row-title">No installations found</span></div>';
+      container.innerHTML = `
+        <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
+          <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
+          <span class="row-title">No installations found</span>
+        </div>
+      `;
       return;
     }
 
@@ -439,6 +499,19 @@ async function applySwitch() {
 // Utilities
 // ============================================
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Create skeleton loading rows (Victor's Tips: use skeletons for layout)
+function createSkeletonRows(count = 3) {
+  return Array(count).fill(0).map(() => `
+    <div class="skeleton-row">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text">
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+  `).join('');
+}
 
 // ============================================
 // Dynamic Version Display

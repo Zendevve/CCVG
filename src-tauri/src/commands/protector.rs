@@ -294,3 +294,140 @@ pub fn run_full_protection(params: ProtectionParams) -> ProtectionResult {
         logs: all_logs,
     }
 }
+
+/// Protection status result
+#[derive(serde::Serialize)]
+pub struct ProtectionStatus {
+    pub is_protected: bool,
+    pub config_locked: bool,
+    pub blockers_exist: bool,
+}
+
+/// Check if protection is currently applied
+#[tauri::command]
+pub fn check_protection_status() -> ProtectionStatus {
+    let apps_path = match std::env::var("LOCALAPPDATA") {
+        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
+        Err(_) => return ProtectionStatus {
+            is_protected: false,
+            config_locked: false,
+            blockers_exist: false,
+        },
+    };
+
+    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+
+    // Check if ProductInfo.xml is a readonly empty file (blocker)
+    let product_info = apps_path.join("ProductInfo.xml");
+    let blockers_exist = if product_info.exists() {
+        if let Ok(meta) = fs::metadata(&product_info) {
+            meta.len() == 0 && meta.permissions().readonly()
+        } else {
+            false
+        }
+    } else {
+        false
+    };
+
+    // Check if update.exe blocker exists
+    let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
+    let update_blocked = if update_blocker.exists() {
+        if let Ok(meta) = fs::metadata(&update_blocker) {
+            meta.len() == 0 && meta.permissions().readonly()
+        } else {
+            false
+        }
+    } else {
+        false
+    };
+
+    // Check if configure.ini has last_version=1.0.0.0
+    let config_path = apps_path.join("configure.ini");
+    let config_locked = if config_path.exists() {
+        if let Ok(content) = fs::read_to_string(&config_path) {
+            content.contains("last_version=1.0.0.0")
+        } else {
+            false
+        }
+    } else {
+        false
+    };
+
+    ProtectionStatus {
+        is_protected: blockers_exist || update_blocked || config_locked,
+        config_locked,
+        blockers_exist: blockers_exist || update_blocked,
+    }
+}
+
+/// Remove all protection measures
+#[tauri::command]
+pub fn remove_protection() -> ProtectionResult {
+    let apps_path = match std::env::var("LOCALAPPDATA") {
+        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
+        Err(_) => {
+            return ProtectionResult {
+                success: false,
+                error: Some("Failed to get LOCALAPPDATA".to_string()),
+                logs: vec![],
+            }
+        }
+    };
+
+    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let mut logs: Vec<String> = Vec::new();
+
+    // Remove ProductInfo.xml blocker
+    let product_info = apps_path.join("ProductInfo.xml");
+    if product_info.exists() {
+        logs.push("Removing ProductInfo.xml blocker...".to_string());
+        if let Err(e) = unset_readonly_recursive(&product_info) {
+            logs.push(format!("[!] Warning: {}", e));
+        }
+        if let Err(e) = fs::remove_file(&product_info) {
+            logs.push(format!("[!] Could not remove ProductInfo.xml: {}", e));
+        } else {
+            logs.push("[OK] ProductInfo.xml blocker removed".to_string());
+        }
+    }
+
+    // Remove update.exe blocker
+    let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
+    if update_blocker.exists() {
+        logs.push("Removing update.exe blocker...".to_string());
+        if let Err(e) = unset_readonly_recursive(&update_blocker) {
+            logs.push(format!("[!] Warning: {}", e));
+        }
+        if let Err(e) = fs::remove_file(&update_blocker) {
+            logs.push(format!("[!] Could not remove update.exe: {}", e));
+        } else {
+            logs.push("[OK] update.exe blocker removed".to_string());
+        }
+    }
+
+    // Reset configure.ini (remove last_version lock)
+    let config_path = apps_path.join("configure.ini");
+    if config_path.exists() {
+        logs.push("Resetting configure.ini...".to_string());
+        if let Ok(content) = fs::read_to_string(&config_path) {
+            let new_content: String = content
+                .lines()
+                .filter(|line| !line.trim().starts_with("last_version"))
+                .collect::<Vec<_>>()
+                .join("\n");
+            if let Err(e) = fs::write(&config_path, new_content) {
+                logs.push(format!("[!] Could not reset configure.ini: {}", e));
+            } else {
+                logs.push("[OK] configure.ini reset".to_string());
+            }
+        }
+    }
+
+    logs.push("[OK] Protection removed - CapCut can now auto-update".to_string());
+
+    ProtectionResult {
+        success: true,
+        error: None,
+        logs,
+    }
+}

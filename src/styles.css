@@ -1222,7 +1222,7 @@ html,
   display: none;
   flex-direction: column;
   flex: 1;
-  animation: viewEnter 0.2s ease-out;
+  animation: viewEnter 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .view.active {
@@ -1232,12 +1232,47 @@ html,
 @keyframes viewEnter {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ========================================================================
+     STATUS BADGE
+     ======================================================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-button);
+  background: rgba(48, 209, 88, 0.15);
+  border: 1px solid rgba(48, 209, 88, 0.30);
+  color: var(--accent-green);
+  font-size: 13px;
+  font-weight: 500;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+.status-badge i {
+  font-size: 16px;
+}
+
+@keyframes badgePulse {
+  0%,
+    100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
   }
 }
 
@@ -1278,6 +1313,10 @@ html,
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.inline-flex {
+  display: inline-flex;
 }
 
 .max-w-\[280px\] {
@@ -1360,6 +1399,65 @@ html,
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Skeleton Loader (Victor's Tips: use skeletons for layout) */
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.skeleton-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-icon);
+  background: linear-gradient(90deg, var(--fill-tertiary) 25%, var(--fill-secondary) 50%, var(--fill-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--fill-tertiary) 25%, var(--fill-secondary) 50%, var(--fill-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-line.short {
+  width: 60%;
+}
+
+.skeleton-line.medium {
+  width: 80%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Smart Loader Text */
+
+@keyframes fadeInHint {
+  to {
+    opacity: 1;
   }
 }
 

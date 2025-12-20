@@ -147,6 +147,76 @@ The material is NOT a single blur — it's a multi-layer composite:
   - Slow/dramatic: 0.5s
 - **Reduced Motion**: Respect `prefers-reduced-motion` — replace springs with cross-fades.
 
+#### Victor Ponamariov's 50 UI Tips (MANDATORY)
+
+**Typography:**
+- Put headlines closer to their respective content (proximity law)
+- Avoid justifying text — align left to prevent "rivers"
+- Use lists instead of long paragraphs
+- Make links visually distinct (not just color)
+- Line height: 1-1.4× for headlines, 1.3-1.6× for body
+- Don't stretch text containers to full width
+
+**Forms:**
+- Never hide form tips — show hints below inputs
+- Place labels near their inputs (not across columns)
+- Use progress indicators for multi-step forms
+- Show password rules immediately, highlight as satisfied
+- Require fewer fields — delay non-essential validation
+- Input width should match expected content length
+- Use labels, never rely on placeholders alone
+- Don't use dropdowns if options ≤ 5-7 (use radio/buttons)
+- Replace default file inputs with custom styled ones
+- Autofocus first input
+- Autoscroll to first error on large forms
+
+**Validation:**
+- Help users fill forms correctly the first time
+- Show positive feedback (green checks) not just errors
+- Place validation errors next to the relevant input
+
+**Focus & Contrast:**
+- Only ONE primary button per logical section
+- Overlay dark filter on images with text
+- Check contrast: minimum AA level (4.5:1)
+
+**Grouping:**
+- Group form elements — labels closer to their inputs
+- Keep dangerous actions (delete) visually apart
+- Use whitespace to create logical groups
+
+**Visuals:**
+- Consider removing borders — use backgrounds/shadows
+- Subtle table striping/borders (barely visible)
+- Soft shadows only, avoid shadow + border combo
+- Show partial content in dropdowns to hint scrollability
+
+**Usability:**
+- Put frequently used options on top
+- Add "copy to clipboard" for links/tokens
+- Avoid complex forms in modals
+- Increase clickable areas (use padding)
+- Don't rely on dots for gallery navigation
+- Consider undo instead of confirmation modals
+- Label all icons
+- Always provide "what to do next" instructions
+- Indicate current location (nav highlights, breadcrumbs)
+
+**Empty/Loading States:**
+- Use empty states for engagement, not just "no data"
+- Use skeletons for layout, spinners for buttons
+- Keep button width consistent during loading (transparent text)
+- Don't show loader immediately — wait 0.5-1s
+- Smart loaders: "Taking longer than usual..." after 5s
+
+**Misc:**
+- Icon consistency: same stroke width, style, fill
+- Prefer horizontal nav for simple apps
+- Auto-submit short verification codes
+- Handle large/long content (truncate, limit, "show more")
+- Give visual hints when more content exists (cut-off items)
+- Always show post/update dates
+
 ### Tauri-Specific Rules
 
 - **Commands in modules** — each feature in its own `commands/*.rs` file

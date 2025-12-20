@@ -1,8 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs;
 use crate::commands::scanner::{get_capcut_apps_path, get_capcut_root_path};
 use serde::Serialize;
-use tauri::State;
 
 #[derive(Serialize)]
 pub struct SwitchResult {
