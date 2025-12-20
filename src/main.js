@@ -204,7 +204,7 @@ async function loadVersions() {
     }
 
     container.innerHTML = vers.map((v, i) => `
-      <div class="list-row selectable" onclick="selectVersion(${i})">
+      <div class="list-row selectable" tabindex="0" onclick="selectVersion(${i})" onkeydown="handleKey(event, () => selectVersion(${i}))">
         <div class="row-icon bg-accent-indigo">
           <i class="ph ph-hard-drives"></i>
         </div>
@@ -430,7 +430,7 @@ async function loadSwitchVersions() {
     }
 
     container.innerHTML = vers.map((v, i) => `
-      <div class="list-row selectable" onclick="selectSwitchVersion(${i})">
+      <div class="list-row selectable" tabindex="0" onclick="selectSwitchVersion(${i})" onkeydown="handleKey(event, () => selectSwitchVersion(${i}))">
         <div class="row-icon bg-accent-purple">
           <i class="ph ph-hard-drives"></i>
         </div>
@@ -499,6 +499,14 @@ async function applySwitch() {
 // Utilities
 // ============================================
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// P3: Keyboard Helper
+window.handleKey = function (e, action) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    action();
+  }
+}
 
 // Create skeleton loading rows (Victor's Tips: use skeletons for layout)
 function createSkeletonRows(count = 3) {

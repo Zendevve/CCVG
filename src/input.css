@@ -143,7 +143,22 @@
     -webkit-backdrop-filter: blur(80px) saturate(190%);
     border: 0.5px solid var(--border-glass);
     border-radius: var(--radius-window);
-    box-shadow: var(--shadow-window);
+    box-shadow: var(--shadow-window), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* P3: Focus styles for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .selectable:focus-visible,
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible,
+  .btn-plain:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
   }
 
   /* ========================================================================
