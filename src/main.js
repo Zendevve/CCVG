@@ -4,6 +4,7 @@
  */
 
 const { invoke } = window.__TAURI__.core;
+const { openUrl } = window.__TAURI__.opener;
 
 // ============================================
 // State
@@ -84,7 +85,7 @@ function renderDownloadManager() {
 }
 
 function downloadVersion(url) {
-  window.open(url, '_blank');
+  openUrl(url);
 }
 
 // ============================================
@@ -244,4 +245,8 @@ async function startProtection() {
 // ============================================
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function openGitHub() {
+  openUrl('https://github.com/Zendevve/capcut-version-guard');
 }

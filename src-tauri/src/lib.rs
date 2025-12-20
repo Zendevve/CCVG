@@ -23,7 +23,7 @@ pub fn run() {
             // Protector commands
             protector::delete_versions,
             protector::apply_protection,
-            protector::apply_protection,
+
             protector::run_full_protection,
             // Switcher commands
             switcher::switch_version,
