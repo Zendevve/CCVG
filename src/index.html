@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CC Version Guard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="brand">
+        <i class="ph-fill ph-shield-check text-accent"></i>
+        <span>ONYX SHIELD</span>
+      </div>
+
+      <div class="nav-item active" onclick="router.navigate('dashboard')">
+        <i class="ph ph-squares-four"></i>
+        <span>Dashboard</span>
+      </div>
+
+      <div class="nav-item" onclick="router.navigate('my-versions')">
+        <i class="ph ph-list-dashes"></i>
+        <span>My Versions</span>
+      </div>
+
+      <div class="nav-item" onclick="router.navigate('library')">
+        <i class="ph ph-bag"></i>
+        <span>Library</span>
+      </div>
+
+      <div class="nav-item" onclick="router.navigate('cleaner')">
+        <i class="ph ph-broom"></i>
+        <span>Cleaner</span>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <div class="nav-item" onclick="window.close()">
+        <i class="ph ph-sign-out"></i>
+        <span>Exit</span>
+      </div>
+    </nav>
+
+    <!-- Content Area -->
+    <main id="content-area">
+
+      <!-- Dashboard View -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="status-orb-container">
+          <div id="status-orb" class="status-orb">
+            <i class="ph-fill ph-shield-check"></i>
+          </div>
+          <h2 id="status-text">System Protected</h2>
+          <p class="text-muted text-sm" id="status-sub">Configuration locked • Blocker active</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <span class="card-title">Active Version</span>
+            <span class="card-value" id="dash-active-ver">--</span>
+            <span class="card-sub text-success">Running</span>
+          </div>
+
+          <div class="card">
+            <span class="card-title">Installed</span>
+            <span class="card-value" id="dash-install-count">0</span>
+            <span class="card-sub">Versions managed</span>
+          </div>
+
+          <div class="card">
+            <span class="card-title">Cache</span>
+            <span class="card-value" id="dash-cache-size">0 MB</span>
+            <span class="card-sub">Recoverable space</span>
+          </div>
+
+          <div class="card" onclick="router.navigate('library')" style="cursor:pointer">
+            <span class="card-title">Updates</span>
+            <span class="card-value text-accent">Check</span>
+            <span class="card-sub">Download new versions</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- My Versions View -->
+      <section id="view-my-versions" class="view-section">
+        <h2 class="mb-lg">My Versions</h2>
+        <div id="installed-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Library View -->
+      <section id="view-library" class="view-section">
+        <h2 class="mb-lg">Version Library</h2>
+        <p class="text-muted mb-md">Download legacy versions directly from official servers.</p>
+        <div id="library-grid" class="dashboard-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Cleaner View -->
+      <section id="view-cleaner" class="view-section">
+        <h2 class="mb-lg">Cache Cleaner</h2>
+        <div class="card mb-lg">
+          <span class="card-title">Total Cache Size</span>
+          <span class="card-value" id="cleaner-size">0.0 MB</span>
+          <p class="text-muted mt-sm">Includes proxy files, temp data, and smart crop cache.</p>
+        </div>
+        <button class="btn btn-primary w-full" onclick="runCleaner()">
+          <i class="ph-bold ph-broom"></i> Clean All Cache
+        </button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Safety Modal -->
+  <div id="safety-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="text-center mb-lg">
+        <i class="ph-fill ph-warning-octagon text-warning" style="font-size: 48px"></i>
+        <h3 class="mt-md">Compatibility Warning</h3>
+      </div>
+
+      <p class="mb-md text-muted">
+        Opening projects in a newer version (e.g. v4.0) makes them <strong>permanently incompatible</strong> with older versions.
+      </p>
+
+      <p class="mb-lg text-muted">
+        If you switch back to an older version later, these projects <strong>will not open</strong>.
+      </p>
+
+      <div style="display:flex; gap:10px; flex-direction:column">
+        <button class="btn" style="padding:12px" onclick="openProjectsFolder()">
+          <i class="ph ph-folder-open"></i> Backup Projects Folder First
+        </button>
+
+        <div style="display:flex; gap:10px; margin-top:10px">
+          <button class="btn w-full" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary w-full" onclick="confirmSwitch()">I Understand, Switch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

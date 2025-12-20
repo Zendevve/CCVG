@@ -1,0 +1,75 @@
+# Feature: Download Manager
+
+Status: Implemented
+Owner: Zendevve
+Created: 2024-12-19
+
+---
+
+## Purpose
+
+Guide users to download legacy CapCut versions from ProjectBukkit by presenting curated "persona" options.
+
+---
+
+## Scope
+
+### In scope
+- Display 3 persona cards with recommended versions
+- Link to ProjectBukkit versions page
+- Show version features and risk levels
+
+### Out of scope
+- Direct in-app downloads
+- Version verification/hashing
+
+---
+
+## Business Rules
+
+- Personas represent use-case archetypes:
+  - **Offline Purist** (v1.5.0): Clean UI, 4K export, zero cloud
+  - **Audio Engineer** (v2.5.4): Multi-track audio, stable mixer
+  - **Classic Pro** (v2.9.0): Most free features (Legacy UI)
+  - **Modern Stable** (v3.2.0): Good balance
+  - **Creator** (v3.9.0): Last free Auto-Captions (High Risk)
+  - **Power User** (v4.0.0): Track height, markers (Stricter Paywall)
+- All download buttons use **Direct CDN Links** (.exe) from `lf16-capcut.faceulv.com`
+- High-risk versions show warning icon
+
+---
+
+## User Flows
+
+### Primary Flow
+
+1. User clicks "Download Legacy Version" on Welcome screen
+2. Download Manager shows 3 persona cards
+3. User clicks a card to select it
+4. User clicks "Download from ProjectBukkit"
+5. Browser opens to ProjectBukkit releases page
+6. User downloads and installs desired version
+7. User returns to app and uses "Skip - Protect existing installation"
+
+---
+
+## UI Requirements
+
+- **2-Column Grid Layout** (6 cards)
+- Cards have dark background with accent border when selected
+- Icon color changes to green when selected
+- Feature badges show with checkmarks
+- Risk warnings show amber warning icon
+- Responsive layout with dynamic spacing
+
+---
+
+## Definition of Done
+
+- [x] 3 persona cards displayed
+- [x] Cards are clickable and show selection state
+- [x] Download button opens Uptodown in browser
+- [x] Skip link navigates to PreCheck flow
+- [x] Back link returns to Welcome
+- [x] Proper contrast on selected cards
+- [x] Responsive layout

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+target/
+dist/
+
+# Build outputs
+*.exe
+*.msi
+*.nsis
+src-tauri/target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local Netlify folder
+.netlify
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
