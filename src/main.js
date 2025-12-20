@@ -246,6 +246,15 @@ const router = {
 };
 
 async function loadDashboard() {
+  // Load archive versions if not already loaded
+  if (state.archiveVersions.length === 0) {
+    try {
+      state.archiveVersions = await invoke('get_archive_versions');
+    } catch (e) {
+      console.error('Failed to load archive versions:', e);
+    }
+  }
+
   await loadInstalledVersions();
   await updateCacheCard();
   updateStatusOrb();
