@@ -91,24 +91,61 @@ capcut_guard_tauri/
 - **Icons**: Use Phosphor Icons from `unpkg.com/@phosphor-icons/web`
 
 
-### UI/UX Rules (CRITICAL: UNIVERSAL INTERFACE LAW)
+### UI/UX Rules (CRITICAL: macOS TAHOE LIQUID GLASS)
 
-- **Philosophy** — Adhere strictly to the "Philosophical Triad":
-    1.  **Clarity**: Eliminate ambiguity. Legibility > Style. Negative space > Borders.
-    2.  **Deference**: Content is the protagonist. UI recedes (neutral chrome, translucency).
-    3.  **Depth**: Use Z-axis layering (background -> content -> controls -> modals).
-- **Spatial Architecture**:
-    - **8-Point Grid**: All spacing/sizing must be multiples of 8 (8, 16, 24, 32...).
-    - **Touch Targets**: MINIMUM 44x44pt for all interactive elements.
-    - **Safe Areas**: Use `env(safe-area-inset-*)` for all padding. Content must not be obscured.
-    - **Squircle**: Use continuous curvature logic (approx. 12-16px radii for cards/buttons).
-- **Visuals & Typography**:
-    - **System Stack**: Use generic system fonts (`-apple-system`, `Segoe UI`, etc.).
-    - **Dark Mode Elevation**: Elevation is indicated by LIGHTNESS, not shadow.
-    - **Semantics**: Use semantic roles (`label-primary`, `system-background`) over hex codes.
-    - **Icons**: Stroke weight MUST match adjacent text weight.
-- **Motion**:
-    - **Springs**: Use snappy, interruptible spring physics (or robust CSS approximations) over linear eases.
+> Based on Apple WWDC 2025 Liquid Glass Design System specifications.
+
+#### Philosophy (The Philosophical Triad)
+1.  **Clarity**: Eliminate ambiguity. Legibility > Style. Negative space > Borders.
+2.  **Deference**: Content is the protagonist. UI recedes (neutral chrome, translucency).
+3.  **Depth**: Use Z-axis layering (background → content → controls → modals).
+
+#### Liquid Glass Material System
+The material is NOT a single blur — it's a multi-layer composite:
+
+| Layer | Effect | Purpose |
+|-------|--------|---------|
+| Base | `rgba(255,255,255, 0.08-0.18)` | Frosted foundation |
+| Backdrop | `blur(20-50px) saturate(180%)` | Obscures detail, adds vibrancy |
+| Noise | 5-10% opacity overlay | Prevents banding |
+| Refraction | Inner shadows (top light, bottom dark) | Simulates light bending |
+| Specular Border | Gradient stroke (top-left white → transparent) | Rim light simulation |
+
+**Material Variants:**
+- `--glass-clear`: 8% white — Immersive overlays, video controls
+- `--glass-regular`: 12% white — Default windows, sidebars
+- `--glass-thick`: 18% white — High-contrast areas, modals
+- `--glass-ultra-thick`: 85% dark gray — Maximum legibility
+
+#### Spatial Architecture
+- **8-Point Grid**: All spacing/sizing MUST be multiples of 8 (8, 16, 24, 32...).
+- **Touch Targets**: MINIMUM 44×44pt for all interactive elements.
+- **Safe Areas**: Use `env(safe-area-inset-*)` for all padding.
+- **Squircle Geometry**: Use continuous curvature (G2 continuity).
+  - Windows: `26-32px` radius
+  - Cards: `20px` radius
+  - Buttons: `12px` radius
+  - Icon containers: `8px` radius
+
+#### Typography (SF Pro / System Stack)
+- **Font Stack**: `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif`
+- **Dynamic Type Scale** (non-linear scaling):
+  - Large Title: 34px/41px, Semibold
+  - Title 1: 28px/34px, Semibold
+  - Body: 17px/22px, Regular
+  - Caption: 12px/16px, Regular
+- **Dark Mode Elevation**: Lighter backgrounds = closer to user (not shadows).
+- **Semantic Colors**: Use CSS variables (`--label-primary`, `--tint-blue`) over hex.
+- **Icon Weights**: Stroke weight MUST match adjacent text weight.
+
+#### Motion (Spring Physics)
+- **Prefer Springs**: Use `cubic-bezier(0.175, 0.885, 0.32, 1.275)` for bouncy, interruptible animations.
+- **Duration Standards**:
+  - Instant feedback: 0.1s
+  - Fast transitions: 0.2s
+  - Normal animations: 0.35s
+  - Slow/dramatic: 0.5s
+- **Reduced Motion**: Respect `prefers-reduced-motion` — replace springs with cross-fades.
 
 ### Tauri-Specific Rules
 
