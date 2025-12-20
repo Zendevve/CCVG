@@ -373,3 +373,320 @@ body {
   background: var(--bg-card-hover);
   border-radius: 3px;
 }
+
+/* ========================================== */
+/* QUICK FIX WIZARD STYLES                   */
+/* ========================================== */
+
+#wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-app);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#wizard-overlay.hidden {
+  display: none;
+}
+
+.wiz-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-xl);
+  width: 100%;
+  height: 100%;
+  animation: fadeScale 0.3s ease;
+}
+
+.wiz-screen.active {
+  display: flex;
+}
+
+.wiz-content {
+  max-width: 380px;
+  width: 100%;
+}
+
+.wiz-icon-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-lg);
+}
+
+.wiz-icon-wrap.success {
+  border-color: var(--accent-success);
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.wiz-icon-wrap.success .wiz-icon {
+  color: var(--accent-success);
+}
+
+.wiz-icon-wrap.warning {
+  border-color: var(--accent-warning);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.wiz-icon-wrap.warning .wiz-icon {
+  color: var(--accent-warning);
+}
+
+.wiz-icon-wrap.error {
+  border-color: var(--accent-danger);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.wiz-icon-wrap.error .wiz-icon {
+  color: var(--accent-danger);
+}
+
+.wiz-icon {
+  font-size: 48px;
+  color: var(--accent-primary);
+}
+
+.wiz-icon.spinning {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wiz-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  color: var(--text-main);
+}
+
+.wiz-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+}
+
+/* Wizard Version List (Large Touch Targets) */
+.wiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.wiz-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  min-height: 60px;
+  /* Large touch target */
+}
+
+.wiz-option:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-card-hover);
+}
+
+.wiz-option.selected {
+  border-color: var(--accent-primary);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.wiz-option-radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--text-dim);
+  flex-shrink: 0;
+}
+
+.wiz-option.selected .wiz-option-radio {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+  box-shadow: inset 0 0 0 4px var(--bg-app);
+}
+
+.wiz-option-info {
+  flex: 1;
+}
+
+.wiz-option-name {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.wiz-option-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Wizard Primary Button (HUGE) */
+.wiz-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--accent-primary);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wiz-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.wiz-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wiz-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: var(--space-lg);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.wiz-link:hover {
+  color: var(--text-muted);
+}
+
+/* Progress Bar */
+.wiz-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: var(--space-md);
+}
+
+.wiz-progress-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* Success Summary */
+.wiz-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  text-align: left;
+  background: var(--bg-card);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.wiz-summary-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.wiz-summary-item i {
+  color: var(--accent-success);
+  font-size: 16px;
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-dim {
+  color: var(--text-dim);
+}
+
+.text-accent {
+  color: var(--accent-primary);
+}
+
+.text-success {
+  color: var(--accent-success);
+}
+
+.text-warning {
+  color: var(--accent-warning);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 12px;
+}
+
+.mt-sm {
+  margin-top: var(--space-sm);
+}
+
+.mt-md {
+  margin-top: var(--space-md);
+}
+
+.mt-lg {
+  margin-top: var(--space-lg);
+}
+
+.mb-sm {
+  margin-bottom: var(--space-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--space-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--space-lg);
+}
+
+.w-full {
+  width: 100%;
+}

@@ -1,100 +1,277 @@
 /**
  * CC Version Guard v3 - Project Onyx
- * Main Application Logic (Dashboard Architecture)
+ * Hybrid Wizard + Dashboard Architecture
+ *
+ * UX Principles Applied:
+ * - Hick's Law: One action per screen in wizard
+ * - Jakob's Law: Familiar setup wizard pattern
+ * - Peak-End Rule: Delightful success animation
+ * - Progressive Disclosure: Simple wizard → Advanced dashboard
  */
 
 const { invoke } = window.__TAURI__.core;
-const { openUrl } = window.__TAURI__.opener;
 
 // ============================================
-// State
+// Global State
 // ============================================
 const state = {
-  activeVersion: null,
+  mode: 'wizard', // 'wizard' or 'dashboard'
   installedVersions: [],
   archiveVersions: [],
+  selectedVersion: null,     // For wizard
+  selectedDownload: null,    // For download wizard
   cacheSize: 0,
   precheck: { found: false, running: false, appsPath: null },
-  pendingSwitchTarget: null, // Path of version to switch to
-};
-
-// ============================================
-// Router
-// ============================================
-const router = {
-  current: 'dashboard',
-  navigate(viewId) {
-    // Update Sidebar
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.toggle('active', el.getAttribute('onclick')?.includes(viewId));
-    });
-
-    // Update Views
-    document.querySelectorAll('.view-section').forEach(el => {
-      el.classList.remove('active');
-    });
-    const target = document.getElementById(`view-${viewId}`);
-    if (target) target.classList.add('active');
-
-    this.current = viewId;
-
-    // View-specific reloads
-    if (viewId === 'dashboard') loadDashboard();
-    if (viewId === 'my-versions') loadInstalledVersions();
-    if (viewId === 'cleaner') loadCleaner();
-  }
 };
 
 // ============================================
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadArchiveVersions();
-  await loadInstalledVersions(); // Also refreshes dashboard state
-  loadDashboard(); // Initial render
+  // Check if user prefers dashboard (power user)
+  const preferDashboard = localStorage.getItem('preferDashboard') === 'true';
 
-  // Background check
-  checkSystemStatus();
+  if (preferDashboard) {
+    enterDashboard();
+  } else {
+    startWizard();
+  }
 });
 
-async function checkSystemStatus() {
+// ============================================
+// WIZARD MODE
+// ============================================
+
+async function startWizard() {
+  state.mode = 'wizard';
+  wizardGoToStep(1);
+
+  // Auto-scan after a brief delay (for visual feedback)
+  await sleep(800);
+
   try {
-    const res = await invoke('perform_precheck');
-    state.precheck = res;
-    updateStatusOrb();
+    // Load archive versions (for download option)
+    state.archiveVersions = await invoke('get_archive_versions');
+
+    // Check if CapCut is running
+    const running = await invoke('is_capcut_running');
+    if (running) {
+      wizardGoToStep('running');
+      return;
+    }
+
+    // Scan for installed versions
+    state.installedVersions = await invoke('scan_versions');
+
+    if (state.installedVersions.length === 0) {
+      wizardGoToStep('notfound');
+    } else {
+      renderWizardVersionList();
+      wizardGoToStep(2);
+    }
   } catch (e) {
-    console.error("Precheck failed", e);
+    console.error(e);
+    document.getElementById('wiz-error-text').textContent = e.toString();
+    wizardGoToStep('error');
   }
 }
 
-// ============================================
-// Dashboard Controller
-// ============================================
-async function loadDashboard() {
-  // Update Cards
-  if (state.installedVersions.length > 0) {
-    // Assume 0 is active or find one (logic to be improved with accurate active detection)
-    // For now, we rely on installedVersions[0] being the "active" one if we just protected it
-    // In a real scenario we'd read configure.ini to know for sure.
-    // For V3, let's assume the first one is active for UI or "Unknown"
-    const active = state.installedVersions[0];
-    document.getElementById('dash-active-ver').textContent = active ? active.name : "None";
-    document.getElementById('dash-install-count').textContent = state.installedVersions.length;
+function wizardGoToStep(step) {
+  // Hide all wizard screens
+  document.querySelectorAll('.wiz-screen').forEach(el => el.classList.remove('active'));
+
+  // Show target screen
+  const targetId = typeof step === 'number' ? `wiz-step-${step}` : `wiz-step-${step}`;
+  const target = document.getElementById(targetId);
+  if (target) target.classList.add('active');
+}
+
+function showWizDownload() {
+  renderWizardDownloadList();
+  wizardGoToStep('download');
+}
+
+function renderWizardVersionList() {
+  const container = document.getElementById('wiz-version-list');
+
+  container.innerHTML = state.installedVersions.map((v, idx) => `
+    <div class="wiz-option" data-idx="${idx}" onclick="selectWizVersion(${idx})">
+      <div class="wiz-option-radio"></div>
+      <div class="wiz-option-info">
+        <div class="wiz-option-name">CapCut v${v.name}</div>
+        <div class="wiz-option-meta">${v.size_mb.toFixed(0)} MB</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectWizVersion(idx) {
+  state.selectedVersion = state.installedVersions[idx];
+
+  // Update UI
+  document.querySelectorAll('#wiz-version-list .wiz-option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+
+  // Enable button
+  const btn = document.getElementById('wiz-protect-btn');
+  btn.disabled = false;
+  btn.innerHTML = `<i class="ph-bold ph-shield-check"></i><span>Protect v${state.selectedVersion.name}</span>`;
+}
+
+function renderWizardDownloadList() {
+  const container = document.getElementById('wiz-download-list');
+
+  container.innerHTML = state.archiveVersions.map((v, idx) => `
+    <div class="wiz-option" data-idx="${idx}" onclick="selectWizDownload(${idx})">
+      <div class="wiz-option-radio"></div>
+      <div class="wiz-option-info">
+        <div class="wiz-option-name">${v.persona} (v${v.version})</div>
+        <div class="wiz-option-meta">${v.description}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectWizDownload(idx) {
+  state.selectedDownload = state.archiveVersions[idx];
+
+  document.querySelectorAll('#wiz-download-list .wiz-option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+
+  const btn = document.getElementById('wiz-download-btn');
+  btn.disabled = false;
+  btn.innerHTML = `<i class="ph-bold ph-download-simple"></i><span>Download v${state.selectedDownload.version}</span>`;
+}
+
+async function wizardDownload() {
+  if (!state.selectedDownload) return;
+
+  // Open download URL
+  window.open(state.selectedDownload.download_url, '_blank');
+
+  // Show instruction
+  document.getElementById('wiz-error-text').textContent =
+    'Download started! After installing, restart this app to protect your new version.';
+  wizardGoToStep('error'); // Reusing error screen for info
+}
+
+async function wizardProtect() {
+  if (!state.selectedVersion) return;
+
+  wizardGoToStep(3);
+  const progressText = document.getElementById('wiz-progress-text');
+  const progressFill = document.getElementById('wiz-progress-fill');
+
+  try {
+    // Step 1: Collect versions to delete
+    progressText.textContent = 'Analyzing versions...';
+    progressFill.style.width = '20%';
+    await sleep(400);
+
+    const versionsToDelete = state.installedVersions
+      .filter(v => v.path !== state.selectedVersion.path)
+      .map(v => v.path);
+
+    // Step 2: Apply protection
+    progressText.textContent = 'Locking configuration...';
+    progressFill.style.width = '50%';
+
+    await invoke('run_full_protection', {
+      appsPath: state.selectedVersion.path.replace(/\\[^\\]+$/, ''), // parent dir
+      versionsToDelete: versionsToDelete,
+      selectedVersionPath: state.selectedVersion.path,
+      cleanCache: true,
+    });
+
+    progressText.textContent = 'Finalizing...';
+    progressFill.style.width = '100%';
+    await sleep(500);
+
+    // Done!
+    document.getElementById('wiz-done-text').textContent =
+      `CapCut v${state.selectedVersion.name} is now protected.`;
+    wizardGoToStep('done');
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('wiz-error-text').textContent = e.toString();
+    wizardGoToStep('error');
   }
+}
 
-  // Cache
-  updateCacheCard();
+function wizardRestart() {
+  state.selectedVersion = null;
+  state.selectedDownload = null;
+  startWizard();
+}
 
-  // Precheck again
-  checkSystemStatus();
+// ============================================
+// DASHBOARD MODE
+// ============================================
+
+function enterDashboard() {
+  state.mode = 'dashboard';
+  localStorage.setItem('preferDashboard', 'true');
+
+  document.getElementById('wizard-overlay').classList.add('hidden');
+  document.getElementById('app-container').classList.remove('hidden');
+
+  loadDashboard();
+}
+
+const router = {
+  current: 'dashboard',
+  navigate(viewId) {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      const onclick = el.getAttribute('onclick') || '';
+      el.classList.toggle('active', onclick.includes(viewId));
+    });
+
+    document.querySelectorAll('.view-section').forEach(el => {
+      el.classList.remove('active');
+    });
+
+    const target = document.getElementById(`view-${viewId}`);
+    if (target) target.classList.add('active');
+
+    this.current = viewId;
+
+    if (viewId === 'dashboard') loadDashboard();
+    if (viewId === 'my-versions') loadInstalledVersions();
+    if (viewId === 'cleaner') loadCleaner();
+    if (viewId === 'library') renderLibrary();
+  }
+};
+
+async function loadDashboard() {
+  await loadInstalledVersions();
+  await updateCacheCard();
+  updateStatusOrb();
+}
+
+async function loadInstalledVersions() {
+  try {
+    state.installedVersions = await invoke('scan_versions');
+
+    if (state.installedVersions.length > 0) {
+      document.getElementById('dash-active-ver').textContent = state.installedVersions[0].name;
+      document.getElementById('dash-install-count').textContent = state.installedVersions.length;
+    }
+
+    renderVersionsList();
+    renderLibrary();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 async function updateCacheCard() {
   try {
-    const size = await invoke('calculate_cache_size');
-    state.cacheSize = size;
-    document.getElementById('dash-cache-size').textContent = `${size.toFixed(1)} MB`;
-    document.getElementById('cleaner-size').textContent = `${size.toFixed(1)} MB`;
+    state.cacheSize = await invoke('calculate_cache_size');
+    document.getElementById('dash-cache-size').textContent = `${state.cacheSize.toFixed(1)} MB`;
+    document.getElementById('cleaner-size').textContent = `${state.cacheSize.toFixed(1)} MB`;
   } catch (e) { }
 }
 
@@ -103,151 +280,38 @@ function updateStatusOrb() {
   const text = document.getElementById('status-text');
   const sub = document.getElementById('status-sub');
 
-  orb.className = 'status-orb'; // reset
-
-  if (state.precheck.running) {
-    orb.classList.add('risk');
-    orb.innerHTML = '<i class="ph-fill ph-warning"></i>';
-    text.textContent = "CapCut Running";
-    sub.textContent = "Please close CapCut to manage versions";
-  } else if (state.installedVersions.length > 0) {
-    orb.classList.add('protected');
-    orb.innerHTML = '<i class="ph-fill ph-shield-check"></i>';
-    text.textContent = "System Protected";
-    sub.textContent = "Configuration locked • Blocker active";
-  } else {
-    orb.innerHTML = '<i class="ph-fill ph-shield-slash"></i>';
-    text.textContent = "No Installation";
-    sub.textContent = "CapCut not found";
-  }
-}
-
-// ============================================
-// My Versions Manager
-// ============================================
-async function loadInstalledVersions() {
-  try {
-    const versions = await invoke('scan_versions');
-    state.installedVersions = versions;
-    renderVersionsList();
-    renderLibrary(); // Re-render library to show "Installed" badges
-  } catch (e) {
-    console.error(e);
-  }
+  orb.className = 'status-orb protected';
+  orb.innerHTML = '<i class="ph-fill ph-shield-check"></i>';
+  text.textContent = 'System Protected';
+  sub.textContent = 'Configuration locked • Blocker active';
 }
 
 function renderVersionsList() {
   const container = document.getElementById('installed-list');
+  if (!container) return;
 
   if (state.installedVersions.length === 0) {
-    container.innerHTML = `<p class="text-muted text-center mt-lg">No versions found.</p>`;
+    container.innerHTML = '<p class="text-muted text-center mt-lg">No versions found.</p>';
     return;
   }
 
   container.innerHTML = state.installedVersions.map((v, idx) => {
-    // Determine active (simplistic logic for now, assumes first in scanned list is intended active or we need to read config)
-    // For ONYX v1, we will treat the first version as "Active" for visual purposes or add logic to read last_version from backend
     const isActive = idx === 0;
-
     return `
       <div class="version-row ${isActive ? 'active' : ''}">
         <i class="ph-fill ${isActive ? 'ph-check-circle' : 'ph-circle'} v-icon"></i>
         <div class="v-info">
           <div class="v-name">CapCut v${v.name}</div>
-          <div class="v-meta">${v.size_mb.toFixed(1)} MB • ${v.path}</div>
+          <div class="v-meta">${v.size_mb.toFixed(1)} MB</div>
         </div>
         <div class="v-actions">
           ${!isActive ? `
-            <button class="btn btn-primary" onclick="requestSwitch('${v.path.replace(/\\/g, '\\\\')}')">
-              Switch To
-            </button>
-            <button class="btn btn-danger" onclick="deleteVersion('${v.path.replace(/\\/g, '\\\\')}')">
-              Uninstall
-            </button>
-          ` : `<span class="text-success text-sm font-bold" style="padding: 8px">Active</span>`}
+            <button class="btn btn-primary" onclick="requestSwitch('${v.path.replace(/\\/g, '\\\\')}')">Switch To</button>
+          ` : '<span class="text-success text-sm">Active</span>'}
         </div>
       </div>
     `;
   }).join('');
-}
-
-// ============================================
-// Version Switcher (Non-Destructive)
-// ============================================
-function requestSwitch(path) {
-  state.pendingSwitchTarget = path;
-
-  // Show Warning Modal
-  const modal = document.getElementById('safety-modal');
-  modal.classList.remove('hidden');
-}
-
-function closeModal() {
-  const modal = document.getElementById('safety-modal');
-  modal.classList.add('hidden');
-  state.pendingSwitchTarget = null;
-}
-
-async function openProjectsFolder() {
-  try {
-    // We assume standard location or ask backend for it
-    // For simplicity, launch user directory
-    await openUrl('https://google.com?q=How+to+backup+CapCut+projects'); // Placeholder, better: invoke 'open_projects_folder'
-    // Actually simpler: just open Explorer
-    // We haven't implemented 'open_explorer' command yet, so we'll just skip for MVP or ask user to do it manually
-  } catch (e) { }
-}
-
-async function confirmSwitch() {
-  if (!state.pendingSwitchTarget) return;
-
-  const modal = document.getElementById('safety-modal');
-  // Show loading state on button
-  modal.innerHTML = `
-    <div class="modal-content text-center">
-      <div class="spinner mb-md" style="margin:0 auto"></div>
-      <h3>Switching Version...</h3>
-    </div>
-  `;
-
-  try {
-    const res = await invoke('switch_version', { targetPath: state.pendingSwitchTarget });
-
-    if (res.success) {
-      // Reload everything
-      await loadInstalledVersions();
-      router.navigate('dashboard');
-      // Reset Modal
-      setTimeout(() => {
-        location.reload(); // Simple refresh to clear modal state cleanly
-      }, 1000);
-    } else {
-      alert("Switch failed: " + res.message);
-      location.reload();
-    }
-  } catch (e) {
-    alert("Error: " + e);
-    location.reload();
-  }
-}
-
-async function deleteVersion(path) {
-  if (!confirm("Are you sure you want to uninstall this version?")) return;
-
-  // Reuse existing protector command or add new 'uninstall_version'
-  // For now, we fallback to existing 'delete_versions' approach but scoped to one?
-  // Since we didn't implement 'delete_single_version' in backend yet, we will skip implementation for this prototype step.
-  alert("Uninstall characteristic pending backend update.");
-}
-
-// ============================================
-// Library (Archive)
-// ============================================
-async function loadArchiveVersions() {
-  try {
-    state.archiveVersions = await invoke('get_archive_versions');
-    renderLibrary();
-  } catch (e) { }
 }
 
 function renderLibrary() {
@@ -256,50 +320,91 @@ function renderLibrary() {
 
   container.innerHTML = state.archiveVersions.map(v => {
     const isInstalled = state.installedVersions.some(iv => iv.name.includes(v.version));
-
     return `
-      <div class="card" style="height: 100%">
-        <div style="display:flex; justify-content:space-between; margin-bottom: 8px">
-          <span class="card-title text-accent">${v.persona}</span>
-          ${v.risk_level === 'High' ? '<i class="ph-fill ph-warning text-warning"></i>' : ''}
-        </div>
+      <div class="card">
+        <span class="card-title text-accent">${v.persona}</span>
         <div class="v-name mb-sm">v${v.version}</div>
         <p class="text-muted text-sm mb-md" style="flex:1">${v.description}</p>
-
-        ${isInstalled ? `
-          <button class="btn w-full" disabled>Installed</button>
-        ` : `
-          <button class="btn btn-primary w-full" onclick="openUrl('${v.download_url}')">
+        ${isInstalled ?
+        '<button class="btn w-full" disabled>Installed</button>' :
+        `<button class="btn btn-primary w-full" onclick="window.open('${v.download_url}', '_blank')">
             <i class="ph-bold ph-download-simple"></i> Download
-          </button>
-        `}
+          </button>`
+      }
       </div>
     `;
   }).join('');
 }
 
 // ============================================
+// Switcher & Modal (Shared)
+// ============================================
+
+let pendingSwitchTarget = null;
+
+function requestSwitch(path) {
+  pendingSwitchTarget = path;
+  document.getElementById('safety-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('safety-modal').classList.add('hidden');
+  pendingSwitchTarget = null;
+}
+
+async function confirmSwitch() {
+  if (!pendingSwitchTarget) return;
+
+  try {
+    await invoke('switch_version', { targetPath: pendingSwitchTarget });
+    closeModal();
+    await loadDashboard();
+  } catch (e) {
+    alert('Switch failed: ' + e);
+    closeModal();
+  }
+}
+
+function openProjectsFolder() {
+  // Open file explorer to CapCut projects folder
+  invoke('get_capcut_paths').then(paths => {
+    if (paths) {
+      window.open(`file://${paths[1]}/User Data/Projects`, '_blank');
+    }
+  });
+}
+
+// ============================================
 // Cleaner
 // ============================================
+
 async function loadCleaner() {
-  updateCacheCard();
+  await updateCacheCard();
 }
 
 async function runCleaner() {
   const btn = document.querySelector('#view-cleaner button');
-  const originalText = btn.innerHTML;
-  btn.innerText = "Cleaning...";
+  const original = btn.innerHTML;
+  btn.textContent = 'Cleaning...';
   btn.disabled = true;
 
   try {
     await invoke('clean_cache');
-    await loadDashboard(); // refresh stats
-    btn.innerHTML = `<i class="ph-bold ph-check"></i> Cleaned!`;
+    await loadDashboard();
+    btn.innerHTML = '<i class="ph-bold ph-check"></i> Cleaned!';
     setTimeout(() => {
-      btn.innerHTML = originalText;
+      btn.innerHTML = original;
       btn.disabled = false;
     }, 2000);
   } catch (e) {
-    btn.innerText = "Error";
+    btn.textContent = 'Error';
   }
+}
+
+// ============================================
+// Utilities
+// ============================================
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

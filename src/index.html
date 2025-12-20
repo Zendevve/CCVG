@@ -9,11 +9,168 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="app-container">
-    <!-- Sidebar -->
+  <!-- ========================================== -->
+  <!-- QUICK FIX WIZARD (Default Entry Point)    -->
+  <!-- ========================================== -->
+  <div id="wizard-overlay">
+
+    <!-- Step 1: Scanning -->
+    <div id="wiz-step-1" class="wiz-screen active">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap">
+          <i class="ph-fill ph-magnifying-glass wiz-icon spinning"></i>
+        </div>
+        <h1 class="wiz-title">Scanning Your System</h1>
+        <p class="wiz-desc">Looking for CapCut installations...</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Choose Version -->
+    <div id="wiz-step-2" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap">
+          <i class="ph-fill ph-list-checks wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">Choose Your Version</h1>
+        <p class="wiz-desc">Select the version you want to KEEP and protect.</p>
+
+        <div id="wiz-version-list" class="wiz-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <button id="wiz-protect-btn" class="wiz-btn-primary" disabled onclick="wizardProtect()">
+          <i class="ph-bold ph-shield-check"></i>
+          <span>Select a Version</span>
+        </button>
+      </div>
+
+      <a class="wiz-link" onclick="showWizDownload()">
+        <i class="ph ph-download-simple"></i> Download a legacy version instead
+      </a>
+    </div>
+
+    <!-- Step 2b: Download (Alternative) -->
+    <div id="wiz-step-download" class="wiz-screen">
+      <div class="wiz-content" style="max-width: 450px">
+        <div class="wiz-icon-wrap">
+          <i class="ph-fill ph-cloud-arrow-down wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">Download Legacy Version</h1>
+        <p class="wiz-desc">Choose from official ByteDance archive.</p>
+
+        <div id="wiz-download-list" class="wiz-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <button id="wiz-download-btn" class="wiz-btn-primary" disabled onclick="wizardDownload()">
+          <i class="ph-bold ph-download-simple"></i>
+          <span>Select a Version</span>
+        </button>
+      </div>
+
+      <a class="wiz-link" onclick="wizardGoToStep(2)">
+        <i class="ph ph-arrow-left"></i> Back to installed versions
+      </a>
+    </div>
+
+    <!-- Step 3: Applying -->
+    <div id="wiz-step-3" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap">
+          <i class="ph-fill ph-gear wiz-icon spinning"></i>
+        </div>
+        <h1 class="wiz-title">Applying Protection</h1>
+        <p class="wiz-desc" id="wiz-progress-text">Preparing...</p>
+
+        <div class="wiz-progress-bar">
+          <div id="wiz-progress-fill" class="wiz-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Done -->
+    <div id="wiz-step-done" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap success">
+          <i class="ph-fill ph-shield-check wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">Protection Complete!</h1>
+        <p class="wiz-desc" id="wiz-done-text">Your CapCut installation is now locked.</p>
+
+        <div class="wiz-summary">
+          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Configuration locked</div>
+          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Update blocker active</div>
+          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Cache cleaned</div>
+        </div>
+
+        <button class="wiz-btn-primary" onclick="window.close()">
+          <i class="ph-bold ph-x"></i> Close
+        </button>
+
+        <a class="wiz-link mt-lg" onclick="enterDashboard()">
+          <i class="ph ph-squares-four"></i> Advanced Settings (Dashboard)
+        </a>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="wiz-step-error" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap error">
+          <i class="ph-fill ph-warning-octagon wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">Something Went Wrong</h1>
+        <p class="wiz-desc" id="wiz-error-text">An error occurred.</p>
+
+        <button class="wiz-btn-primary" onclick="wizardRestart()">
+          <i class="ph-bold ph-arrow-clockwise"></i> Try Again
+        </button>
+      </div>
+    </div>
+
+    <!-- No CapCut Found -->
+    <div id="wiz-step-notfound" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap">
+          <i class="ph-fill ph-folder-notch-open wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">CapCut Not Found</h1>
+        <p class="wiz-desc">No CapCut installation detected on your system.</p>
+
+        <button class="wiz-btn-primary" onclick="showWizDownload()">
+          <i class="ph-bold ph-download-simple"></i> Download a Version
+        </button>
+
+        <a class="wiz-link mt-lg" onclick="wizardRestart()">
+          <i class="ph ph-arrow-clockwise"></i> Scan Again
+        </a>
+      </div>
+    </div>
+
+    <!-- CapCut Running -->
+    <div id="wiz-step-running" class="wiz-screen">
+      <div class="wiz-content">
+        <div class="wiz-icon-wrap warning">
+          <i class="ph-fill ph-warning wiz-icon"></i>
+        </div>
+        <h1 class="wiz-title">CapCut is Running</h1>
+        <p class="wiz-desc">Please close CapCut before proceeding.</p>
+
+        <button class="wiz-btn-primary" onclick="wizardRestart()">
+          <i class="ph-bold ph-arrow-clockwise"></i> Check Again
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- DASHBOARD (Advanced Mode)                 -->
+  <!-- ========================================== -->
+  <div id="app-container" class="hidden">
     <nav id="sidebar">
       <div class="brand">
-        <i class="ph-fill ph-shield-check text-accent"></i>
+        <i class="ph-fill ph-shield-check"></i>
         <span>ONYX SHIELD</span>
       </div>
 
@@ -45,10 +202,8 @@
       </div>
     </nav>
 
-    <!-- Content Area -->
     <main id="content-area">
 
-      <!-- Dashboard View -->
       <section id="view-dashboard" class="view-section active">
         <div class="status-orb-container">
           <div id="status-orb" class="status-orb">
@@ -78,31 +233,24 @@
           </div>
 
           <div class="card" onclick="router.navigate('library')" style="cursor:pointer">
-            <span class="card-title">Updates</span>
-            <span class="card-value text-accent">Check</span>
-            <span class="card-sub">Download new versions</span>
+            <span class="card-title">Library</span>
+            <span class="card-value text-accent">Browse</span>
+            <span class="card-sub">Download versions</span>
           </div>
         </div>
       </section>
 
-      <!-- My Versions View -->
       <section id="view-my-versions" class="view-section">
         <h2 class="mb-lg">My Versions</h2>
-        <div id="installed-list">
-          <!-- Populated by JS -->
-        </div>
+        <div id="installed-list"></div>
       </section>
 
-      <!-- Library View -->
       <section id="view-library" class="view-section">
         <h2 class="mb-lg">Version Library</h2>
         <p class="text-muted mb-md">Download legacy versions directly from official servers.</p>
-        <div id="library-grid" class="dashboard-grid">
-          <!-- Populated by JS -->
-        </div>
+        <div id="library-grid" class="dashboard-grid"></div>
       </section>
 
-      <!-- Cleaner View -->
       <section id="view-cleaner" class="view-section">
         <h2 class="mb-lg">Cache Cleaner</h2>
         <div class="card mb-lg">
@@ -118,7 +266,7 @@
     </main>
   </div>
 
-  <!-- Safety Modal -->
+  <!-- Safety Modal (shared) -->
   <div id="safety-modal" class="modal-overlay hidden">
     <div class="modal-content">
       <div class="text-center mb-lg">
@@ -127,7 +275,7 @@
       </div>
 
       <p class="mb-md text-muted">
-        Opening projects in a newer version (e.g. v4.0) makes them <strong>permanently incompatible</strong> with older versions.
+        Opening projects in a newer version makes them <strong>permanently incompatible</strong> with older versions.
       </p>
 
       <p class="mb-lg text-muted">
