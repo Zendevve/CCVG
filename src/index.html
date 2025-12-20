@@ -9,290 +9,234 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- ========================================== -->
-  <!-- QUICK FIX WIZARD (Default Entry Point)    -->
-  <!-- ========================================== -->
-  <div id="wizard-overlay">
+  <div id="app">
 
-    <!-- Step 1: Scanning -->
-    <div id="wiz-step-1" class="wiz-screen active">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap">
-          <i class="ph-fill ph-magnifying-glass wiz-icon spinning"></i>
-        </div>
-        <h1 class="wiz-title">Scanning Your System</h1>
-        <p class="wiz-desc">Looking for CapCut installations...</p>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-step" data-step="1">
+        <div class="step-dot"></div>
+        <span>Start</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2">
+        <div class="step-dot"></div>
+        <span>Select</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3">
+        <div class="step-dot"></div>
+        <span>Options</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="4">
+        <div class="step-dot"></div>
+        <span>Done</span>
       </div>
     </div>
 
-    <!-- Step 2: Choose Version -->
-    <div id="wiz-step-2" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap">
-          <i class="ph-fill ph-list-checks wiz-icon"></i>
+    <!-- Screen: Welcome -->
+    <div id="screen-welcome" class="screen active">
+      <div class="screen-content">
+        <div class="icon-wrap accent">
+          <i class="ph-fill ph-shield-check"></i>
         </div>
-        <h1 class="wiz-title">Choose Your Version</h1>
-        <p class="wiz-desc">Select the version you want to KEEP and protect.</p>
+        <h1>CC Version Guard</h1>
+        <p class="subtitle">Lock your CapCut version and prevent auto-updates.</p>
 
-        <div id="wiz-version-list" class="wiz-list">
-          <!-- Populated by JS -->
-        </div>
-
-        <button id="wiz-protect-btn" class="wiz-btn-primary" disabled onclick="wizardProtect()">
-          <i class="ph-bold ph-shield-check"></i>
-          <span>Select a Version</span>
-        </button>
-      </div>
-
-      <a class="wiz-link" onclick="showWizDownload()">
-        <i class="ph ph-download-simple"></i> Download a legacy version instead
-      </a>
-    </div>
-
-    <!-- Step 2b: Download (Alternative) -->
-    <div id="wiz-step-download" class="wiz-screen">
-      <div class="wiz-content" style="max-width: 450px">
-        <div class="wiz-icon-wrap">
-          <i class="ph-fill ph-cloud-arrow-down wiz-icon"></i>
-        </div>
-        <h1 class="wiz-title">Download Legacy Version</h1>
-        <p class="wiz-desc">Choose from official ByteDance archive.</p>
-
-        <div id="wiz-download-list" class="wiz-list">
-          <!-- Populated by JS -->
+        <div class="info-card">
+          <div class="info-row">
+            <i class="ph ph-check-circle"></i>
+            <span>Protect against forced updates</span>
+          </div>
+          <div class="info-row">
+            <i class="ph ph-check-circle"></i>
+            <span>Clean cache to free disk space</span>
+          </div>
+          <div class="info-row">
+            <i class="ph ph-check-circle"></i>
+            <span>Download legacy versions</span>
+          </div>
         </div>
 
-        <button id="wiz-download-btn" class="wiz-btn-primary" disabled onclick="wizardDownload()">
-          <i class="ph-bold ph-download-simple"></i>
-          <span>Select a Version</span>
-        </button>
-      </div>
-
-      <a class="wiz-link" onclick="wizardGoToStep(2)">
-        <i class="ph ph-arrow-left"></i> Back to installed versions
-      </a>
-    </div>
-
-    <!-- Step 3: Applying -->
-    <div id="wiz-step-3" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap">
-          <i class="ph-fill ph-gear wiz-icon spinning"></i>
-        </div>
-        <h1 class="wiz-title">Applying Protection</h1>
-        <p class="wiz-desc" id="wiz-progress-text">Preparing...</p>
-
-        <div class="wiz-progress-bar">
-          <div id="wiz-progress-fill" class="wiz-progress-fill"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4: Done -->
-    <div id="wiz-step-done" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap success">
-          <i class="ph-fill ph-shield-check wiz-icon"></i>
-        </div>
-        <h1 class="wiz-title">Protection Complete!</h1>
-        <p class="wiz-desc" id="wiz-done-text">Your CapCut installation is now locked.</p>
-
-        <div class="wiz-summary">
-          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Configuration locked</div>
-          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Update blocker active</div>
-          <div class="wiz-summary-item"><i class="ph-fill ph-check-circle"></i> Cache cleaned</div>
-        </div>
-
-        <button class="wiz-btn-primary" onclick="window.close()">
-          <i class="ph-bold ph-x"></i> Close
+        <button class="btn-primary" onclick="startCheck()">
+          <i class="ph-bold ph-play"></i> Start Protection
         </button>
 
-        <a class="wiz-link mt-lg" onclick="enterDashboard()">
-          <i class="ph ph-squares-four"></i> Advanced Settings (Dashboard)
+        <a class="link-secondary" onclick="showScreen('download-manager')">
+          <i class="ph ph-download-simple"></i> Download a Legacy Version
         </a>
       </div>
     </div>
 
-    <!-- Error State -->
-    <div id="wiz-step-error" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap error">
-          <i class="ph-fill ph-warning-octagon wiz-icon"></i>
-        </div>
-        <h1 class="wiz-title">Something Went Wrong</h1>
-        <p class="wiz-desc" id="wiz-error-text">An error occurred.</p>
+    <!-- Screen: Download Manager -->
+    <div id="screen-download-manager" class="screen">
+      <div class="screen-content wide">
+        <h2>Download Legacy Version</h2>
+        <p class="subtitle">Choose from official ByteDance archives.</p>
 
-        <button class="wiz-btn-primary" onclick="wizardRestart()">
-          <i class="ph-bold ph-arrow-clockwise"></i> Try Again
+        <div id="version-grid" class="version-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <button class="btn-secondary" onclick="showScreen('welcome')">
+          <i class="ph ph-arrow-left"></i> Back
         </button>
       </div>
     </div>
 
-    <!-- No CapCut Found -->
-    <div id="wiz-step-notfound" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap">
-          <i class="ph-fill ph-folder-notch-open wiz-icon"></i>
+    <!-- Screen: PreCheck -->
+    <div id="screen-precheck" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap">
+          <i class="ph-fill ph-magnifying-glass spinning"></i>
         </div>
-        <h1 class="wiz-title">CapCut Not Found</h1>
-        <p class="wiz-desc">No CapCut installation detected on your system.</p>
-
-        <button class="wiz-btn-primary" onclick="showWizDownload()">
-          <i class="ph-bold ph-download-simple"></i> Download a Version
-        </button>
-
-        <a class="wiz-link mt-lg" onclick="wizardRestart()">
-          <i class="ph ph-arrow-clockwise"></i> Scan Again
-        </a>
+        <h2>Scanning System</h2>
+        <p class="subtitle" id="precheck-status">Looking for CapCut installations...</p>
       </div>
     </div>
 
-    <!-- CapCut Running -->
-    <div id="wiz-step-running" class="wiz-screen">
-      <div class="wiz-content">
-        <div class="wiz-icon-wrap warning">
-          <i class="ph-fill ph-warning wiz-icon"></i>
+    <!-- Screen: CapCut Running -->
+    <div id="screen-running-warning" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap warning">
+          <i class="ph-fill ph-warning"></i>
         </div>
-        <h1 class="wiz-title">CapCut is Running</h1>
-        <p class="wiz-desc">Please close CapCut before proceeding.</p>
+        <h2>CapCut is Running</h2>
+        <p class="subtitle">Please close CapCut before continuing.</p>
 
-        <button class="wiz-btn-primary" onclick="wizardRestart()">
+        <button class="btn-primary" onclick="startCheck()">
           <i class="ph-bold ph-arrow-clockwise"></i> Check Again
         </button>
       </div>
     </div>
 
-  </div>
-
-  <!-- ========================================== -->
-  <!-- DASHBOARD (Advanced Mode)                 -->
-  <!-- ========================================== -->
-  <div id="app-container" class="hidden">
-    <nav id="sidebar">
-      <div class="brand">
-        <i class="ph-fill ph-shield-check"></i>
-        <span>ONYX SHIELD</span>
-      </div>
-
-      <div class="nav-item active" onclick="router.navigate('dashboard')">
-        <i class="ph ph-squares-four"></i>
-        <span>Dashboard</span>
-      </div>
-
-      <div class="nav-item" onclick="router.navigate('my-versions')">
-        <i class="ph ph-list-dashes"></i>
-        <span>My Versions</span>
-      </div>
-
-      <div class="nav-item" onclick="router.navigate('library')">
-        <i class="ph ph-bag"></i>
-        <span>Library</span>
-      </div>
-
-      <div class="nav-item" onclick="router.navigate('cleaner')">
-        <i class="ph ph-broom"></i>
-        <span>Cleaner</span>
-      </div>
-
-      <div style="flex:1"></div>
-
-      <div class="nav-item" onclick="window.close()">
-        <i class="ph ph-sign-out"></i>
-        <span>Exit</span>
-      </div>
-    </nav>
-
-    <main id="content-area">
-
-      <section id="view-dashboard" class="view-section active">
-        <div class="status-orb-container">
-          <div id="status-orb" class="status-orb">
-            <i class="ph-fill ph-shield-check"></i>
-          </div>
-          <h2 id="status-text">System Protected</h2>
-          <p class="text-muted text-sm" id="status-sub">Configuration locked • Blocker active</p>
+    <!-- Screen: Not Found -->
+    <div id="screen-not-found" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap">
+          <i class="ph-fill ph-folder-notch-open"></i>
         </div>
+        <h2>CapCut Not Found</h2>
+        <p class="subtitle">No installation detected on this system.</p>
 
-        <div class="dashboard-grid">
-          <div class="card">
-            <span class="card-title">Active Version</span>
-            <span class="card-value" id="dash-active-ver">--</span>
-            <span class="card-sub text-success">Running</span>
-          </div>
-
-          <div class="card">
-            <span class="card-title">Installed</span>
-            <span class="card-value" id="dash-install-count">0</span>
-            <span class="card-sub">Versions managed</span>
-          </div>
-
-          <div class="card">
-            <span class="card-title">Cache</span>
-            <span class="card-value" id="dash-cache-size">0 MB</span>
-            <span class="card-sub">Recoverable space</span>
-          </div>
-
-          <div class="card" onclick="router.navigate('library')" style="cursor:pointer">
-            <span class="card-title">Library</span>
-            <span class="card-value text-accent">Browse</span>
-            <span class="card-sub">Download versions</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-my-versions" class="view-section">
-        <h2 class="mb-lg">My Versions</h2>
-        <div id="installed-list"></div>
-      </section>
-
-      <section id="view-library" class="view-section">
-        <h2 class="mb-lg">Version Library</h2>
-        <p class="text-muted mb-md">Download legacy versions directly from official servers.</p>
-        <div id="library-grid" class="dashboard-grid"></div>
-      </section>
-
-      <section id="view-cleaner" class="view-section">
-        <h2 class="mb-lg">Cache Cleaner</h2>
-        <div class="card mb-lg">
-          <span class="card-title">Total Cache Size</span>
-          <span class="card-value" id="cleaner-size">0.0 MB</span>
-          <p class="text-muted mt-sm">Includes proxy files, temp data, and smart crop cache.</p>
-        </div>
-        <button class="btn btn-primary w-full" onclick="runCleaner()">
-          <i class="ph-bold ph-broom"></i> Clean All Cache
-        </button>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- Safety Modal (shared) -->
-  <div id="safety-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <div class="text-center mb-lg">
-        <i class="ph-fill ph-warning-octagon text-warning" style="font-size: 48px"></i>
-        <h3 class="mt-md">Compatibility Warning</h3>
-      </div>
-
-      <p class="mb-md text-muted">
-        Opening projects in a newer version makes them <strong>permanently incompatible</strong> with older versions.
-      </p>
-
-      <p class="mb-lg text-muted">
-        If you switch back to an older version later, these projects <strong>will not open</strong>.
-      </p>
-
-      <div style="display:flex; gap:10px; flex-direction:column">
-        <button class="btn" style="padding:12px" onclick="openProjectsFolder()">
-          <i class="ph ph-folder-open"></i> Backup Projects Folder First
+        <button class="btn-primary" onclick="showScreen('download-manager')">
+          <i class="ph-bold ph-download-simple"></i> Download a Version
         </button>
 
-        <div style="display:flex; gap:10px; margin-top:10px">
-          <button class="btn w-full" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary w-full" onclick="confirmSwitch()">I Understand, Switch</button>
+        <a class="link-secondary" onclick="startCheck()">
+          <i class="ph ph-arrow-clockwise"></i> Scan Again
+        </a>
+      </div>
+    </div>
+
+    <!-- Screen: Version Select -->
+    <div id="screen-version-select" class="screen">
+      <div class="screen-content">
+        <h2>Select Version to Keep</h2>
+        <p class="subtitle">All other versions will be removed.</p>
+
+        <div id="installed-versions" class="version-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <button id="btn-continue-select" class="btn-primary" disabled onclick="goToCacheScreen()">
+          <i class="ph-bold ph-arrow-right"></i> Continue
+        </button>
+
+        <a class="link-secondary" onclick="showScreen('welcome')">
+          <i class="ph ph-arrow-left"></i> Back
+        </a>
+      </div>
+    </div>
+
+    <!-- Screen: Cache Clean Options -->
+    <div id="screen-cache-clean" class="screen">
+      <div class="screen-content">
+        <h2>Cache Cleanup</h2>
+        <p class="subtitle">Free up disk space by removing temporary files.</p>
+
+        <div class="cache-card">
+          <div class="cache-info">
+            <span class="cache-label">Recoverable Space</span>
+            <span class="cache-value" id="cache-size">0 MB</span>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" id="cache-toggle" checked />
+            <span class="toggle-switch"></span>
+            <span>Clean cache during protection</span>
+          </label>
+        </div>
+
+        <button class="btn-primary" onclick="startProtection()">
+          <i class="ph-bold ph-shield-check"></i> Apply Protection
+        </button>
+
+        <a class="link-secondary" onclick="showScreen('version-select')">
+          <i class="ph ph-arrow-left"></i> Back
+        </a>
+      </div>
+    </div>
+
+    <!-- Screen: Running -->
+    <div id="screen-running" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap">
+          <i class="ph-fill ph-gear spinning"></i>
+        </div>
+        <h2>Applying Protection</h2>
+        <p class="subtitle" id="running-status">Preparing...</p>
+
+        <div class="progress-container">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div id="action-log" class="action-log">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
+
+    <!-- Screen: Complete -->
+    <div id="screen-complete" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap success">
+          <i class="ph-fill ph-shield-check"></i>
+        </div>
+        <h2>Protection Complete!</h2>
+        <p class="subtitle" id="complete-text">Your CapCut installation is now protected.</p>
+
+        <div class="success-summary">
+          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Versions cleaned</div>
+          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Configuration locked</div>
+          <div class="summary-row"><i class="ph-fill ph-check-circle"></i> Update blocker active</div>
+          <div class="summary-row" id="cache-cleaned-row"><i class="ph-fill ph-check-circle"></i> Cache cleaned</div>
+        </div>
+
+        <button class="btn-primary" onclick="window.close()">
+          <i class="ph-bold ph-x"></i> Close
+        </button>
+
+        <a class="link-secondary" href="https://github.com/Zendevve/capcut-version-guard" target="_blank">
+          <i class="ph ph-github-logo"></i> View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Screen: Error -->
+    <div id="screen-error" class="screen">
+      <div class="screen-content">
+        <div class="icon-wrap error">
+          <i class="ph-fill ph-warning-octagon"></i>
+        </div>
+        <h2>Something Went Wrong</h2>
+        <p class="subtitle" id="error-text">An error occurred.</p>
+
+        <button class="btn-primary" onclick="showScreen('welcome')">
+          <i class="ph-bold ph-arrow-clockwise"></i> Try Again
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <script src="main.js"></script>
