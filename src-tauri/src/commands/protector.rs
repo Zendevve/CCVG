@@ -173,11 +173,66 @@ pub fn apply_protection() -> ProtectionResult {
     }
 }
 
+/// Apply protection with specific options
+pub fn apply_protection_with_options(lock_config: bool, create_blockers: bool) -> ProtectionResult {
+    let apps_path = match std::env::var("LOCALAPPDATA") {
+        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
+        Err(_) => {
+            return ProtectionResult {
+                success: false,
+                error: Some("Failed to get LOCALAPPDATA".to_string()),
+                logs: vec![],
+            }
+        }
+    };
+
+    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let mut logs: Vec<String> = Vec::new();
+
+    // Lock configuration if enabled
+    if lock_config {
+        logs.push("Modifying config...".to_string());
+        if let Err(e) = lock_configuration(&apps_path) {
+            return ProtectionResult {
+                success: false,
+                error: Some(e),
+                logs,
+            };
+        }
+        logs.push("[OK] Configuration locked".to_string());
+    } else {
+        logs.push("Skipping config lock (disabled)".to_string());
+    }
+
+    // Create blockers if enabled
+    if create_blockers {
+        logs.push("Creating blockers...".to_string());
+        if let Err(e) = create_dummy_files(&capcut_root, &apps_path) {
+            return ProtectionResult {
+                success: false,
+                error: Some(e),
+                logs,
+            };
+        }
+        logs.push("[OK] Update blockers created".to_string());
+    } else {
+        logs.push("Skipping blocker creation (disabled)".to_string());
+    }
+
+    ProtectionResult {
+        success: true,
+        error: None,
+        logs,
+    }
+}
+
 /// Full protection sequence
 #[derive(serde::Deserialize)]
 pub struct ProtectionParams {
     pub versions_to_delete: Vec<String>,
     pub clean_cache: bool,
+    pub lock_config: bool,
+    pub create_blockers: bool,
 }
 
 #[tauri::command]
@@ -218,15 +273,19 @@ pub fn run_full_protection(params: ProtectionParams) -> ProtectionResult {
         all_logs.push("Skipping cache cleaning (disabled)".to_string());
     }
 
-    // Apply protection
-    let protect_result = apply_protection();
-    all_logs.extend(protect_result.logs);
-    if !protect_result.success {
-        return ProtectionResult {
-            success: false,
-            error: protect_result.error,
-            logs: all_logs,
-        };
+    // Apply protection (conditionally based on flags)
+    if params.lock_config || params.create_blockers {
+        let protect_result = apply_protection_with_options(params.lock_config, params.create_blockers);
+        all_logs.extend(protect_result.logs);
+        if !protect_result.success {
+            return ProtectionResult {
+                success: false,
+                error: protect_result.error,
+                logs: all_logs,
+            };
+        }
+    } else {
+        all_logs.push("Skipping protection (all options disabled)".to_string());
     }
 
     ProtectionResult {

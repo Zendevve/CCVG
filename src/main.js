@@ -5,6 +5,7 @@
 
 const { invoke } = window.__TAURI__.core;
 const { getCurrentWindow } = window.__TAURI__.window;
+const { getVersion } = window.__TAURI__.app;
 
 // ============================================
 // Window Controls
@@ -20,6 +21,7 @@ const state = {
   history: ['welcome'],
   versions: [],
   selectedVersion: null,
+  switchTarget: null,
   cacheEnabled: true,
   lockEnabled: true,
   blockerEnabled: true,
@@ -38,6 +40,7 @@ function navigateTo(viewId) {
   if (viewId === 'versions') loadVersions();
   if (viewId === 'legacy') loadArchiveVersions();
   if (viewId === 'options') loadCacheSize();
+  if (viewId === 'switch') loadSwitchVersions();
 }
 
 function showView(viewId) {
@@ -128,6 +131,12 @@ document.getElementById('btn-continue-version')?.addEventListener('click', () =>
 
 async function loadVersions() {
   const container = document.getElementById('version-list');
+  const continueBtn = document.getElementById('btn-continue-version');
+
+  // Reset state
+  state.selectedVersion = null;
+  continueBtn.disabled = true;
+
   container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
 
   try {
@@ -251,7 +260,9 @@ async function runProtectionSequence() {
     const result = await invoke('run_full_protection', {
       params: {
         versions_to_delete: versionsToDelete,
-        clean_cache: state.cacheEnabled
+        clean_cache: state.cacheEnabled,
+        lock_config: state.lockEnabled,
+        create_blockers: state.blockerEnabled
       }
     });
 
@@ -333,6 +344,111 @@ async function loadArchiveVersions() {
 }
 
 // ============================================
+// Quick Switch View Handlers
+// ============================================
+document.getElementById('btn-switch')?.addEventListener('click', () => navigateTo('switch'));
+document.getElementById('switch-back')?.addEventListener('click', goBack);
+document.getElementById('btn-switch-apply')?.addEventListener('click', applySwitch);
+
+async function loadSwitchVersions() {
+  const container = document.getElementById('switch-list');
+  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
+
+  try {
+    const vers = await invoke('scan_versions');
+    state.versions = vers;
+    state.switchTarget = null;
+
+    if (vers.length === 0) {
+      container.innerHTML = '<div class="list-row"><span class="row-title">No installations found</span></div>';
+      return;
+    }
+
+    if (vers.length === 1) {
+      container.innerHTML = '<div class="list-row"><span class="row-title">Only one version installed — nothing to switch</span></div>';
+      return;
+    }
+
+    container.innerHTML = vers.map((v, i) => `
+      <div class="list-row selectable" onclick="selectSwitchVersion(${i})">
+        <div class="row-icon bg-accent-purple">
+          <i class="ph ph-hard-drives"></i>
+        </div>
+        <div class="row-content">
+          <span class="row-title">CapCut v${v.name}</span>
+          <span class="row-subtitle">${v.size_mb.toFixed(0)} MB</span>
+        </div>
+        <i class="ph ph-check row-accessory" style="opacity: 0; color: var(--accent-blue); font-size: 18px;"></i>
+      </div>
+    `).join('');
+
+  } catch (e) {
+    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
+  }
+}
+
+window.selectSwitchVersion = function (idx) {
+  state.switchTarget = state.versions[idx];
+  document.getElementById('btn-switch-apply').disabled = false;
+
+  document.querySelectorAll('#switch-list .list-row').forEach((el, i) => {
+    const check = el.querySelector('.row-accessory');
+    if (i === idx) {
+      el.style.backgroundColor = 'var(--fill-tertiary)';
+      if (check) check.style.opacity = '1';
+    } else {
+      el.style.backgroundColor = '';
+      if (check) check.style.opacity = '0';
+    }
+  });
+};
+
+async function applySwitch() {
+  if (!state.switchTarget) return;
+
+  const btn = document.getElementById('btn-switch-apply');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-circle-notch spin"></i> Switching...';
+
+  try {
+    const result = await invoke('switch_version', { targetPath: state.switchTarget.path });
+
+    if (result.success) {
+      btn.innerHTML = '<i class="ph ph-check"></i> Switched!';
+      btn.style.background = 'var(--accent-green)';
+      await sleep(1000);
+      state.history = ['welcome'];
+      showView('welcome');
+      btn.innerHTML = '<i class="ph ph-swap"></i> Switch Version';
+      btn.style.background = '';
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (e) {
+    btn.innerHTML = '<i class="ph ph-x"></i> Failed';
+    btn.style.background = 'var(--accent-red)';
+    console.error(e);
+    await sleep(2000);
+    btn.innerHTML = '<i class="ph ph-swap"></i> Switch Version';
+    btn.style.background = '';
+    btn.disabled = false;
+  }
+}
+
+// ============================================
 // Utilities
 // ============================================
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================
+// Dynamic Version Display
+// ============================================
+(async function loadAppVersion() {
+  try {
+    const version = await getVersion();
+    const versionEl = document.getElementById('app-version');
+    if (versionEl) versionEl.textContent = `v${version}`;
+  } catch (e) {
+    console.warn('Could not load app version:', e);
+  }
+})();

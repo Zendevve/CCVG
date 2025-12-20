@@ -646,15 +646,22 @@ html,
 
 ::-webkit-scrollbar-track {
   background: transparent;
+  margin: 4px 0;
+  /* Creates space at top/bottom to avoid sharp corners */
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
+  border: 2px solid transparent;
+  /* Creates inset effect */
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-corner {
@@ -1292,6 +1299,11 @@ html,
   background-color: rgb(255 159 10 / var(--tw-bg-opacity, 1));
 }
 
+.bg-accent-purple {
+  --tw-bg-opacity: 1;
+  background-color: rgb(191 90 242 / var(--tw-bg-opacity, 1));
+}
+
 .text-center {
   text-align: center;
 }
@@ -1319,6 +1331,10 @@ html,
 
 .bg-accent-orange {
   background: var(--accent-orange);
+}
+
+.bg-accent-purple {
+  background: var(--accent-purple);
 }
 
 .bg-accent-indigo {

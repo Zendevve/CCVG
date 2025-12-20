@@ -39,6 +39,10 @@
 
       <div class="button-stack mx-auto">
         <button class="btn-primary" id="btn-start">Get Started</button>
+        <button class="btn-secondary" id="btn-switch">
+          <i class="ph ph-swap"></i>
+          Quick Switch
+        </button>
         <button class="btn-plain" id="btn-legacy">
           <i class="ph ph-download-simple"></i>
           Download Legacy Version
@@ -49,7 +53,7 @@
         <a href="https://github.com/Zendevve/capcut-version-guard" target="_blank">
           <i class="ph ph-github-logo"></i> GitHub
         </a>
-        <span>v2.2.0</span>
+        <span id="app-version">v2.2.0</span>
       </footer>
     </section>
 
@@ -256,6 +260,35 @@
         <div class="glass-panel" id="legacy-list">
           <!-- Legacy versions populated by JS -->
         </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         VIEW: QUICK SWITCH
+         ================================================================ -->
+    <section id="view-switch" class="view">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="switch-back">
+          <i class="ph ph-caret-left"></i>
+        </button>
+        <span class="tahoe-nav-title">Quick Switch</span>
+      </nav>
+
+      <p class="text-center text-label-secondary text-13 mb-4">Select a version to activate without re-protecting.</p>
+
+      <div class="list-section">
+        <div class="glass-panel" id="switch-list">
+          <!-- Versions populated by JS -->
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-switch-apply" disabled>
+          <i class="ph ph-swap"></i>
+          Switch Version
+        </button>
       </div>
     </section>
 
