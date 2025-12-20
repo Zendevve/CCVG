@@ -107,37 +107,42 @@ fn calculate_dir_size(path: &Path) -> u64 {
 
 /// Scan for installed CapCut versions
 #[tauri::command]
-pub fn scan_versions() -> Vec<VersionInfo> {
-    let apps_path = match get_capcut_apps_path() {
-        Some(p) if p.exists() => p,
-        _ => return Vec::new(),
-    };
+pub async fn scan_versions() -> Vec<VersionInfo> {
+    let result = tauri::async_runtime::spawn_blocking(move || {
+        let apps_path = match get_capcut_apps_path() {
+            Some(p) if p.exists() => p,
+            _ => return Vec::new(),
+        };
 
-    let mut versions: Vec<VersionInfo> = fs::read_dir(&apps_path)
-        .ok()
-        .into_iter()
-        .flatten()
-        .filter_map(|e| e.ok())
-        .map(|e| e.path())
-        .filter(|p| p.is_dir())
-        .map(|p| {
-            let name = p
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string();
-            let size_mb = calculate_dir_size(&p) as f64 / (1024.0 * 1024.0);
-            VersionInfo {
-                name,
-                path: p.to_string_lossy().to_string(),
-                size_mb,
-            }
-        })
-        .collect();
+        let mut versions: Vec<VersionInfo> = fs::read_dir(&apps_path)
+            .ok()
+            .into_iter()
+            .flatten()
+            .filter_map(|e| e.ok())
+            .map(|e| e.path())
+            .filter(|p| p.is_dir())
+            .map(|p| {
+                let name = p
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+                let size_mb = calculate_dir_size(&p) as f64 / (1024.0 * 1024.0);
+                VersionInfo {
+                    name,
+                    path: p.to_string_lossy().to_string(),
+                    size_mb,
+                }
+            })
+            .collect();
 
-    // Sort by version name (oldest first) using simple string comparison
-    versions.sort_by(|a, b| a.name.cmp(&b.name));
-    versions
+        // Sort by version name (oldest first) using simple string comparison
+        versions.sort_by(|a, b| a.name.cmp(&b.name));
+        versions
+    })
+    .await;
+
+    result.unwrap_or_default()
 }
 
 /// Get CapCut installation paths

@@ -1461,6 +1461,39 @@ html,
   }
 }
 
+/* ========================================================================
+     REDUCED MOTION (Accessibility)
+     Respect user's motion preferences - replace animations with cross-fades
+     ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+    *::before,
+    *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .view {
+    animation: none;
+  }
+
+  .skeleton-icon,
+    .skeleton-line {
+    animation: none;
+    background: var(--fill-tertiary);
+  }
+
+  .status-badge {
+    animation: none;
+  }
+
+  .spin {
+    animation: none;
+  }
+}
+
 /* ==========================================================================
    macOS 26 TAHOE DESIGN SYSTEM
    Extracted from official reference images
