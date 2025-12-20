@@ -179,10 +179,10 @@ async function wizardProtect() {
     progressFill.style.width = '50%';
 
     await invoke('run_full_protection', {
-      appsPath: state.selectedVersion.path.replace(/\\[^\\]+$/, ''), // parent dir
-      versionsToDelete: versionsToDelete,
-      selectedVersionPath: state.selectedVersion.path,
-      cleanCache: true,
+      params: {
+        versions_to_delete: versionsToDelete,
+        clean_cache: true,
+      }
     });
 
     progressText.textContent = 'Finalizing...';
