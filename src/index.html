@@ -1,82 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>CC Version Guard</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Version Guard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3/src/regular/style.min.css">
 </head>
-<body>
+<body class="tahoe-window">
 
-  <!-- Window Chrome (Tahoe Glass Menu Bar) -->
-  <div class="window-drag-region">
-    <div class="win-controls">
-      <button class="win-btn close" onclick="window.app.close()"></button>
-      <button class="win-btn minimize" onclick="window.app.minimize()"></button>
-      <button class="win-btn maximize" onclick="window.app.toggleMaximize()"></button>
+  <!-- ====================================================================
+       TITLEBAR - macOS Traffic Lights
+       ==================================================================== -->
+  <header class="tahoe-titlebar">
+    <div class="traffic-lights">
+      <button class="traffic-light close" id="btn-close"></button>
+      <button class="traffic-light minimize" id="btn-minimize"></button>
+      <button class="traffic-light maximize" id="btn-maximize"></button>
     </div>
-  </div>
+  </header>
 
-  <!-- Main Stage -->
-  <main id="main-stage">
+  <!-- ====================================================================
+       MAIN CONTENT AREA
+       ==================================================================== -->
+  <main id="main-stage" class="tahoe-content">
 
-    <!-- View: Welcome -->
+    <!-- ================================================================
+         VIEW: WELCOME
+         ================================================================ -->
     <section id="view-welcome" class="view active">
       <div class="hero">
-        <i class="ph-fill ph-shield-check hero-icon" style="color: var(--tint-blue);"></i>
+        <i class="ph ph-shield-check hero-icon"></i>
         <h1>Version Guard</h1>
         <p>Lock your CapCut version and prevent unsolicited updates.</p>
       </div>
 
       <div class="spacer"></div>
 
-      <div class="button-stack" style="align-self: center;">
-        <button class="btn btn-primary" onclick="window.wizard.startCheck()">
-          Get Started
-        </button>
-        <button class="btn-plain" onclick="window.wizard.goToLegacy()">
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-start">Get Started</button>
+        <button class="btn-plain" id="btn-legacy">
           <i class="ph ph-download-simple"></i>
           Download Legacy Version
         </button>
       </div>
 
       <footer class="app-footer">
-        <a href="#" onclick="window.__TAURI__.opener.openUrl('https://github.com/Zendevve/capcut-version-guard')">
+        <a href="https://github.com/Zendevve/capcut-version-guard" target="_blank">
           <i class="ph ph-github-logo"></i> GitHub
         </a>
         <span>v2.2.0</span>
       </footer>
     </section>
 
-    <!-- View: PreCheck -->
+    <!-- ================================================================
+         VIEW: PRECHECK - System Environment Check
+         ================================================================ -->
     <section id="view-precheck" class="view">
-      <nav class="nav-bar">
-        <button class="nav-back" onclick="window.wizard.back()">
-          <i class="ph-bold ph-caret-left"></i>
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="precheck-back">
+          <i class="ph ph-caret-left"></i>
         </button>
-        <span class="nav-title">System Check</span>
-        <div style="width: 44px;"></div>
+        <span class="tahoe-nav-title">System Check</span>
       </nav>
 
-      <div class="hero" style="padding-top: 0;">
-        <i class="ph-fill ph-folder-notch-open hero-icon" style="color: var(--tint-blue); font-size: 64px;"></i>
+      <div class="hero">
+        <i class="ph ph-folder-open hero-icon"></i>
         <h2>Checking Environment</h2>
         <p>Verifying your system configuration.</p>
       </div>
 
       <div class="list-section">
-        <div class="list-group">
+        <div class="glass-panel">
           <div class="list-row">
-            <i id="check-install-icon" class="ph-fill ph-circle-notch status-icon pending pulse"></i>
+            <i class="status-icon success ph ph-check-circle" id="check-install"></i>
             <div class="row-content">
-              <span id="check-install-text" class="row-title">Checking installation...</span>
+              <span class="row-title" id="check-install-text">CapCut installation found</span>
             </div>
           </div>
           <div class="list-row">
-            <i id="check-running-icon" class="ph-fill ph-circle-notch status-icon pending pulse"></i>
+            <i class="status-icon success ph ph-check-circle" id="check-process"></i>
             <div class="row-content">
-              <span id="check-running-text" class="row-title">Checking processes...</span>
+              <span class="row-title" id="check-process-text">CapCut is not running</span>
             </div>
           </div>
         </div>
@@ -84,193 +89,178 @@
 
       <div class="spacer"></div>
 
-      <div class="button-stack" style="align-self: center;">
-        <button id="btn-precheck-next" class="btn btn-primary" disabled onclick="window.wizard.next()">
-          Continue
-        </button>
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-continue-precheck">Continue</button>
       </div>
     </section>
 
-    <!-- View: Legacy Downloads -->
-    <section id="view-legacy" class="view">
-      <nav class="nav-bar">
-        <button class="nav-back" onclick="window.wizard.back()">
-          <i class="ph-bold ph-caret-left"></i>
+    <!-- ================================================================
+         VIEW: VERSION SELECT
+         ================================================================ -->
+    <section id="view-versions" class="view">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="versions-back">
+          <i class="ph ph-caret-left"></i>
         </button>
-        <span class="nav-title">Legacy Archive</span>
-        <div style="width: 44px;"></div>
+        <span class="tahoe-nav-title">Select Version</span>
       </nav>
 
-      <p class="subheadline" style="text-align: center; margin-bottom: var(--space-2);">Curated versions from ByteDance CDN.</p>
+      <p class="text-center text-label-secondary text-13 mb-4">Choose the version to protect.</p>
 
-      <div id="legacy-list-container" class="list-group" style="overflow-y: auto; max-height: 360px; flex: 1;">
-        <!-- Injected via JS -->
-      </div>
-    </section>
-
-    <!-- View: Select Version -->
-    <section id="view-select" class="view">
-      <nav class="nav-bar">
-        <button class="nav-back" onclick="window.wizard.back()">
-          <i class="ph-bold ph-caret-left"></i>
-        </button>
-        <span class="nav-title">Select Version</span>
-        <div style="width: 44px;"></div>
-      </nav>
-
-      <p class="subheadline" style="text-align: center; margin-bottom: var(--space-2);">Choose the version to protect.</p>
-
-      <div class="list-section" style="flex: 1; overflow-y: auto;">
-        <div id="version-list-container" class="list-group">
-          <!-- Injected via JS -->
+      <div class="list-section">
+        <div class="glass-panel" id="version-list">
+          <!-- Versions populated by JS -->
         </div>
       </div>
 
-      <div class="button-stack" style="align-self: center; margin-top: var(--space-2);">
-        <button id="btn-lock-ver" class="btn btn-primary" disabled onclick="window.wizard.goToCleanup()">
-          Continue
-        </button>
+      <div class="spacer"></div>
+
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-continue-version" disabled>Continue</button>
       </div>
     </section>
 
-    <!-- View: Cache Cleanup -->
-    <section id="view-cleanup" class="view">
-      <nav class="nav-bar">
-        <button class="nav-back" onclick="window.wizard.back()">
-          <i class="ph-bold ph-caret-left"></i>
+    <!-- ================================================================
+         VIEW: OPTIONS - Cache Clean & Protection
+         ================================================================ -->
+    <section id="view-options" class="view">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="options-back">
+          <i class="ph ph-caret-left"></i>
         </button>
-        <span class="nav-title">Options</span>
-        <div style="width: 44px;"></div>
+        <span class="tahoe-nav-title">Options</span>
       </nav>
 
-      <div class="list-section" style="margin-top: var(--space-1);">
-        <div class="list-header">Cleanup</div>
-        <div class="list-group">
+      <div class="list-section">
+        <span class="list-header">Cleanup</span>
+        <div class="glass-panel">
           <div class="list-row">
-            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-orange), var(--tint-red));">
-              <i class="ph-fill ph-trash"></i>
+            <div class="row-icon bg-accent-orange">
+              <i class="ph ph-trash"></i>
             </div>
             <div class="row-content">
               <span class="row-title">Clean Temporary Files</span>
-              <span id="cache-size-text" class="row-subtitle">Calculating...</span>
+              <span class="row-subtitle" id="cache-size">0.0 MB can be freed</span>
             </div>
-            <div id="cache-toggle" class="toggle on" onclick="window.wizard.toggleCache()"></div>
+            <div class="toggle-switch on" id="toggle-cache"></div>
           </div>
         </div>
       </div>
 
       <div class="list-section">
-        <div class="list-header">Protection</div>
-        <div class="list-group">
+        <span class="list-header">Protection</span>
+        <div class="glass-panel">
           <div class="list-row">
-            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-blue), var(--tint-indigo));">
-              <i class="ph-fill ph-lock-key"></i>
+            <div class="row-icon bg-accent-blue">
+              <i class="ph ph-lock"></i>
             </div>
             <div class="row-content">
               <span class="row-title">Lock Configuration</span>
               <span class="row-subtitle">Prevents automatic updates</span>
             </div>
-            <div class="toggle on" style="pointer-events: none;"></div>
+            <div class="toggle-switch on" id="toggle-lock"></div>
           </div>
           <div class="list-row">
-            <div class="row-icon" style="background: linear-gradient(135deg, var(--tint-green), var(--tint-teal));">
-              <i class="ph-fill ph-shield-slash"></i>
+            <div class="row-icon bg-accent-green">
+              <i class="ph ph-shield"></i>
             </div>
             <div class="row-content">
               <span class="row-title">Create Blockers</span>
               <span class="row-subtitle">Blocks updater executable</span>
             </div>
-            <div class="toggle on" style="pointer-events: none;"></div>
+            <div class="toggle-switch on" id="toggle-blocker"></div>
           </div>
         </div>
       </div>
 
       <div class="spacer"></div>
 
-      <div class="button-stack" style="align-self: center;">
-        <button class="btn btn-primary" onclick="window.wizard.runProtection()">
-          <i class="ph-bold ph-lock-key"></i>
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-apply">
+          <i class="ph ph-lock"></i>
           Apply Protection
         </button>
       </div>
     </section>
 
-    <!-- View: Processing -->
-    <section id="view-process" class="view">
-      <div class="center-content">
-        <i class="ph-duotone ph-gear-six spin" style="font-size: 64px; color: var(--label-tertiary); margin-bottom: var(--space-3);"></i>
-
+    <!-- ================================================================
+         VIEW: PROCESSING
+         ================================================================ -->
+    <section id="view-processing" class="view">
+      <div class="hero">
+        <i class="ph ph-gear spin hero-icon"></i>
         <h2>Applying Protection</h2>
         <p>Please wait...</p>
+      </div>
 
-        <div class="progress-bar" style="width: 80%; max-width: 260px;">
-          <div id="progress-bar" class="progress-bar-fill"></div>
-        </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-bar"></div>
+      </div>
 
-        <p id="process-status" class="footnote">Initializing...</p>
+      <p class="text-center text-label-secondary text-13 mb-4" id="status-text">Initializing...</p>
 
-        <div id="activity-log" class="activity-log" style="width: 100%; max-width: 300px; margin-top: var(--space-3);">
-          <!-- Injected via JS -->
-        </div>
+      <div class="activity-log" id="activity-log">
+        <!-- Log entries populated by JS -->
       </div>
     </section>
 
-    <!-- View: Success -->
-    <section id="view-success" class="view">
-      <div class="hero">
-        <i class="ph-fill ph-check-circle hero-icon" style="color: var(--tint-green);"></i>
-        <h1>Protected</h1>
-        <p>Your installation is now secured.</p>
+    <!-- ================================================================
+         VIEW: COMPLETE
+         ================================================================ -->
+    <section id="view-complete" class="view">
+      <div class="center-content">
+        <i class="ph ph-check-circle hero-icon" style="color: #30D158;"></i>
+        <h2>Protection Applied</h2>
+        <p class="text-label-secondary text-13 mt-2 max-w-[280px]">
+          Your CapCut version is now locked and protected from automatic updates.
+        </p>
       </div>
 
-      <div class="list-section" style="width: 100%; max-width: 300px; align-self: center;">
-        <div class="list-group">
-          <div class="list-row">
-            <i class="ph-fill ph-check-circle status-icon success"></i>
-            <span class="row-title">Cleaned extra versions</span>
-          </div>
-          <div class="list-row">
-            <i class="ph-fill ph-check-circle status-icon success"></i>
-            <span class="row-title">Locked configuration</span>
-          </div>
-          <div class="list-row">
-            <i class="ph-fill ph-check-circle status-icon success"></i>
-            <span class="row-title">Created update blockers</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="spacer"></div>
-
-      <div class="button-stack" style="align-self: center;">
-        <button class="btn btn-primary" onclick="window.app.close()">
-          Done
-        </button>
+      <div class="button-stack mx-auto">
+        <button class="btn-primary" id="btn-done">Done</button>
       </div>
     </section>
 
-    <!-- View: Error -->
+    <!-- ================================================================
+         VIEW: ERROR
+         ================================================================ -->
     <section id="view-error" class="view">
-      <div class="hero">
-        <i class="ph-fill ph-warning-octagon hero-icon" style="color: var(--tint-red);"></i>
-        <h1>Error</h1>
-        <p id="error-message" style="color: var(--tint-red);">Something went wrong.</p>
+      <div class="center-content">
+        <i class="ph ph-warning-circle hero-icon" style="color: #FF453A;"></i>
+        <h2>Something went wrong</h2>
+        <p class="text-label-secondary text-13 mt-2 max-w-[280px]" id="error-message">
+          An unexpected error occurred.
+        </p>
       </div>
 
-      <div class="spacer"></div>
+      <div class="button-stack mx-auto">
+        <button class="btn-secondary" id="btn-retry">Try Again</button>
+        <button class="btn-plain" id="btn-back-error">Go Back</button>
+      </div>
+    </section>
 
-      <div class="button-stack" style="align-self: center;">
-        <button class="btn btn-primary" onclick="window.location.reload()">
-          Try Again
+    <!-- ================================================================
+         VIEW: LEGACY DOWNLOADS
+         ================================================================ -->
+    <section id="view-legacy" class="view">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="legacy-back">
+          <i class="ph ph-caret-left"></i>
         </button>
-        <button class="btn-plain" onclick="window.app.close()">
-          Close
-        </button>
+        <span class="tahoe-nav-title">Legacy Versions</span>
+      </nav>
+
+      <p class="text-center text-label-secondary text-13 mb-4">Download previous CapCut versions.</p>
+
+      <div class="list-section">
+        <div class="glass-panel" id="legacy-list">
+          <!-- Legacy versions populated by JS -->
+        </div>
       </div>
     </section>
 
   </main>
 
-  <script src="main.js"></script>
+  <script src="main.js" type="module"></script>
 </body>
 </html>

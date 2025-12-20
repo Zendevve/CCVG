@@ -1,86 +1,43 @@
 /**
- * Universal Interface Controller
- * SwiftUI-like patterns with HIG compliance
+ * Version Guard - Main Controller
+ * macOS 26 Tahoe Design System
  */
 
 const { invoke } = window.__TAURI__.core;
 const { getCurrentWindow } = window.__TAURI__.window;
-const { openUrl } = window.__TAURI__.opener;
 
 // ============================================
-// App Controls (WindowGroup)
+// Window Controls
 // ============================================
-window.app = {
-  minimize: () => getCurrentWindow().minimize(),
-  close: () => getCurrentWindow().close(),
-  toggleMaximize: () => getCurrentWindow().toggleMaximize(),
-};
+document.getElementById('btn-close')?.addEventListener('click', () => getCurrentWindow().close());
+document.getElementById('btn-minimize')?.addEventListener('click', () => getCurrentWindow().minimize());
+document.getElementById('btn-maximize')?.addEventListener('click', () => getCurrentWindow().toggleMaximize());
 
 // ============================================
-// State (ObservableObject)
+// State
 // ============================================
 const state = {
   history: ['welcome'],
   versions: [],
   selectedVersion: null,
   cacheEnabled: true,
+  lockEnabled: true,
+  blockerEnabled: true,
   cacheSizeMb: 0,
 };
 
 // ============================================
-// Wizard Actions
-// ============================================
-window.wizard = {
-  startCheck: () => navigateTo('precheck'),
-  next: () => navigateTo('select'),
-  goToLegacy: () => navigateTo('legacy'),
-  goToCleanup: () => navigateTo('cleanup'),
-
-  back: () => {
-    if (state.history.length > 1) {
-      state.history.pop();
-      showView(state.history[state.history.length - 1]);
-    }
-  },
-
-  selectObj: (idx) => {
-    state.selectedVersion = state.versions[idx];
-    document.getElementById('btn-lock-ver').disabled = false;
-
-    // Update selection visuals
-    document.querySelectorAll('#version-list-container .list-row').forEach((el, i) => {
-      const check = el.querySelector('.row-accessory');
-      if (i === idx) {
-        el.style.backgroundColor = 'var(--fill-tertiary)';
-        if (check) check.style.opacity = '1';
-      } else {
-        el.style.backgroundColor = '';
-        if (check) check.style.opacity = '0';
-      }
-    });
-  },
-
-  toggleCache: () => {
-    state.cacheEnabled = !state.cacheEnabled;
-    const toggle = document.getElementById('cache-toggle');
-    toggle.classList.toggle('on', state.cacheEnabled);
-  },
-
-  runProtection: () => runProtectionSequence()
-};
-
-// ============================================
-// Navigation (NavigationStack)
+// Navigation
 // ============================================
 function navigateTo(viewId) {
   state.history.push(viewId);
   showView(viewId);
 
-  // Trigger data loading
+  // Trigger data loading based on view
   if (viewId === 'precheck') runPreCheck();
-  if (viewId === 'select') loadVersions();
+  if (viewId === 'versions') loadVersions();
   if (viewId === 'legacy') loadArchiveVersions();
-  if (viewId === 'cleanup') loadCacheSize();
+  if (viewId === 'options') loadCacheSize();
 }
 
 function showView(viewId) {
@@ -89,21 +46,37 @@ function showView(viewId) {
   if (target) target.classList.add('active');
 }
 
+function goBack() {
+  if (state.history.length > 1) {
+    state.history.pop();
+    showView(state.history[state.history.length - 1]);
+  }
+}
+
 // ============================================
-// Pre-Check Logic
+// Welcome View Handlers
 // ============================================
+document.getElementById('btn-start')?.addEventListener('click', () => navigateTo('precheck'));
+document.getElementById('btn-legacy')?.addEventListener('click', () => navigateTo('legacy'));
+
+// ============================================
+// Precheck View Handlers
+// ============================================
+document.getElementById('precheck-back')?.addEventListener('click', goBack);
+document.getElementById('btn-continue-precheck')?.addEventListener('click', () => navigateTo('versions'));
+
 async function runPreCheck() {
-  const installIcon = document.getElementById('check-install-icon');
+  const installIcon = document.getElementById('check-install');
   const installText = document.getElementById('check-install-text');
-  const runningIcon = document.getElementById('check-running-icon');
-  const runningText = document.getElementById('check-running-text');
-  const nextBtn = document.getElementById('btn-precheck-next');
+  const processIcon = document.getElementById('check-process');
+  const processText = document.getElementById('check-process-text');
+  const nextBtn = document.getElementById('btn-continue-precheck');
 
   // Reset
-  setStatus(installIcon, 'pending');
+  setStatusIcon(installIcon, 'pending');
   installText.textContent = 'Checking installation...';
-  setStatus(runningIcon, 'pending');
-  runningText.textContent = 'Checking processes...';
+  setStatusIcon(processIcon, 'pending');
+  processText.textContent = 'Checking processes...';
   nextBtn.disabled = true;
 
   await sleep(400);
@@ -111,50 +84,118 @@ async function runPreCheck() {
   try {
     const result = await invoke('perform_precheck');
 
-    // Installation status
     if (result.capcut_found) {
-      setStatus(installIcon, 'success');
+      setStatusIcon(installIcon, 'success');
       installText.textContent = 'CapCut installation found';
     } else {
-      setStatus(installIcon, 'error');
+      setStatusIcon(installIcon, 'error');
       installText.textContent = 'CapCut not found';
     }
 
-    // Running status
     if (result.capcut_running) {
-      setStatus(runningIcon, 'warning');
-      runningText.textContent = 'CapCut is running — close it first';
+      setStatusIcon(processIcon, 'warning');
+      processText.textContent = 'CapCut is running — close it first';
     } else {
-      setStatus(runningIcon, 'success');
-      runningText.textContent = 'CapCut is not running';
+      setStatusIcon(processIcon, 'success');
+      processText.textContent = 'CapCut is not running';
     }
 
-    // Enable continue if ready
     if (result.capcut_found && !result.capcut_running) {
       nextBtn.disabled = false;
     }
   } catch (e) {
-    setStatus(installIcon, 'error');
+    setStatusIcon(installIcon, 'error');
     installText.textContent = `Error: ${e}`;
   }
 }
 
-function setStatus(icon, status) {
-  icon.className = 'status-icon';
+function setStatusIcon(icon, status) {
+  icon.className = 'status-icon ph';
   const icons = {
-    pending: 'ph-fill ph-circle-notch',
-    success: 'ph-fill ph-check-circle',
-    warning: 'ph-fill ph-warning',
-    error: 'ph-fill ph-x-circle'
+    pending: 'ph-circle-notch spin',
+    success: 'ph-check-circle',
+    warning: 'ph-warning',
+    error: 'ph-x-circle'
   };
   icon.classList.add(...icons[status].split(' '), status);
 }
 
 // ============================================
-// Cache Size
+// Versions View Handlers
 // ============================================
+document.getElementById('versions-back')?.addEventListener('click', goBack);
+document.getElementById('btn-continue-version')?.addEventListener('click', () => navigateTo('options'));
+
+async function loadVersions() {
+  const container = document.getElementById('version-list');
+  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
+
+  try {
+    const vers = await invoke('scan_versions');
+    state.versions = vers;
+
+    if (vers.length === 0) {
+      container.innerHTML = '<div class="list-row"><span class="row-title">No installations found</span></div>';
+      return;
+    }
+
+    container.innerHTML = vers.map((v, i) => `
+      <div class="list-row selectable" onclick="selectVersion(${i})">
+        <div class="row-icon bg-accent-indigo">
+          <i class="ph ph-hard-drives"></i>
+        </div>
+        <div class="row-content">
+          <span class="row-title">CapCut v${v.name}</span>
+          <span class="row-subtitle">${v.size_mb.toFixed(0)} MB</span>
+        </div>
+        <i class="ph ph-check row-accessory" style="opacity: 0; color: var(--accent-blue); font-size: 18px;"></i>
+      </div>
+    `).join('');
+
+  } catch (e) {
+    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
+  }
+}
+
+window.selectVersion = function (idx) {
+  state.selectedVersion = state.versions[idx];
+  document.getElementById('btn-continue-version').disabled = false;
+
+  document.querySelectorAll('#version-list .list-row').forEach((el, i) => {
+    const check = el.querySelector('.row-accessory');
+    if (i === idx) {
+      el.style.backgroundColor = 'var(--fill-tertiary)';
+      if (check) check.style.opacity = '1';
+    } else {
+      el.style.backgroundColor = '';
+      if (check) check.style.opacity = '0';
+    }
+  });
+};
+
+// ============================================
+// Options View Handlers
+// ============================================
+document.getElementById('options-back')?.addEventListener('click', goBack);
+document.getElementById('btn-apply')?.addEventListener('click', () => runProtectionSequence());
+
+document.getElementById('toggle-cache')?.addEventListener('click', function () {
+  state.cacheEnabled = !state.cacheEnabled;
+  this.classList.toggle('on', state.cacheEnabled);
+});
+
+document.getElementById('toggle-lock')?.addEventListener('click', function () {
+  state.lockEnabled = !state.lockEnabled;
+  this.classList.toggle('on', state.lockEnabled);
+});
+
+document.getElementById('toggle-blocker')?.addEventListener('click', function () {
+  state.blockerEnabled = !state.blockerEnabled;
+  this.classList.toggle('on', state.blockerEnabled);
+});
+
 async function loadCacheSize() {
-  const sizeText = document.getElementById('cache-size-text');
+  const sizeText = document.getElementById('cache-size');
   try {
     const size = await invoke('calculate_cache_size');
     state.cacheSizeMb = size;
@@ -168,10 +209,10 @@ async function loadCacheSize() {
 // Protection Sequence
 // ============================================
 async function runProtectionSequence() {
-  navigateTo('process');
+  navigateTo('processing');
 
   const progressBar = document.getElementById('progress-bar');
-  const statusText = document.getElementById('process-status');
+  const statusText = document.getElementById('status-text');
   const logContainer = document.getElementById('activity-log');
   logContainer.innerHTML = '';
 
@@ -182,10 +223,10 @@ async function runProtectionSequence() {
 
   const addLog = (msg, type = 'info') => {
     const icons = { ok: 'ph-check', warn: 'ph-warning', info: 'ph-dot' };
-    const colors = { ok: 'var(--tint-green)', warn: 'var(--tint-orange)', info: 'var(--label-tertiary)' };
+    const classes = { ok: 'success', warn: 'warning', info: '' };
     logContainer.innerHTML += `
-      <div class="log-entry">
-        <i class="ph ${icons[type]}" style="color: ${colors[type]};"></i>
+      <div class="log-entry ${classes[type]}">
+        <i class="ph ${icons[type]}"></i>
         <span>${msg}</span>
       </div>
     `;
@@ -214,7 +255,6 @@ async function runProtectionSequence() {
       }
     });
 
-    // Log backend output
     if (result.logs) {
       result.logs.forEach(log => {
         const type = log.startsWith('[OK]') ? 'ok' : log.startsWith('[!]') ? 'warn' : 'info';
@@ -233,7 +273,7 @@ async function runProtectionSequence() {
     addLog('Protection applied successfully', 'ok');
     await sleep(400);
 
-    navigateTo('success');
+    navigateTo('complete');
 
   } catch (e) {
     console.error(e);
@@ -243,70 +283,52 @@ async function runProtectionSequence() {
 }
 
 // ============================================
-// Version List
+// Complete View Handlers
 // ============================================
-async function loadVersions() {
-  const container = document.getElementById('version-list-container');
-  container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Scanning...</span></div>';
-
-  try {
-    const vers = await invoke('scan_versions');
-    state.versions = vers;
-
-    if (vers.length === 0) {
-      container.innerHTML = '<div class="list-row"><span class="row-title">No installations found</span></div>';
-      return;
-    }
-
-    container.innerHTML = vers.map((v, i) => `
-      <div class="list-row selectable" onclick="window.wizard.selectObj(${i})">
-        <div class="row-icon" style="background: var(--tint-indigo);">
-          <i class="ph-fill ph-hard-drives"></i>
-        </div>
-        <div class="row-content">
-          <span class="row-title">CapCut v${v.name}</span>
-          <span class="row-subtitle">${v.size_mb.toFixed(0)} MB</span>
-        </div>
-        <i class="ph-bold ph-check row-accessory" style="opacity: 0; color: var(--tint-blue); font-size: 18px;"></i>
-      </div>
-    `).join('');
-
-  } catch (e) {
-    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--tint-red);">Error: ${e}</span></div>`;
-  }
-}
+document.getElementById('btn-done')?.addEventListener('click', () => getCurrentWindow().close());
 
 // ============================================
-// Archive Versions
+// Error View Handlers
 // ============================================
+document.getElementById('btn-retry')?.addEventListener('click', () => {
+  state.history = ['welcome'];
+  showView('welcome');
+});
+document.getElementById('btn-back-error')?.addEventListener('click', goBack);
+
+// ============================================
+// Legacy View Handlers
+// ============================================
+document.getElementById('legacy-back')?.addEventListener('click', goBack);
+
 async function loadArchiveVersions() {
-  const container = document.getElementById('legacy-list-container');
+  const container = document.getElementById('legacy-list');
   container.innerHTML = '<div class="list-row"><span class="row-title" style="color: var(--label-tertiary);">Loading...</span></div>';
 
   try {
     const archives = await invoke('get_archive_versions');
 
     container.innerHTML = archives.map(v => {
-      const riskColor = v.risk_level === 'High' ? 'var(--tint-red)' :
-        v.risk_level === 'Medium' ? 'var(--tint-orange)' : 'var(--tint-green)';
+      const riskColor = v.risk_level === 'High' ? 'var(--accent-red)' :
+        v.risk_level === 'Medium' ? 'var(--accent-orange)' : 'var(--accent-green)';
       return `
         <div class="list-row">
           <div class="row-icon" style="background: ${riskColor};">
-            <i class="ph-fill ph-package"></i>
+            <i class="ph ph-package"></i>
           </div>
           <div class="row-content">
             <span class="row-title">v${v.version} · ${v.persona}</span>
             <span class="row-subtitle">${v.description}</span>
           </div>
           <button class="btn-plain" style="padding: 8px;" onclick="window.__TAURI__.opener.openUrl('${v.download_url}')">
-            <i class="ph-bold ph-download-simple" style="font-size: 18px;"></i>
+            <i class="ph ph-download-simple" style="font-size: 18px;"></i>
           </button>
         </div>
       `;
     }).join('');
 
   } catch (e) {
-    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--tint-red);">Error: ${e}</span></div>`;
+    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
   }
 }
 

@@ -1,56 +1,71 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,js}"],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Tahoe semantic colors
-        'glass': {
-          'clear': 'rgba(255, 255, 255, 0.08)',
-          'regular': 'rgba(255, 255, 255, 0.15)',
-          'thick': 'rgba(255, 255, 255, 0.25)',
-          'ultra': 'rgba(40, 40, 44, 0.85)',
+        // macOS 26 Tahoe Colors from reference
+        'tahoe': {
+          // Window backgrounds
+          'window': 'rgba(40, 40, 42, 0.78)',
+          'titlebar': 'rgba(50, 50, 52, 0.92)',
+          'sidebar': 'rgba(35, 35, 37, 0.85)',
+          'content': 'rgba(30, 30, 32, 0.95)',
+
+          // Glass panels
+          'glass': 'rgba(60, 60, 65, 0.55)',
+          'glass-light': 'rgba(80, 80, 85, 0.40)',
+
+          // Fills
+          'fill': 'rgba(255, 255, 255, 0.08)',
+          'fill-secondary': 'rgba(255, 255, 255, 0.05)',
         },
+        // Labels
         'label': {
           'primary': '#FFFFFF',
-          'secondary': 'rgba(235, 235, 245, 0.60)',
-          'tertiary': 'rgba(235, 235, 245, 0.30)',
-          'quaternary': 'rgba(235, 235, 245, 0.18)',
+          'secondary': 'rgba(255, 255, 255, 0.55)',
+          'tertiary': 'rgba(255, 255, 255, 0.25)',
         },
-        'tint': {
-          'blue': '#0A84FF',
+        // System accents
+        'accent': {
+          'blue': '#007AFF',
           'green': '#30D158',
           'red': '#FF453A',
           'orange': '#FF9F0A',
           'purple': '#BF5AF2',
-          'indigo': '#5E5CE6',
-          'teal': '#64D2FF',
         },
-        'fill': {
-          'primary': 'rgba(120, 120, 128, 0.36)',
-          'secondary': 'rgba(120, 120, 128, 0.32)',
-          'tertiary': 'rgba(120, 120, 128, 0.24)',
-        },
+        // Borders
+        'border': {
+          'glass': 'rgba(255, 255, 255, 0.18)',
+          'separator': 'rgba(255, 255, 255, 0.08)',
+        }
       },
       borderRadius: {
-        'tahoe-window': '26px',
-        'tahoe-card': '20px',
-        'tahoe-button': '14px',
-        'tahoe-sm': '10px',
+        'tahoe': '12px',
+        'panel': '10px',
+        'button': '8px',
+        'field': '6px',
       },
       backdropBlur: {
-        'glass': '30px',
-        'glass-heavy': '50px',
+        'window': '80px',
+        'panel': '40px',
+        'menu': '25px',
       },
       backdropSaturate: {
         '180': '1.8',
+        '190': '1.9',
       },
       fontFamily: {
-        'system': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'system-ui', 'sans-serif'],
       },
-      animation: {
-        'spin-slow': 'spin 1.5s linear infinite',
-        'pulse-soft': 'pulse 2s ease-in-out infinite',
+      fontSize: {
+        '11': ['11px', '13px'],
+        '13': ['13px', '16px'],
+        '15': ['15px', '20px'],
+        '17': ['17px', '22px'],
+        '20': ['20px', '24px'],
+        '22': ['22px', '28px'],
       },
     },
   },

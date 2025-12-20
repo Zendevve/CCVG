@@ -1,0 +1,616 @@
+{
+  "meta": {
+    "name": "macOS 26 Tahoe Design System",
+    "version": "1.0.0",
+    "source": "macOS 26 (Community) Figma Kit",
+    "mode": "dark",
+    "description": "Comprehensive design tokens extracted from official macOS 26 Tahoe reference images"
+  },
+  "foundations": {
+    "colors": {
+      "backgrounds": {
+        "window": {
+          "value": "rgba(30, 30, 32, 0.78)",
+          "description": "Main window glass background with blur",
+          "blur": "80px",
+          "saturation": "190%"
+        },
+        "windowSolid": {
+          "value": "#1E1E20",
+          "description": "Fallback opaque window background"
+        },
+        "titlebar": {
+          "value": "rgba(38, 38, 40, 0.95)",
+          "description": "Titlebar/toolbar area"
+        },
+        "sidebar": {
+          "value": "rgba(28, 28, 30, 0.85)",
+          "description": "Sidebar glass background"
+        },
+        "content": {
+          "value": "#232325",
+          "description": "Main content area background"
+        },
+        "elevated": {
+          "value": "#2C2C2E",
+          "description": "Elevated surface (cards, popovers)"
+        },
+        "modal": {
+          "value": "rgba(44, 44, 46, 0.95)",
+          "description": "Modal/alert backdrop"
+        }
+      },
+      "fills": {
+        "primary": {
+          "value": "rgba(255, 255, 255, 0.10)",
+          "description": "Primary interactive fill (buttons, inputs)"
+        },
+        "secondary": {
+          "value": "rgba(255, 255, 255, 0.06)",
+          "description": "Secondary fill (hover states)"
+        },
+        "tertiary": {
+          "value": "rgba(255, 255, 255, 0.04)",
+          "description": "Tertiary fill (subtle backgrounds)"
+        },
+        "quaternary": {
+          "value": "rgba(255, 255, 255, 0.02)",
+          "description": "Minimal fill"
+        }
+      },
+      "labels": {
+        "primary": {
+          "value": "#FFFFFF",
+          "opacity": 1.0,
+          "description": "Primary text - titles, important content"
+        },
+        "secondary": {
+          "value": "rgba(255, 255, 255, 0.55)",
+          "description": "Secondary text - subtitles, descriptions"
+        },
+        "tertiary": {
+          "value": "rgba(255, 255, 255, 0.25)",
+          "description": "Tertiary text - placeholders, disabled"
+        },
+        "quaternary": {
+          "value": "rgba(255, 255, 255, 0.10)",
+          "description": "Quaternary text - barely visible"
+        }
+      },
+      "accents": {
+        "blue": {
+          "value": "#007AFF",
+          "hover": "#0071EB",
+          "active": "#005BC4",
+          "description": "Primary accent - buttons, links, selection"
+        },
+        "green": {
+          "value": "#30D158",
+          "description": "Success, enabled toggles"
+        },
+        "red": {
+          "value": "#FF453A",
+          "description": "Destructive, errors"
+        },
+        "orange": {
+          "value": "#FF9F0A",
+          "description": "Warnings"
+        },
+        "yellow": {
+          "value": "#FFD60A",
+          "description": "Caution"
+        },
+        "purple": {
+          "value": "#BF5AF2",
+          "description": "Accent variant"
+        },
+        "pink": {
+          "value": "#FF375F",
+          "description": "Accent variant"
+        },
+        "teal": {
+          "value": "#40C8E0",
+          "description": "Accent variant"
+        },
+        "indigo": {
+          "value": "#5856D6",
+          "description": "Accent variant"
+        }
+      },
+      "borders": {
+        "glass": {
+          "value": "rgba(255, 255, 255, 0.18)",
+          "description": "Glass container borders"
+        },
+        "separator": {
+          "value": "rgba(255, 255, 255, 0.08)",
+          "description": "Dividers between list items"
+        },
+        "opaque": {
+          "value": "rgba(255, 255, 255, 0.12)",
+          "description": "Solid element borders"
+        },
+        "focus": {
+          "value": "rgba(0, 122, 255, 0.50)",
+          "description": "Focus ring color"
+        }
+      },
+      "trafficLights": {
+        "close": {
+          "gradient": "linear-gradient(180deg, #FF6058 0%, #FF5147 100%)",
+          "border": "rgba(0, 0, 0, 0.15)"
+        },
+        "minimize": {
+          "gradient": "linear-gradient(180deg, #FFBF2F 0%, #FEBC2E 100%)",
+          "border": "rgba(0, 0, 0, 0.15)"
+        },
+        "maximize": {
+          "gradient": "linear-gradient(180deg, #2DD13F 0%, #28C840 100%)",
+          "border": "rgba(0, 0, 0, 0.15)"
+        },
+        "inactive": {
+          "fill": "rgba(255, 255, 255, 0.10)",
+          "border": "rgba(255, 255, 255, 0.08)"
+        }
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "system": "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
+        "mono": "'SF Mono', Menlo, Monaco, 'Courier New', monospace"
+      },
+      "fontWeight": {
+        "regular": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "styles": {
+        "largeTitle": {
+          "size": "26px",
+          "lineHeight": "32px",
+          "weight": 700,
+          "tracking": "0.022em"
+        },
+        "title1": {
+          "size": "22px",
+          "lineHeight": "28px",
+          "weight": 600,
+          "tracking": "-0.01em"
+        },
+        "title2": {
+          "size": "17px",
+          "lineHeight": "22px",
+          "weight": 600,
+          "tracking": "-0.008em"
+        },
+        "title3": {
+          "size": "15px",
+          "lineHeight": "20px",
+          "weight": 600,
+          "tracking": "0"
+        },
+        "headline": {
+          "size": "13px",
+          "lineHeight": "16px",
+          "weight": 600,
+          "tracking": "0"
+        },
+        "body": {
+          "size": "13px",
+          "lineHeight": "18px",
+          "weight": 400,
+          "tracking": "0"
+        },
+        "callout": {
+          "size": "12px",
+          "lineHeight": "16px",
+          "weight": 400,
+          "tracking": "0"
+        },
+        "subheadline": {
+          "size": "11px",
+          "lineHeight": "14px",
+          "weight": 400,
+          "tracking": "0"
+        },
+        "footnote": {
+          "size": "10px",
+          "lineHeight": "13px",
+          "weight": 400,
+          "tracking": "0"
+        },
+        "caption1": {
+          "size": "10px",
+          "lineHeight": "13px",
+          "weight": 500,
+          "tracking": "0.02em"
+        },
+        "caption2": {
+          "size": "9px",
+          "lineHeight": "11px",
+          "weight": 500,
+          "tracking": "0.02em"
+        }
+      }
+    },
+    "spacing": {
+      "unit": 4,
+      "scale": {
+        "0": "0px",
+        "1": "4px",
+        "2": "8px",
+        "3": "12px",
+        "4": "16px",
+        "5": "20px",
+        "6": "24px",
+        "8": "32px",
+        "10": "40px",
+        "12": "48px",
+        "16": "64px"
+      }
+    },
+    "radii": {
+      "none": "0px",
+      "xs": "4px",
+      "sm": "6px",
+      "md": "8px",
+      "lg": "10px",
+      "xl": "12px",
+      "window": "12px",
+      "panel": "10px",
+      "button": "8px",
+      "field": "6px",
+      "badge": "4px",
+      "full": "9999px"
+    },
+    "shadows": {
+      "window": {
+        "value": "0 25px 80px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.12), inset 0 0.5px 0 rgba(255, 255, 255, 0.08)",
+        "description": "Main window drop shadow with inner glow"
+      },
+      "elevated": {
+        "value": "0 10px 40px rgba(0, 0, 0, 0.30), 0 0 0 0.5px rgba(255, 255, 255, 0.10)",
+        "description": "Popovers, menus, modals"
+      },
+      "card": {
+        "value": "0 2px 8px rgba(0, 0, 0, 0.15)",
+        "description": "Card/panel shadow"
+      },
+      "button": {
+        "value": "0 1px 3px rgba(0, 0, 0, 0.12)",
+        "description": "Button shadow"
+      },
+      "none": {
+        "value": "none"
+      }
+    },
+    "blur": {
+      "window": "80px",
+      "sidebar": "50px",
+      "panel": "40px",
+      "menu": "25px",
+      "toolbar": "30px"
+    },
+    "saturation": {
+      "window": "190%",
+      "panel": "150%",
+      "menu": "180%"
+    }
+  },
+  "components": {
+    "window": {
+      "background": "rgba(30, 30, 32, 0.78)",
+      "backdropFilter": "blur(80px) saturate(190%)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.18)",
+      "borderRadius": "12px",
+      "shadow": "0 25px 80px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.12), inset 0 0.5px 0 rgba(255, 255, 255, 0.08)",
+      "DO_NOT": "Do NOT apply window blur/saturation to inner content. Only on the root container."
+    },
+    "titlebar": {
+      "height": "52px",
+      "background": "rgba(38, 38, 40, 0.95)",
+      "backdropFilter": "blur(30px) saturate(180%)",
+      "borderBottom": "0.5px solid rgba(255, 255, 255, 0.08)",
+      "innerShadow": "inset 0 -0.5px 0 rgba(0, 0, 0, 0.3)",
+      "trafficLights": {
+        "size": "12px",
+        "gap": "8px",
+        "hoverBrightness": "0.88"
+      },
+      "DO_NOT": "Do NOT put content behind titlebar. Keep it separate."
+    },
+    "toolbar": {
+      "height": "38px",
+      "background": "rgba(44, 44, 46, 0.90)",
+      "borderBottom": "0.5px solid rgba(255, 255, 255, 0.06)",
+      "iconSize": "16px",
+      "iconColor": "rgba(255, 255, 255, 0.55)",
+      "iconHoverColor": "#FFFFFF"
+    },
+    "sidebar": {
+      "width": "220px",
+      "minWidth": "180px",
+      "maxWidth": "320px",
+      "background": "rgba(28, 28, 30, 0.85)",
+      "backdropFilter": "blur(50px) saturate(150%)",
+      "borderRight": "0.5px solid rgba(255, 255, 255, 0.06)",
+      "sectionHeader": {
+        "fontSize": "11px",
+        "fontWeight": 500,
+        "color": "rgba(255, 255, 255, 0.40)",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.5px",
+        "padding": "8px 12px 4px"
+      },
+      "row": {
+        "height": "28px",
+        "padding": "0 12px",
+        "borderRadius": "6px",
+        "selectedBackground": "rgba(255, 255, 255, 0.10)",
+        "hoverBackground": "rgba(255, 255, 255, 0.05)"
+      },
+      "DO_NOT": "Do NOT use bright colors in sidebar. Keep it subdued."
+    },
+    "list": {
+      "group": {
+        "background": "rgba(60, 60, 65, 0.50)",
+        "backdropFilter": "blur(40px) saturate(150%)",
+        "borderRadius": "10px",
+        "border": "0.5px solid rgba(255, 255, 255, 0.12)",
+        "innerShadow": "inset 0 0.5px 0 rgba(255, 255, 255, 0.06)",
+        "outerShadow": "0 2px 8px rgba(0, 0, 0, 0.12)"
+      },
+      "header": {
+        "fontSize": "11px",
+        "fontWeight": 500,
+        "color": "rgba(255, 255, 255, 0.50)",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.3px",
+        "padding": "0 12px",
+        "marginBottom": "6px"
+      },
+      "row": {
+        "minHeight": "44px",
+        "padding": "8px 12px",
+        "borderBottom": "0.5px solid rgba(255, 255, 255, 0.06)",
+        "hoverBackground": "rgba(255, 255, 255, 0.04)",
+        "activeBackground": "rgba(255, 255, 255, 0.08)",
+        "selectedBackground": "rgba(0, 122, 255, 0.20)"
+      },
+      "rowIcon": {
+        "size": "28px",
+        "borderRadius": "6px",
+        "marginRight": "12px",
+        "iconSize": "14px",
+        "iconColor": "#FFFFFF"
+      },
+      "rowTitle": {
+        "fontSize": "13px",
+        "fontWeight": 400,
+        "color": "#FFFFFF"
+      },
+      "rowSubtitle": {
+        "fontSize": "11px",
+        "fontWeight": 400,
+        "color": "rgba(255, 255, 255, 0.50)"
+      },
+      "rowAccessory": {
+        "fontSize": "13px",
+        "color": "rgba(255, 255, 255, 0.25)"
+      },
+      "DO_NOT": "Do NOT apply list group background to individual rows. Group wraps rows."
+    },
+    "buttons": {
+      "primary": {
+        "height": "32px",
+        "padding": "0 16px",
+        "borderRadius": "8px",
+        "background": "#007AFF",
+        "color": "#FFFFFF",
+        "fontSize": "13px",
+        "fontWeight": 500,
+        "hover": {
+          "background": "#0071EB",
+          "shadow": "0 2px 10px rgba(0, 122, 255, 0.40)"
+        },
+        "active": {
+          "background": "#005BC4",
+          "transform": "scale(0.98)"
+        },
+        "disabled": {
+          "opacity": 0.35
+        }
+      },
+      "secondary": {
+        "height": "32px",
+        "padding": "0 16px",
+        "borderRadius": "8px",
+        "background": "rgba(255, 255, 255, 0.08)",
+        "border": "0.5px solid rgba(255, 255, 255, 0.12)",
+        "color": "#FFFFFF",
+        "fontSize": "13px",
+        "fontWeight": 400,
+        "hover": {
+          "background": "rgba(255, 255, 255, 0.12)"
+        }
+      },
+      "tertiary": {
+        "height": "32px",
+        "padding": "0 12px",
+        "borderRadius": "6px",
+        "background": "transparent",
+        "color": "#007AFF",
+        "fontSize": "13px",
+        "fontWeight": 400,
+        "hover": {
+          "textDecoration": "underline"
+        }
+      },
+      "destructive": {
+        "height": "32px",
+        "padding": "0 16px",
+        "borderRadius": "8px",
+        "background": "#FF453A",
+        "color": "#FFFFFF",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "DO_NOT": "Do NOT apply button gradients. macOS 26 buttons are FLAT colors."
+    },
+    "toggle": {
+      "width": "38px",
+      "height": "22px",
+      "borderRadius": "11px",
+      "backgroundOff": "rgba(120, 120, 128, 0.32)",
+      "backgroundOn": "#30D158",
+      "knob": {
+        "size": "18px",
+        "background": "#FFFFFF",
+        "shadow": "0 1px 2px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.10)",
+        "offset": "2px"
+      },
+      "transition": "200ms cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "textField": {
+      "height": "22px",
+      "padding": "0 8px",
+      "borderRadius": "6px",
+      "background": "rgba(255, 255, 255, 0.06)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.10)",
+      "fontSize": "13px",
+      "color": "#FFFFFF",
+      "placeholder": "rgba(255, 255, 255, 0.25)",
+      "focus": {
+        "border": "0.5px solid rgba(0, 122, 255, 0.60)",
+        "shadow": "0 0 0 3px rgba(0, 122, 255, 0.25)"
+      }
+    },
+    "alert": {
+      "background": "rgba(44, 44, 46, 0.95)",
+      "backdropFilter": "blur(40px) saturate(180%)",
+      "borderRadius": "12px",
+      "border": "0.5px solid rgba(255, 255, 255, 0.15)",
+      "shadow": "0 25px 80px rgba(0, 0, 0, 0.50)",
+      "padding": "20px",
+      "maxWidth": "280px",
+      "icon": {
+        "size": "48px",
+        "marginBottom": "16px"
+      },
+      "title": {
+        "fontSize": "13px",
+        "fontWeight": 600,
+        "color": "#FFFFFF",
+        "marginBottom": "4px"
+      },
+      "message": {
+        "fontSize": "11px",
+        "fontWeight": 400,
+        "color": "rgba(255, 255, 255, 0.55)",
+        "marginBottom": "16px"
+      },
+      "buttonStack": {
+        "gap": "8px",
+        "layout": "horizontal",
+        "buttonMinWidth": "68px"
+      }
+    },
+    "menu": {
+      "background": "rgba(50, 50, 52, 0.92)",
+      "backdropFilter": "blur(25px) saturate(180%)",
+      "borderRadius": "8px",
+      "border": "0.5px solid rgba(255, 255, 255, 0.15)",
+      "shadow": "0 10px 40px rgba(0, 0, 0, 0.35)",
+      "padding": "4px",
+      "item": {
+        "height": "22px",
+        "padding": "0 10px",
+        "borderRadius": "4px",
+        "fontSize": "13px",
+        "color": "#FFFFFF",
+        "hoverBackground": "rgba(0, 122, 255, 0.80)",
+        "hoverColor": "#FFFFFF"
+      },
+      "separator": {
+        "height": "1px",
+        "background": "rgba(255, 255, 255, 0.10)",
+        "margin": "4px 0"
+      },
+      "shortcut": {
+        "fontSize": "12px",
+        "color": "rgba(255, 255, 255, 0.40)"
+      }
+    },
+    "notification": {
+      "background": "rgba(50, 50, 52, 0.95)",
+      "backdropFilter": "blur(40px) saturate(180%)",
+      "borderRadius": "12px",
+      "border": "0.5px solid rgba(255, 255, 255, 0.15)",
+      "shadow": "0 15px 50px rgba(0, 0, 0, 0.40)",
+      "padding": "12px 16px",
+      "width": "345px"
+    },
+    "progressBar": {
+      "height": "4px",
+      "borderRadius": "2px",
+      "background": "rgba(255, 255, 255, 0.08)",
+      "fill": "#007AFF",
+      "fillBorderRadius": "2px"
+    },
+    "scrollbar": {
+      "width": "8px",
+      "trackBackground": "transparent",
+      "thumbBackground": "rgba(255, 255, 255, 0.15)",
+      "thumbHoverBackground": "rgba(255, 255, 255, 0.25)",
+      "thumbBorderRadius": "4px"
+    }
+  },
+  "animations": {
+    "durations": {
+      "instant": "50ms",
+      "fast": "100ms",
+      "normal": "200ms",
+      "slow": "300ms",
+      "verySlow": "500ms"
+    },
+    "easings": {
+      "easeOut": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+      "easeIn": "cubic-bezier(0.4, 0.0, 1, 1)",
+      "easeInOut": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+      "spring": "cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+    },
+    "transitions": {
+      "opacity": "opacity 200ms ease-out",
+      "transform": "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "background": "background 100ms ease-out",
+      "all": "all 200ms ease-out"
+    }
+  },
+  "rules": {
+    "DO_NOT": [
+      "DO NOT apply gradients to buttons - macOS 26 uses flat accent colors",
+      "DO NOT put backdrop-filter on individual list rows - only on the glass container",
+      "DO NOT use bright colors for window backgrounds - keep them dark/muted",
+      "DO NOT apply window shadow to inner content cards",
+      "DO NOT use more than 3 font weights on a single view",
+      "DO NOT exceed 55% opacity for secondary text",
+      "DO NOT use white (#FFFFFF) for backgrounds - only for primary text",
+      "DO NOT apply border-radius greater than 12px except for pills/toggles",
+      "DO NOT use colored borders - borders are always white with low opacity",
+      "DO NOT place icons inside buttons without proper sizing (14-16px max)"
+    ],
+    "ALWAYS": [
+      "ALWAYS use rgba for backgrounds to enable layering",
+      "ALWAYS apply backdrop-filter WITH blur AND saturate together",
+      "ALWAYS use 0.5px borders (hairline) for subtle separators",
+      "ALWAYS maintain 44px minimum touch targets for interactive elements",
+      "ALWAYS use SF Pro system font stack",
+      "ALWAYS apply inner shadow (inset 0 0.5px 0 rgba(255,255,255,0.08)) to glass containers",
+      "ALWAYS use proper text hierarchy: primary > secondary > tertiary",
+      "ALWAYS add outer border to window (0.5px solid rgba(255,255,255,0.18))",
+      "ALWAYS keep toggle knobs pure white with subtle shadow",
+      "ALWAYS use accent blue (#007AFF) as the primary interactive color"
+    ]
+  }
+}
