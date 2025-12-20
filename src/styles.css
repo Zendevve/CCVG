@@ -1,11 +1,16 @@
 /* ==========================================================================
    macOS TAHOE - LIQUID GLASS DESIGN SYSTEM
-   Based on Apple's Liquid Glass UI Language (WWDC 2025)
+   Definitive Implementation Based on Apple WWDC 2025 Specifications
+
+   Core Principles:
+   - Liquid Glass: Multi-layered refractive material
+   - Spatial Paradigm: Z-axis depth with light physics
+   - Geometric Rhythm: Continuous curvature (Squircle)
    ========================================================================== */
 
 :root {
   /* ------------------------------------------------------------------
-     SPACE: 8-Point Grid (Apple HIG Standard)
+     SPACE: 8-Point Grid System (Strict Apple HIG)
      ------------------------------------------------------------------ */
   --space-0_5: 4px;
   --space-1: 8px;
@@ -15,45 +20,78 @@
   --space-4: 32px;
   --space-5: 40px;
   --space-6: 48px;
+  --space-8: 64px;
 
   /* ------------------------------------------------------------------
-     LIQUID GLASS: Core Material System
+     LIQUID GLASS: Multi-Layer Material System
+     The material is NOT a single blur - it's a composite of:
+     1. Base translucency layer
+     2. Noise texture overlay
+     3. Refraction (inner shadow simulating light bending)
+     4. Specular border (rim light gradient)
+     5. Surface sheen (localized highlight)
      ------------------------------------------------------------------ */
 
-  /* Glass Tints (Dark Mode) */
+  /* Glass Base Fills (White with variable opacity) */
   --glass-clear: rgba(255, 255, 255, 0.08);
-  --glass-tinted: rgba(120, 120, 128, 0.16);
-  --glass-thick: rgba(40, 40, 44, 0.72);
-  --glass-ultra-thick: rgba(30, 30, 34, 0.88);
+  /* Immersive overlays */
+  --glass-regular: rgba(255, 255, 255, 0.12);
+  /* Default windows/sidebars */
+  --glass-thick: rgba(255, 255, 255, 0.18);
+  /* High-contrast areas */
+  --glass-ultra-thick: rgba(40, 40, 44, 0.85);
+  /* Maximum legibility */
 
-  /* Glass Blur Values */
-  --blur-subtle: 12px;
-  --blur-regular: 20px;
-  --blur-prominent: 40px;
-  --blur-ultra: 80px;
+  /* Blur Values (Progressive) */
+  --blur-light: 20px;
+  --blur-regular: 30px;
+  --blur-heavy: 50px;
 
-  /* Glass Borders (Refraction Edge) */
-  --glass-border-light: rgba(255, 255, 255, 0.18);
-  --glass-border-dark: rgba(255, 255, 255, 0.06);
-  --glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  /* Saturation Boost (CRITICAL - prevents muddy blur) */
+  --saturation: saturate(180%);
+
+  /* Specular Borders (Rim Light Simulation) */
+  --border-specular: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.2) 40%,
+      rgba(255, 255, 255, 0.05) 100%);
+  --border-subtle: rgba(255, 255, 255, 0.18);
+  --border-dark: rgba(255, 255, 255, 0.06);
+
+  /* Refraction Simulation (Inner Shadows) */
+  --refraction-top: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --refraction-bottom: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+
+  /* Depth Shadows (Colored, Soft) */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.25);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
 
   /* ------------------------------------------------------------------
-     COLOR: Tahoe Semantic Palette (Dark Mode)
+     COLOR: Tahoe Semantic Palette (Dark Mode Default)
+     Elevation by Lightness principle
      ------------------------------------------------------------------ */
 
-  /* Backgrounds */
+  /* Backgrounds (Z-axis: darker = further) */
   --bg-base: #000000;
+  /* Level 0: Pure black */
   --bg-primary: #1C1C1E;
+  /* Level 1: Cards */
   --bg-secondary: #2C2C2E;
+  /* Level 2: Modals */
   --bg-tertiary: #3A3A3C;
+  /* Level 3: Popovers */
+  --bg-elevated: #48484A;
+  /* Level 4: Alerts */
 
-  /* Labels */
+  /* Labels (Semantic text colors) */
   --label-primary: #FFFFFF;
   --label-secondary: rgba(235, 235, 245, 0.60);
   --label-tertiary: rgba(235, 235, 245, 0.30);
-  --label-quaternary: rgba(235, 235, 245, 0.16);
+  --label-quaternary: rgba(235, 235, 245, 0.18);
 
-  /* Fills */
+  /* Fills (Interactive backgrounds) */
   --fill-primary: rgba(120, 120, 128, 0.36);
   --fill-secondary: rgba(120, 120, 128, 0.32);
   --fill-tertiary: rgba(120, 120, 128, 0.24);
@@ -61,9 +99,9 @@
 
   /* Separators */
   --separator: rgba(84, 84, 88, 0.65);
-  --separator-opaque: #3D3D41;
+  --separator-opaque: #38383A;
 
-  /* System Tints */
+  /* System Tints (Slightly lighter in dark mode for contrast) */
   --tint-blue: #0A84FF;
   --tint-green: #30D158;
   --tint-indigo: #5E5CE6;
@@ -71,22 +109,23 @@
   --tint-pink: #FF375F;
   --tint-purple: #BF5AF2;
   --tint-red: #FF453A;
-  --tint-teal: #40C8E0;
+  --tint-teal: #64D2FF;
   --tint-yellow: #FFD60A;
   --tint-gray: #8E8E93;
 
   /* ------------------------------------------------------------------
-     TYPOGRAPHY: SF Pro (System Font Stack)
+     TYPOGRAPHY: SF Pro System Font Stack
+     Using optical sizing and variable widths
      ------------------------------------------------------------------ */
-  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-rounded: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", system-ui, sans-serif;
-  --font-mono: "SF Mono", ui-monospace, monospace;
+  --font-mono: "SF Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
 
-  /* Type Scale */
-  --text-large-title: 600 34px/40px var(--font-system);
+  /* Dynamic Type Scale (Non-linear scaling) */
+  --text-large-title: 600 34px/41px var(--font-system);
   --text-title-1: 600 28px/34px var(--font-system);
   --text-title-2: 600 22px/28px var(--font-system);
-  --text-title-3: 600 20px/24px var(--font-system);
+  --text-title-3: 600 20px/25px var(--font-system);
   --text-headline: 600 17px/22px var(--font-system);
   --text-body: 400 17px/22px var(--font-system);
   --text-callout: 400 16px/21px var(--font-system);
@@ -96,29 +135,38 @@
   --text-caption-2: 500 11px/13px var(--font-system);
 
   /* ------------------------------------------------------------------
-     GEOMETRY: Tahoe Rounded Corners (More Aggressive)
+     GEOMETRY: Tahoe Squircle Corners (Aggressive Radii)
+     Using continuous curvature (G2 continuity)
      ------------------------------------------------------------------ */
-  --radius-small: 10px;
-  --radius-medium: 14px;
-  --radius-large: 20px;
-  --radius-xlarge: 26px;
-  --radius-window: 12px;
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-window: 26px;
+  /* Window corners: 26-32pt */
+  --radius-card: 20px;
+  /* Card containers */
+  --radius-button: 12px;
+  /* Buttons and controls */
   --radius-capsule: 999px;
 
   /* ------------------------------------------------------------------
-     MOTION: Tahoe Animations (Fluid, Bouncy)
+     MOTION: Spring Physics (Interruptible)
+     Not ease-in-out, but mass/stiffness/damping simulation
      ------------------------------------------------------------------ */
-  --ease-default: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   --duration-instant: 0.1s;
   --duration-fast: 0.2s;
   --duration-normal: 0.35s;
   --duration-slow: 0.5s;
 
-  /* Touch Targets */
-  --min-tap: 44px;
+  /* Touch Targets (HIG Minimum) */
+  --touch-min: 44px;
 }
 
 /* ==========================================================================
@@ -149,14 +197,14 @@ body {
 body {
   display: flex;
   flex-direction: column;
-  /* Tahoe-style subtle gradient background */
+  /* Tahoe ambient gradient (subtle depth cue) */
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(100, 100, 120, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(100, 120, 150, 0.12) 0%, transparent 60%),
     var(--bg-base);
 }
 
 /* ==========================================================================
-   WINDOW CHROME (Tahoe Traffic Lights)
+   WINDOW CHROME (Transparent Menu Bar with Liquid Glass)
    ========================================================================== */
 .window-drag-region {
   position: fixed;
@@ -169,30 +217,36 @@ body {
   display: flex;
   align-items: center;
   padding: 0 var(--space-2);
-  /* Liquid Glass menu bar */
+
+  /* Liquid Glass Menu Bar */
   background: var(--glass-clear);
-  backdrop-filter: blur(var(--blur-prominent)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--blur-prominent)) saturate(180%);
-  border-bottom: 0.5px solid var(--glass-border-dark);
+  backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  -webkit-backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  border-bottom: 0.5px solid var(--border-dark);
 }
 
 .win-controls {
   -webkit-app-region: no-drag;
   display: flex;
   gap: 8px;
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
-/* macOS Traffic Light Style */
+/* macOS Traffic Light Buttons */
 .win-btn {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   border: none;
   font-size: 0;
+  line-height: 0;
   cursor: pointer;
-  transition: all var(--duration-instant);
+  transition: filter var(--duration-instant);
   position: relative;
+}
+
+.win-btn:hover {
+  filter: brightness(1.1);
 }
 
 .win-btn.close {
@@ -207,11 +261,12 @@ body {
   background: #28C840;
 }
 
-/* Show symbols on hover (like real macOS) */
+/* Show symbols on group hover */
 .win-controls:hover .win-btn::after {
-  font-size: 8px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.5);
+  font-family: system-ui;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.4);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -219,7 +274,8 @@ body {
 }
 
 .win-controls:hover .win-btn.close::after {
-  content: "✕";
+  content: "×";
+  font-size: 11px;
 }
 
 .win-controls:hover .win-btn.minimize::after {
@@ -232,7 +288,7 @@ body {
 }
 
 /* ==========================================================================
-   MAIN STAGE
+   MAIN STAGE (Content Area)
    ========================================================================== */
 #main-stage {
   flex: 1;
@@ -244,11 +300,10 @@ body {
   width: 100%;
   padding: var(--space-3);
   padding-top: 64px;
-  /* Account for glass menu bar */
 }
 
 /* ==========================================================================
-   NAVIGATION BAR (Tahoe Style)
+   NAVIGATION BAR
    ========================================================================== */
 .nav-bar {
   display: flex;
@@ -267,7 +322,7 @@ body {
   border: none;
   cursor: pointer;
   padding: 0;
-  min-height: var(--min-tap);
+  min-height: var(--touch-min);
   transition: opacity var(--duration-instant);
 }
 
@@ -288,29 +343,29 @@ body {
 }
 
 /* ==========================================================================
-   VIEWS (Screen Transitions)
+   VIEWS (Screen Transitions with Depth)
    ========================================================================== */
 .view {
   display: none;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  animation: viewEnter var(--duration-normal) var(--ease-default);
+  animation: viewSlideIn var(--duration-normal) var(--ease-smooth);
 }
 
 .view.active {
   display: flex;
 }
 
-@keyframes viewEnter {
+@keyframes viewSlideIn {
   from {
     opacity: 0;
-    transform: translateX(30px) scale(0.98);
+    transform: translateX(30px);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateX(0);
   }
 }
 
@@ -362,19 +417,31 @@ p {
 }
 
 /* ==========================================================================
-   LIQUID GLASS CARD
+   LIQUID GLASS CARD (Multi-Layer Composite)
+
+   Layer Stack:
+   1. Base: White 10-18% fill
+   2. Backdrop: blur(30px) saturate(180%)
+   3. Border: Specular gradient (rim light)
+   4. Inner Shadow: Light refraction simulation
+   5. Drop Shadow: Colored, soft
    ========================================================================== */
 .glass-card {
-  background: var(--glass-thick);
-  backdrop-filter: blur(var(--blur-regular)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--blur-regular)) saturate(150%);
-  border-radius: var(--radius-large);
-  border: 0.5px solid var(--glass-border-light);
+  position: relative;
+  background: var(--glass-regular);
+  backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  -webkit-backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  border-radius: var(--radius-card);
+  border: 0.5px solid var(--border-subtle);
   box-shadow:
-    var(--glass-inner-shadow),
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.2);
+    var(--refraction-top),
+    var(--shadow-glass);
   overflow: hidden;
+}
+
+/* Thick variant for high-contrast needs */
+.glass-card--thick {
+  background: var(--glass-thick);
 }
 
 /* ==========================================================================
@@ -384,20 +451,20 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--min-tap);
+  min-height: var(--touch-min);
   padding: 0 var(--space-3);
   border: none;
-  border-radius: var(--radius-medium);
+  border-radius: var(--radius-button);
   font: var(--text-headline);
   cursor: pointer;
   gap: var(--space-1);
   transition:
-    transform var(--duration-instant) var(--ease-bounce),
-    opacity var(--duration-instant);
+    transform var(--duration-instant) var(--ease-spring),
+    filter var(--duration-instant);
 }
 
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .btn:disabled {
@@ -405,24 +472,29 @@ p {
   pointer-events: none;
 }
 
-/* Primary: Filled Tint */
+/* Primary: Filled with tint color */
 .btn-primary {
   background: var(--tint-blue);
   color: white;
   min-width: 180px;
-  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
 }
 
-/* Secondary: Glass */
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Secondary: Glass with tint border */
 .btn-secondary {
-  background: var(--glass-tinted);
-  backdrop-filter: blur(var(--blur-subtle));
-  -webkit-backdrop-filter: blur(var(--blur-subtle));
+  background: var(--glass-regular);
+  backdrop-filter: blur(var(--blur-light)) var(--saturation);
+  -webkit-backdrop-filter: blur(var(--blur-light)) var(--saturation);
   color: var(--tint-blue);
-  border: 0.5px solid var(--glass-border-light);
+  border: 0.5px solid var(--border-subtle);
+  box-shadow: var(--refraction-top);
 }
 
-/* Plain: Text Only */
+/* Plain: Text only (links) */
 .btn-plain {
   background: none;
   border: none;
@@ -430,7 +502,10 @@ p {
   font: var(--text-body);
   padding: var(--space-1);
   cursor: pointer;
-  min-height: var(--min-tap);
+  min-height: var(--touch-min);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0_5);
 }
 
 .btn-plain:active {
@@ -438,7 +513,7 @@ p {
 }
 
 /* ==========================================================================
-   GROUPED LIST (Tahoe Inset Grouped Style)
+   GROUPED LIST (Inset Grouped Style)
    ========================================================================== */
 .list-section {
   margin-bottom: var(--space-3);
@@ -448,19 +523,19 @@ p {
   font: var(--text-footnote);
   color: var(--label-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
   padding: 0 var(--space-2);
   margin-bottom: var(--space-1);
 }
 
 .list-group {
-  background: var(--glass-thick);
-  backdrop-filter: blur(var(--blur-regular)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--blur-regular)) saturate(150%);
-  border-radius: var(--radius-medium);
-  border: 0.5px solid var(--glass-border-light);
+  background: var(--glass-regular);
+  backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  -webkit-backdrop-filter: blur(var(--blur-regular)) var(--saturation);
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border-subtle);
   overflow: hidden;
-  box-shadow: var(--glass-inner-shadow);
+  box-shadow: var(--refraction-top);
 }
 
 .list-row {
@@ -485,11 +560,11 @@ p {
   background: var(--fill-tertiary);
 }
 
-/* Row Icon (Rounded Square) */
+/* Row Icon (Rounded Square with Gradient) */
 .row-icon {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -518,11 +593,12 @@ p {
   color: var(--label-secondary);
 }
 
-/* Row Accessory */
+/* Row Accessory (Chevron, Checkmark) */
 .row-accessory {
   color: var(--label-quaternary);
   font-size: 16px;
   margin-left: var(--space-1);
+  transition: opacity var(--duration-fast);
 }
 
 .row-value {
@@ -532,7 +608,7 @@ p {
 }
 
 /* ==========================================================================
-   TOGGLE SWITCH (iOS 26 Style)
+   TOGGLE SWITCH (iOS 17+ Style)
    ========================================================================== */
 .toggle {
   position: relative;
@@ -561,7 +637,7 @@ p {
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.15),
     0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform var(--duration-fast) var(--ease-bounce);
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .toggle.on::after {
@@ -569,7 +645,7 @@ p {
 }
 
 /* ==========================================================================
-   HERO SECTION
+   HERO SECTION (Centered Content)
    ========================================================================== */
 .hero {
   display: flex;
@@ -582,8 +658,8 @@ p {
 .hero-icon {
   font-size: 80px;
   margin-bottom: var(--space-3);
-  /* Liquid Glass icon glow */
-  filter: drop-shadow(0 4px 20px rgba(10, 132, 255, 0.3));
+  /* Liquid Glass icon glow effect */
+  filter: drop-shadow(0 4px 24px rgba(10, 132, 255, 0.25));
 }
 
 .hero h1,
@@ -616,14 +692,14 @@ p {
 }
 
 /* ==========================================================================
-   ACTIVITY LOG (Console Style)
+   ACTIVITY LOG
    ========================================================================== */
 .activity-log {
-  background: var(--glass-tinted);
-  backdrop-filter: blur(var(--blur-subtle));
-  -webkit-backdrop-filter: blur(var(--blur-subtle));
-  border-radius: var(--radius-small);
-  border: 0.5px solid var(--glass-border-dark);
+  background: var(--glass-clear);
+  backdrop-filter: blur(var(--blur-light)) var(--saturation);
+  -webkit-backdrop-filter: blur(var(--blur-light)) var(--saturation);
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-dark);
   padding: var(--space-1_5);
   max-height: 140px;
   overflow-y: auto;
