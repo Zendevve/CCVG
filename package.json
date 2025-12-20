@@ -4,9 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "css": "tailwindcss -i ./src/input.css -o ./src/styles.css --watch",
+    "css:build": "tailwindcss -i ./src/input.css -o ./src/styles.css --minify",
+    "dev": "npm run css:build && tauri dev",
+    "build": "npm run css:build && tauri build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2"
+    "@tauri-apps/cli": "^2",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
   }
 }

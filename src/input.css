@@ -1,8 +1,38 @@
+@import "tailwindcss";
+
 /* ==========================================================================
    macOS TAHOE - LIQUID GLASS DESIGN SYSTEM
    With VISIBLE gradient background for glass blur effect
    ========================================================================== */
 
+@theme {
+  /* Colors */
+  --color-glass-clear: rgba(255, 255, 255, 0.08);
+  --color-glass-regular: rgba(255, 255, 255, 0.15);
+  --color-glass-thick: rgba(255, 255, 255, 0.25);
+  --color-glass-ultra: rgba(40, 40, 44, 0.85);
+
+  --color-label-primary: #FFFFFF;
+  --color-label-secondary: rgba(235, 235, 245, 0.60);
+  --color-label-tertiary: rgba(235, 235, 245, 0.30);
+
+  --color-tint-blue: #0A84FF;
+  --color-tint-green: #30D158;
+  --color-tint-red: #FF453A;
+  --color-tint-orange: #FF9F0A;
+  --color-tint-purple: #BF5AF2;
+  --color-tint-indigo: #5E5CE6;
+
+  /* Radii */
+  --radius-tahoe-window: 26px;
+  --radius-tahoe-card: 20px;
+  --radius-tahoe-button: 14px;
+  --radius-tahoe-sm: 10px;
+}
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES
+   ========================================================================== */
 :root {
   /* 8-Point Grid */
   --space-1: 8px;
@@ -12,7 +42,7 @@
   --space-5: 40px;
   --space-6: 48px;
 
-  /* Glass Materials - HIGHER OPACITY for visibility */
+  /* Glass Materials */
   --glass-clear: rgba(255, 255, 255, 0.08);
   --glass-regular: rgba(255, 255, 255, 0.15);
   --glass-thick: rgba(255, 255, 255, 0.25);
@@ -23,9 +53,9 @@
   --blur-heavy: 50px;
   --saturation: saturate(180%);
 
-  /* Borders - BRIGHTER for visibility */
-  --border-glass: rgba(255, 255, 255, 0.25);
-  --border-light: rgba(255, 255, 255, 0.4);
+  /* Borders */
+  --border-glass: rgba(255, 255, 255, 0.2);
+  --border-light: rgba(255, 255, 255, 0.35);
 
   /* Labels */
   --label-primary: #FFFFFF;
@@ -39,7 +69,6 @@
   --tint-orange: #FF9F0A;
   --tint-purple: #BF5AF2;
   --tint-indigo: #5E5CE6;
-  --tint-teal: #64D2FF;
 
   /* Fills */
   --fill-tertiary: rgba(120, 120, 128, 0.24);
@@ -82,21 +111,19 @@ body {
 
 /* ==========================================================================
    GRADIENT BACKGROUND (Makes Glass Visible!)
-   This is the KEY - you need colorful content behind glass for it to blur
    ========================================================================== */
 body {
   /* Rich gradient background that glass can blur */
   background:
-    radial-gradient(ellipse 100% 80% at 70% 10%, rgba(94, 92, 230, 0.5) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 60% at 20% 90%, rgba(191, 90, 242, 0.4) 0%, transparent 50%),
-    radial-gradient(ellipse 90% 50% at 50% 50%, rgba(10, 132, 255, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(48, 209, 88, 0.2) 0%, transparent 40%),
-    linear-gradient(180deg, #0f0f18 0%, #1a1a2e 50%, #0a0a12 100%);
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(94, 92, 230, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 30% 80%, rgba(191, 90, 242, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 40% at 50% 50%, rgba(10, 132, 255, 0.25) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
   background-attachment: fixed;
 }
 
 /* ==========================================================================
-   WINDOW CHROME (Traffic Lights with Glass)
+   WINDOW CHROME (Traffic Lights)
    ========================================================================== */
 .window-drag-region {
   position: fixed;
@@ -110,14 +137,11 @@ body {
   align-items: center;
   padding: 0 var(--space-2);
 
-  /* VISIBLE Glass menu bar */
+  /* Glass menu bar */
   background: var(--glass-regular);
   backdrop-filter: blur(var(--blur-heavy)) var(--saturation);
   -webkit-backdrop-filter: blur(var(--blur-heavy)) var(--saturation);
-  border-bottom: 1px solid var(--border-glass);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 4px 20px rgba(0, 0, 0, 0.3);
+  border-bottom: 0.5px solid var(--border-glass);
 }
 
 .win-controls {
@@ -263,7 +287,7 @@ body {
 }
 
 /* ==========================================================================
-   LIQUID GLASS CARD - NOW VISIBLE!
+   LIQUID GLASS CARD
    ========================================================================== */
 .glass-card {
   background: var(--glass-thick);
@@ -272,10 +296,8 @@ body {
   border-radius: var(--radius-card);
   border: 1px solid var(--border-light);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.25);
   overflow: hidden;
 }
 
@@ -303,17 +325,17 @@ body {
   border: 1px solid var(--border-light);
   overflow: hidden;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 4px 20px rgba(0, 0, 0, 0.25);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .list-row {
   display: flex;
   align-items: center;
-  min-height: 58px;
+  min-height: 54px;
   padding: 12px 16px;
   background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
   transition: background 0.1s;
 }
 
@@ -326,17 +348,17 @@ body {
 }
 
 .list-row.selectable:active {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .row-icon {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 14px;
+  margin-right: 12px;
   font-size: 18px;
   color: white;
   flex-shrink: 0;
@@ -346,14 +368,13 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .row-title {
   font-size: 17px;
   color: var(--label-primary);
-  font-weight: 500;
 }
 
 .row-subtitle {
@@ -382,11 +403,11 @@ body {
   font-weight: 600;
   cursor: pointer;
   gap: var(--space-1);
-  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.1s;
+  transition: transform 0.1s, filter 0.1s;
 }
 
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .btn:disabled {
@@ -395,13 +416,10 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, #1e90ff 0%, var(--tint-blue) 100%);
+  background: var(--tint-blue);
   color: white;
   min-width: 200px;
-  box-shadow:
-    0 4px 20px rgba(10, 132, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
 }
 
 .btn-primary:hover {
@@ -414,7 +432,6 @@ body {
   -webkit-backdrop-filter: blur(20px) var(--saturation);
   color: var(--tint-blue);
   border: 1px solid var(--border-glass);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-plain {
@@ -428,7 +445,7 @@ body {
   min-height: var(--touch-min);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .btn-plain:active {
@@ -442,19 +459,15 @@ body {
   position: relative;
   width: 51px;
   height: 31px;
-  background: rgba(120, 120, 128, 0.4);
+  background: rgba(120, 120, 128, 0.32);
   border-radius: 16px;
   cursor: pointer;
   transition: background 0.2s;
   flex-shrink: 0;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toggle.on {
   background: var(--tint-green);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 12px rgba(48, 209, 88, 0.4);
 }
 
 .toggle::after {
@@ -466,9 +479,7 @@ body {
   height: 27px;
   background: white;
   border-radius: 50%;
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -490,7 +501,7 @@ body {
 .hero-icon {
   font-size: 80px;
   margin-bottom: var(--space-3);
-  filter: drop-shadow(0 8px 32px rgba(10, 132, 255, 0.5));
+  filter: drop-shadow(0 4px 24px rgba(10, 132, 255, 0.4));
 }
 
 .hero h1,
@@ -498,14 +509,13 @@ body {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: var(--space-1);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .hero p {
   max-width: 280px;
   font-size: 15px;
   color: var(--label-secondary);
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 /* ==========================================================================
@@ -514,7 +524,7 @@ body {
 .progress-bar {
   width: 100%;
   height: 4px;
-  background: rgba(120, 120, 128, 0.3);
+  background: rgba(120, 120, 128, 0.24);
   border-radius: 2px;
   overflow: hidden;
   margin: var(--space-2) 0;
@@ -523,21 +533,9 @@ body {
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--tint-blue), var(--tint-purple), var(--tint-teal));
-  background-size: 200% 100%;
+  background: linear-gradient(90deg, var(--tint-blue), var(--tint-purple));
   border-radius: 2px;
   transition: width 0.3s linear;
-  animation: shimmer 2s linear infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-
-  100% {
-    background-position: -100% 0;
-  }
 }
 
 /* ==========================================================================
@@ -559,7 +557,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: var(--space-1);
-  padding: 4px 0;
+  padding: 3px 0;
   color: var(--label-tertiary);
 }
 
@@ -602,8 +600,8 @@ body {
 }
 
 .status-icon {
-  font-size: 22px;
-  margin-right: 14px;
+  font-size: 20px;
+  margin-right: 12px;
 }
 
 .status-icon.success {
