@@ -16,8 +16,9 @@
 
 [Download](#-quick-start) • [Features](#-features) • [Design](#-design-philosophy) • [Build](#-building-from-source) • [Docs](#-documentation)
 
-</div>
-
+---
+> [!IMPORTANT]
+> **Unofficial Tool**: CC Version Guard is an independent, proprietary project and is **not** affiliated with, endorsed by, or connected to ByteDance or CapCut. "CapCut" is a trademark of Bytedance Pte. Ltd. This tool is provided "as is" to manage your local installation.
 ---
 
 ## 🎯 The Problem
