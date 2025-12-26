@@ -85,6 +85,11 @@
           <i class="ph ph-clock-counter-clockwise" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
           <span style="font-size: 11px;">Backups</span>
         </button>
+        <div style="width: 1px; background: var(--border-opaque);"></div>
+        <button class="btn-tool" id="btn-settings" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
+          <i class="ph ph-gear" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
+          <span style="font-size: 11px;">Settings</span>
+        </button>
       </div>
 
       <footer class="app-footer">
@@ -412,6 +417,64 @@
           <i class="ph ph-trash"></i>
           Clear All Backups
         </button>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         VIEW: SETTINGS - Application Configuration
+         Laws of UX Applied:
+         - Law of Common Region: Grouped settings
+         - Jakob's Law: Standard switch controls
+         ================================================================ -->
+    <section id="view-settings" class="view">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="settings-back">
+          <i class="ph ph-caret-left"></i>
+          Back
+        </button>
+        <span class="tahoe-nav-title">Settings</span>
+      </nav>
+
+      <div class="hero" style="padding: var(--space-4) 0;">
+        <div class="hero-icon" style="font-size: 40px;">
+          <i class="ph ph-gear"></i>
+        </div>
+        <h2>Settings</h2>
+        <p>Configure application behavior</p>
+      </div>
+
+      <div class="list-section">
+        <div class="list-header">GENERAL</div>
+        <div class="glass-panel" style="padding: 0;">
+
+          <!-- Auto-Start Toggle -->
+          <div class="list-row" style="padding: var(--space-3) var(--space-4); justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <div class="row-icon" style="background: var(--fill-secondary);">
+                <i class="ph ph-rocket-launch"></i>
+              </div>
+              <div class="row-content">
+                <span class="row-title">Auto-Start on Boot</span>
+                <span class="row-subtitle">Start Version Guard with Windows</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-autostart">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+        </div>
+        <div class="list-header" style="margin-top: var(--space-4);">ABOUT</div>
+         <div class="glass-panel" style="padding: var(--space-3);">
+            <div class="row-content">
+                <span class="row-title">CC Version Guard</span>
+                <span class="row-subtitle" id="settings-version">v2.3.0</span>
+                <span class="row-subtitle" style="margin-top: 4px; display: block; color: var(--label-tertiary);">
+                  Proprietary. Free to build for personal use.
+                </span>
+            </div>
+         </div>
       </div>
     </section>
 

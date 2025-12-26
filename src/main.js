@@ -1032,4 +1032,50 @@ window.showView = function (view) {
   if (view === 'backups') {
     loadBackups();
   }
+  if (view === 'settings') {
+    loadSettings();
+  }
 };
+
+// ============================================
+// Settings View Handlers
+// ============================================
+document.getElementById('btn-settings')?.addEventListener('click', () => navigateTo('settings'));
+document.getElementById('settings-back')?.addEventListener('click', goBack);
+
+const autostartToggle = document.getElementById('setting-autostart');
+autostartToggle?.addEventListener('change', async (e) => {
+  try {
+    await invoke('set_autostart_enabled', { enabled: e.target.checked });
+  } catch (err) {
+    console.error('Failed to set autostart:', err);
+    e.target.checked = !e.target.checked;
+    await modal.show({
+      title: 'Error',
+      message: `Failed to update settings: ${err}`,
+      confirmText: 'OK',
+      cancelText: 'Close',
+      danger: true,
+      iconName: 'warning-circle'
+    });
+  }
+});
+
+async function loadSettings() {
+  // Load app version
+  try {
+    const version = await getVersion();
+    const settingsVersionEl = document.getElementById('settings-version');
+    if (settingsVersionEl) settingsVersionEl.textContent = `v${version}`;
+  } catch (e) {
+    console.warn('Could not load version for settings:', e);
+  }
+
+  // Load auto-start state
+  try {
+    const isEnabled = await invoke('get_autostart_enabled');
+    if (autostartToggle) autostartToggle.checked = isEnabled;
+  } catch (e) {
+    console.warn('Could not load autostart status:', e);
+  }
+}

@@ -11,6 +11,9 @@
 [![MCAF](https://img.shields.io/badge/Follows-MCAF-purple?style=flat-square)](https://mcaf.managed-code.com/)
 [![Laws of UX](https://img.shields.io/badge/Design-Laws%20of%20UX-blueviolet?style=flat-square)](https://lawsofux.com/)
 
+> [!NOTE]
+> **Open Core Model**: This project is completely proprietary under Proprietary. You are free to build, modify, and run the code yourself for free. We charge for pre-built convenience binaries to support development.
+
 [Download](#-quick-start) • [Features](#-features) • [Design](#-design-philosophy) • [Build](#-building-from-source) • [Docs](#-documentation)
 
 </div>
