@@ -65,6 +65,74 @@ function text(str) {
 }
 
 // ============================================
+// Modal Confirmation Dialog
+// ============================================
+const modal = {
+  overlay: null,
+  resolvePromise: null,
+
+  /**
+   * Show a confirmation dialog
+   * @param {Object} options
+   * @param {string} options.title - Dialog title
+   * @param {string} options.message - Dialog message
+   * @param {string} options.confirmText - Confirm button text (default: "Confirm")
+   * @param {string} options.cancelText - Cancel button text (default: "Cancel")
+   * @param {boolean} options.danger - Show danger styling (red button)
+   * @param {string} options.iconName - Phosphor icon name (default: "warning-circle")
+   * @returns {Promise<boolean>} - Resolves true if confirmed, false if cancelled
+   */
+  show({ title, message, confirmText = 'Confirm', cancelText = 'Cancel', danger = false, iconName = 'warning-circle' }) {
+    return new Promise((resolve) => {
+      this.resolvePromise = resolve;
+      this.overlay = document.getElementById('modal-overlay');
+
+      const modalIcon = document.getElementById('modal-icon');
+      const modalTitle = document.getElementById('modal-title');
+      const modalMessage = document.getElementById('modal-message');
+      const confirmBtn = document.getElementById('modal-confirm');
+      const cancelBtn = document.getElementById('modal-cancel');
+
+      // Update content
+      modalIcon.replaceChildren(icon(iconName));
+      modalIcon.className = danger ? 'modal-icon danger' : 'modal-icon';
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      confirmBtn.textContent = confirmText;
+      cancelBtn.textContent = cancelText;
+
+      // Update danger styling
+      if (danger) {
+        confirmBtn.classList.add('btn-danger');
+      } else {
+        confirmBtn.classList.remove('btn-danger');
+      }
+
+      // Show modal
+      this.overlay.style.display = 'flex';
+    });
+  },
+
+  hide(result) {
+    if (this.overlay) {
+      this.overlay.style.display = 'none';
+    }
+    if (this.resolvePromise) {
+      this.resolvePromise(result);
+      this.resolvePromise = null;
+    }
+  }
+};
+
+// Modal event handlers
+document.getElementById('modal-cancel')?.addEventListener('click', () => modal.hide(false));
+document.getElementById('modal-confirm')?.addEventListener('click', () => modal.hide(true));
+document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modal-overlay') modal.hide(false);
+});
+
+
+// ============================================
 // Window Controls
 // ============================================
 document.getElementById('btn-close')?.addEventListener('click', () => getCurrentWindow().close());
@@ -160,6 +228,18 @@ function updateStatusCard(isProtected) {
 }
 
 async function removeProtection() {
+  // Show confirmation dialog first
+  const confirmed = await modal.show({
+    title: 'Remove Protection?',
+    message: 'CapCut will be able to auto-update again. You can re-apply protection anytime.',
+    confirmText: 'Remove',
+    cancelText: 'Keep Protected',
+    danger: true,
+    iconName: 'shield-slash'
+  });
+
+  if (!confirmed) return;
+
   const btn = document.getElementById('btn-remove-protection');
 
   // Store original content for reset
@@ -378,7 +458,25 @@ window.selectVersion = function (idx) {
 // Options View Handlers
 // ============================================
 document.getElementById('options-back')?.addEventListener('click', goBack);
-document.getElementById('btn-apply')?.addEventListener('click', () => runProtectionSequence());
+document.getElementById('btn-apply')?.addEventListener('click', async () => {
+  const versionsToDelete = state.versions.filter(v => v.path !== state.selectedVersion.path);
+
+  // If deleting other versions, show confirmation
+  if (versionsToDelete.length > 0) {
+    const confirmed = await modal.show({
+      title: 'Apply Protection?',
+      message: `This will permanently delete ${versionsToDelete.length} other version${versionsToDelete.length !== 1 ? 's' : ''} and lock your selected version.`,
+      confirmText: 'Apply Protection',
+      cancelText: 'Go Back',
+      danger: false,
+      iconName: 'shield-check'
+    });
+
+    if (!confirmed) return;
+  }
+
+  runProtectionSequence();
+});
 
 // Toggle handlers with keyboard support (Accessibility)
 function setupToggle(id, stateKey) {
@@ -667,6 +765,18 @@ window.selectSwitchVersion = function (idx) {
 
 async function applySwitch() {
   if (!state.switchTarget) return;
+
+  // Show confirmation dialog
+  const confirmed = await modal.show({
+    title: 'Switch Version?',
+    message: `This will set CapCut v${state.switchTarget.name} as the active version.`,
+    confirmText: 'Switch',
+    cancelText: 'Cancel',
+    danger: false,
+    iconName: 'swap'
+  });
+
+  if (!confirmed) return;
 
   const btn = document.getElementById('btn-switch-apply');
   btn.disabled = true;

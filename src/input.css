@@ -1038,6 +1038,103 @@
   .max-w-280 {
     max-width: 280px;
   }
+
+  /* ========================================================================
+     MODAL DIALOG
+     Tesler's Law: Absorb complexity into the system
+     ======================================================================== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: modalFadeIn var(--duration-normal) var(--ease-out);
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .modal-container {
+    width: 90%;
+    max-width: 320px;
+    padding: var(--space-6);
+    text-align: center;
+    animation: modalSlideIn var(--duration-slow) var(--ease-spring);
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .modal-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-4);
+    border-radius: var(--radius-full);
+    background: rgba(255, 159, 10, 0.15);
+    color: var(--accent-orange);
+    font-size: 28px;
+  }
+
+  .modal-icon.danger {
+    background: rgba(255, 69, 58, 0.15);
+    color: var(--accent-red);
+  }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--label-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .modal-message {
+    font-size: 13px;
+    color: var(--label-secondary);
+    line-height: 1.4;
+    margin-bottom: var(--space-5);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .modal-actions button {
+    flex: 1;
+    height: 40px;
+  }
+
+  .btn-danger {
+    background: var(--accent-red) !important;
+  }
+
+  .btn-danger:hover {
+    background: #e63d33 !important;
+  }
 }
 
 /* ========================================================================

@@ -371,6 +371,26 @@
 
   </main>
 
+  <!-- ================================================================
+       MODAL: CONFIRMATION DIALOG
+       Laws of UX Applied:
+       - Tesler's Law: Absorb complexity into the system
+       - Peak-End Rule: Allow user to gracefully back out
+       ================================================================ -->
+  <div id="modal-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-container glass-panel">
+      <div class="modal-icon" id="modal-icon">
+        <i class="ph ph-warning-circle"></i>
+      </div>
+      <h3 class="modal-title" id="modal-title">Are you sure?</h3>
+      <p class="modal-message" id="modal-message">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="modal-cancel">Cancel</button>
+        <button class="btn-primary btn-danger" id="modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <script src="main.js" type="module"></script>
 </body>
 </html>
