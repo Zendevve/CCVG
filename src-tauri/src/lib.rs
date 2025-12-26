@@ -3,7 +3,7 @@
 
 mod commands;
 
-use commands::{cleaner, process, protector, scanner, switcher};
+use commands::{cleaner, paths, process, protector, scanner, switcher};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -82,6 +82,9 @@ pub fn run() {
             scanner::get_archive_versions,
             scanner::scan_versions,
             scanner::get_capcut_paths,
+            // Path resolution commands
+            paths::get_path_info,
+            paths::validate_custom_capcut_path,
             // Process commands
             process::is_capcut_running,
             process::perform_precheck,

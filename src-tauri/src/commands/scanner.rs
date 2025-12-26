@@ -3,8 +3,11 @@
 
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use walkdir::WalkDir;
+
+// Re-export path functions from paths module for backwards compatibility
+pub use super::paths::{get_capcut_apps_path, get_capcut_root_path};
 
 /// Information about an installed CapCut version
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -78,20 +81,6 @@ pub fn get_archive_versions() -> Vec<ArchiveVersion> {
             risk_level: "Medium".to_string(),
         },
     ]
-}
-
-/// Get the CapCut Apps path
-pub fn get_capcut_apps_path() -> Option<PathBuf> {
-    std::env::var("LOCALAPPDATA")
-        .ok()
-        .map(|p| PathBuf::from(p).join("CapCut").join("Apps"))
-}
-
-/// Get the CapCut root path
-pub fn get_capcut_root_path() -> Option<PathBuf> {
-    std::env::var("LOCALAPPDATA")
-        .ok()
-        .map(|p| PathBuf::from(p).join("CapCut"))
 }
 
 /// Calculate directory size recursively

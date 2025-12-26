@@ -6,6 +6,8 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use walkdir::WalkDir;
 
+use super::paths;
+
 /// Unset readonly attribute recursively
 fn unset_readonly_recursive(path: &Path) -> Result<(), String> {
     for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
@@ -130,18 +132,19 @@ pub fn delete_versions(paths: Vec<String>) -> ProtectionResult {
 /// Apply protection (lock config + create blockers)
 #[tauri::command]
 pub fn apply_protection() -> ProtectionResult {
-    let apps_path = match std::env::var("LOCALAPPDATA") {
-        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
-        Err(_) => {
+    let capcut_paths = match paths::resolve_capcut_paths() {
+        Some(p) => p,
+        None => {
             return ProtectionResult {
                 success: false,
-                error: Some("Failed to get LOCALAPPDATA".to_string()),
+                error: Some("Could not find CapCut installation".to_string()),
                 logs: vec![],
             }
         }
     };
 
-    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let apps_path = capcut_paths.apps;
+    let capcut_root = capcut_paths.root;
     let mut logs: Vec<String> = Vec::new();
 
     // Lock configuration
@@ -175,18 +178,19 @@ pub fn apply_protection() -> ProtectionResult {
 
 /// Apply protection with specific options
 pub fn apply_protection_with_options(lock_config: bool, create_blockers: bool) -> ProtectionResult {
-    let apps_path = match std::env::var("LOCALAPPDATA") {
-        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
-        Err(_) => {
+    let capcut_paths = match paths::resolve_capcut_paths() {
+        Some(p) => p,
+        None => {
             return ProtectionResult {
                 success: false,
-                error: Some("Failed to get LOCALAPPDATA".to_string()),
+                error: Some("Could not find CapCut installation".to_string()),
                 logs: vec![],
             }
         }
     };
 
-    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let apps_path = capcut_paths.apps;
+    let capcut_root = capcut_paths.root;
     let mut logs: Vec<String> = Vec::new();
 
     // Lock configuration if enabled
@@ -306,16 +310,17 @@ pub struct ProtectionStatus {
 /// Check if protection is currently applied
 #[tauri::command]
 pub fn check_protection_status() -> ProtectionStatus {
-    let apps_path = match std::env::var("LOCALAPPDATA") {
-        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
-        Err(_) => return ProtectionStatus {
+    let capcut_paths = match paths::resolve_capcut_paths() {
+        Some(p) => p,
+        None => return ProtectionStatus {
             is_protected: false,
             config_locked: false,
             blockers_exist: false,
         },
     };
 
-    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let apps_path = capcut_paths.apps;
+    let capcut_root = capcut_paths.root;
 
     // Check if ProductInfo.xml is a readonly empty file (blocker)
     let product_info = apps_path.join("ProductInfo.xml");
@@ -363,18 +368,19 @@ pub fn check_protection_status() -> ProtectionStatus {
 /// Remove all protection measures
 #[tauri::command]
 pub fn remove_protection() -> ProtectionResult {
-    let apps_path = match std::env::var("LOCALAPPDATA") {
-        Ok(p) => PathBuf::from(p).join("CapCut").join("Apps"),
-        Err(_) => {
+    let capcut_paths = match paths::resolve_capcut_paths() {
+        Some(p) => p,
+        None => {
             return ProtectionResult {
                 success: false,
-                error: Some("Failed to get LOCALAPPDATA".to_string()),
+                error: Some("Could not find CapCut installation".to_string()),
                 logs: vec![],
             }
         }
     };
 
-    let capcut_root = apps_path.parent().unwrap_or(&apps_path).to_path_buf();
+    let apps_path = capcut_paths.apps;
+    let capcut_root = capcut_paths.root;
     let mut logs: Vec<String> = Vec::new();
 
     // Remove ProductInfo.xml blocker
