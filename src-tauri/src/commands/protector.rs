@@ -93,14 +93,31 @@ pub struct ProtectionResult {
     pub logs: Vec<String>,
 }
 
-/// Delete specified version directories
+/// Delete specified version directories (with automatic backup)
 #[tauri::command]
 pub fn delete_versions(paths: Vec<String>) -> ProtectionResult {
+    use super::backup;
+
     let mut logs: Vec<String> = Vec::new();
 
     for path_str in &paths {
         let path = PathBuf::from(path_str);
         let name = path.file_name().unwrap_or_default().to_string_lossy();
+
+        // Create backup before deletion
+        logs.push(format!("Backing up: {}", name));
+        let backup_result = backup::create_backup(&path, "Version deleted during protection");
+
+        if backup_result.success {
+            if let Some(backup_id) = &backup_result.backup_id {
+                logs.push(format!("[OK] Backup created: {}", backup_id));
+            }
+        } else {
+            // Backup failed - warn but continue (user confirmed deletion)
+            logs.push(format!("[!] Backup failed: {}", backup_result.error.unwrap_or_default()));
+            logs.push("[!] Proceeding with deletion (backup unavailable)".to_string());
+        }
+
         logs.push(format!("Deleting: {}", name));
 
         if let Err(e) = unset_readonly_recursive(&path) {
@@ -120,6 +137,7 @@ pub fn delete_versions(paths: Vec<String>) -> ProtectionResult {
         logs.push("[OK] No versions to delete".to_string());
     } else {
         logs.push(format!("[OK] Deleted {} version(s)", paths.len()));
+        logs.push("[OK] Backups available for recovery".to_string());
     }
 
     ProtectionResult {

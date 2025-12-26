@@ -3,7 +3,7 @@
 
 mod commands;
 
-use commands::{cleaner, paths, process, protector, scanner, switcher};
+use commands::{backup, cleaner, paths, process, protector, scanner, switcher};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -85,6 +85,12 @@ pub fn run() {
             // Path resolution commands
             paths::get_path_info,
             paths::validate_custom_capcut_path,
+            // Backup commands
+            backup::list_backups,
+            backup::restore_version_backup,
+            backup::delete_backup,
+            backup::get_backup_size,
+            backup::clear_all_backups,
             // Process commands
             process::is_capcut_running,
             process::perform_precheck,
