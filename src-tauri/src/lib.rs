@@ -3,7 +3,7 @@
 
 mod commands;
 
-use commands::{backup, cleaner, paths, process, protector, scanner, switcher};
+use commands::{autostart, backup, cleaner, paths, process, protector, scanner, switcher};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -91,9 +91,13 @@ pub fn run() {
             backup::delete_backup,
             backup::get_backup_size,
             backup::clear_all_backups,
+            // Autostart commands
+            autostart::get_autostart_enabled,
+            autostart::set_autostart_enabled,
             // Process commands
             process::is_capcut_running,
             process::perform_precheck,
+            process::launch_capcut,
             // Cleaner commands
             cleaner::calculate_cache_size,
             cleaner::clean_cache,

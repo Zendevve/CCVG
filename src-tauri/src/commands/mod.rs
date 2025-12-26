@@ -1,3 +1,4 @@
+pub mod autostart;
 pub mod backup;
 pub mod cleaner;
 pub mod paths;
