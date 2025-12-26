@@ -860,3 +860,176 @@ function createSkeletonRows(count = 3) {
     console.warn('Could not load app version:', e);
   }
 })();
+
+// ============================================
+// Backups View Handlers
+// ============================================
+document.getElementById('btn-backups')?.addEventListener('click', () => navigateTo('backups'));
+document.getElementById('backups-back')?.addEventListener('click', goBack);
+document.getElementById('btn-clear-backups')?.addEventListener('click', clearAllBackups);
+
+async function loadBackups() {
+  const container = document.getElementById('backup-list');
+  const sizeInfo = document.getElementById('backup-size-info');
+
+  container.replaceChildren(createSkeletonFragment(2));
+
+  try {
+    const [backups, size] = await Promise.all([
+      invoke('list_backups'),
+      invoke('get_backup_size')
+    ]);
+
+    // Update size info
+    const sizeMB = (size / (1024 * 1024)).toFixed(1);
+    sizeInfo.textContent = `Total: ${sizeMB} MB`;
+
+    if (backups.length === 0) {
+      container.replaceChildren(
+        el('div', { className: 'list-row', style: { justifyContent: 'center', color: 'var(--label-tertiary)' } },
+          el('span', {}, 'No backups available')
+        )
+      );
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    backups.forEach((backup, idx) => {
+      const date = new Date(backup.created_at * 1000);
+      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const sizeMB = (backup.size_bytes / (1024 * 1024)).toFixed(1);
+      const backupId = `${backup.version_name}_${backup.created_at}`;
+
+      const row = el('div', { className: 'list-row', style: { gap: 'var(--space-3)' } },
+        el('div', { className: 'row-icon', style: { background: 'var(--fill-secondary)' } },
+          icon('folder-simple')
+        ),
+        el('div', { className: 'row-content' },
+          el('span', { className: 'row-title' }, backup.version_name),
+          el('span', { className: 'row-subtitle' }, `${dateStr} • ${sizeMB} MB`)
+        ),
+        el('div', { style: { display: 'flex', gap: 'var(--space-2)' } },
+          el('button', {
+            className: 'btn-secondary',
+            style: { padding: '6px 10px', height: 'auto', minWidth: 'auto' },
+            title: 'Restore this backup',
+            onclick: () => restoreBackup(backupId, backup.version_name)
+          }, icon('arrow-counter-clockwise')),
+          el('button', {
+            className: 'btn-secondary',
+            style: { padding: '6px 10px', height: 'auto', minWidth: 'auto', color: 'var(--accent-red)' },
+            title: 'Delete this backup',
+            onclick: () => deleteBackup(backupId, backup.version_name)
+          }, icon('trash'))
+        )
+      );
+
+      fragment.append(row);
+    });
+
+    container.replaceChildren(fragment);
+
+  } catch (e) {
+    container.replaceChildren(
+      el('div', { className: 'list-row', style: { color: 'var(--accent-red)' } },
+        el('span', {}, `Error: ${e}`)
+      )
+    );
+  }
+}
+
+async function restoreBackup(backupId, versionName) {
+  const confirmed = await modal.show({
+    title: 'Restore Backup?',
+    message: `This will restore ${versionName} to its original location.`,
+    confirmText: 'Restore',
+    cancelText: 'Cancel',
+    danger: false,
+    iconName: 'arrow-counter-clockwise'
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const result = await invoke('restore_version_backup', { backupId });
+    if (result.success) {
+      await modal.show({
+        title: 'Restored!',
+        message: `${versionName} has been restored successfully.`,
+        confirmText: 'OK',
+        cancelText: 'Close',
+        danger: false,
+        iconName: 'check-circle'
+      });
+      loadBackups();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (e) {
+    await modal.show({
+      title: 'Restore Failed',
+      message: e.toString(),
+      confirmText: 'OK',
+      cancelText: 'Close',
+      danger: true,
+      iconName: 'x-circle'
+    });
+  }
+}
+
+async function deleteBackup(backupId, versionName) {
+  const confirmed = await modal.show({
+    title: 'Delete Backup?',
+    message: `This will permanently delete the backup of ${versionName}.`,
+    confirmText: 'Delete',
+    cancelText: 'Keep',
+    danger: true,
+    iconName: 'trash'
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const result = await invoke('delete_backup', { backupId });
+    if (result.success) {
+      loadBackups();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (e) {
+    console.error('Delete backup failed:', e);
+  }
+}
+
+async function clearAllBackups() {
+  const confirmed = await modal.show({
+    title: 'Clear All Backups?',
+    message: 'This will permanently delete all backups. You won\'t be able to restore deleted versions.',
+    confirmText: 'Clear All',
+    cancelText: 'Keep Backups',
+    danger: true,
+    iconName: 'trash'
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const result = await invoke('clear_all_backups');
+    if (result.success) {
+      loadBackups();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (e) {
+    console.error('Clear backups failed:', e);
+  }
+}
+
+// Load backups when view is shown
+const originalShowView = showView;
+window.showView = function (view) {
+  originalShowView(view);
+  if (view === 'backups') {
+    loadBackups();
+  }
+};
