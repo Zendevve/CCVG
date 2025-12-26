@@ -1,11 +1,68 @@
 /**
  * Version Guard - Main Controller
  * macOS 26 Tahoe Design System
+ *
+ * Security: All DOM manipulation uses safe builder functions (no innerHTML)
  */
 
 const { invoke } = window.__TAURI__.core;
 const { getCurrentWindow } = window.__TAURI__.window;
 const { getVersion } = window.__TAURI__.app;
+
+// ============================================
+// Safe DOM Builder Utilities (XSS Prevention)
+// ============================================
+
+/**
+ * Create an element with attributes, styles, and children (safe - no innerHTML)
+ * @param {string} tag - HTML tag name
+ * @param {Object} attrs - Attributes (class, id, etc.) and style object
+ * @param {...(Node|string)} children - Child elements or text
+ * @returns {HTMLElement}
+ */
+function el(tag, attrs = {}, ...children) {
+  const element = document.createElement(tag);
+
+  for (const [key, value] of Object.entries(attrs)) {
+    if (key === 'style' && typeof value === 'object') {
+      Object.assign(element.style, value);
+    } else if (key === 'className') {
+      element.className = value;
+    } else if (key.startsWith('on') && typeof value === 'function') {
+      element.addEventListener(key.slice(2).toLowerCase(), value);
+    } else if (key === 'dataset') {
+      Object.assign(element.dataset, value);
+    } else {
+      element.setAttribute(key, value);
+    }
+  }
+
+  for (const child of children) {
+    if (child == null) continue;
+    element.append(typeof child === 'string' ? document.createTextNode(child) : child);
+  }
+
+  return element;
+}
+
+/**
+ * Create Phosphor icon element
+ * @param {string} iconName - Icon name without 'ph-' prefix (e.g., 'check', 'folder-open')
+ * @param {Object} attrs - Additional attributes
+ * @returns {HTMLElement}
+ */
+function icon(iconName, attrs = {}) {
+  return el('i', { className: `ph ph-${iconName}`, ...attrs });
+}
+
+/**
+ * Create text node (escapes HTML automatically)
+ * @param {string} text
+ * @returns {Text}
+ */
+function text(str) {
+  return document.createTextNode(str);
+}
 
 // ============================================
 // Window Controls
@@ -104,16 +161,18 @@ function updateStatusCard(isProtected) {
 
 async function removeProtection() {
   const btn = document.getElementById('btn-remove-protection');
-  const originalText = btn.innerHTML;
+
+  // Store original content for reset
+  const originalContent = Array.from(btn.childNodes).map(n => n.cloneNode(true));
 
   btn.disabled = true;
-  btn.innerHTML = '<i class="ph ph-circle-notch spin"></i> Removing...';
+  btn.replaceChildren(icon('circle-notch', { className: 'ph ph-circle-notch spin' }), ' Removing...');
 
   try {
     const result = await invoke('remove_protection');
 
     if (result.success) {
-      btn.innerHTML = '<i class="ph ph-check"></i> Removed!';
+      btn.replaceChildren(icon('check'), ' Removed!');
       btn.style.background = 'var(--accent-green)';
 
       // Update status card
@@ -124,17 +183,17 @@ async function removeProtection() {
 
       // Reset button state for next time
       btn.disabled = false;
-      btn.innerHTML = originalText;
+      btn.replaceChildren(...originalContent);
       btn.style.background = '';
     } else {
       throw new Error(result.error);
     }
   } catch (e) {
-    btn.innerHTML = '<i class="ph ph-x"></i> Failed';
+    btn.replaceChildren(icon('x'), ' Failed');
     btn.style.background = 'var(--accent-red)';
     console.error(e);
     await sleep(2000);
-    btn.innerHTML = '<i class="ph ph-shield-slash"></i> Remove Protection';
+    btn.replaceChildren(icon('shield-slash'), ' Remove Protection');
     btn.style.background = '';
     btn.disabled = false;
   }
@@ -232,43 +291,70 @@ async function loadVersions() {
   state.selectedVersion = null;
   continueBtn.disabled = true;
 
-  // Show skeleton loader (Victor's Tips: use skeletons for layout)
-  container.innerHTML = createSkeletonRows(3);
+  // Show skeleton loader
+  container.replaceChildren(createSkeletonRows(3));
 
   try {
     const vers = await invoke('scan_versions');
     state.versions = vers;
 
     if (vers.length === 0) {
-      // Empty state with actionable CTA (Laws of UX: Zeigarnik Effect - guide user to next step)
-      container.innerHTML = `
-        <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
-          <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
-          <span class="row-title">No installations found</span>
-          <span class="row-subtitle" style="margin-bottom: 12px;">Download a legacy version to get started</span>
-          <button class="btn-plain" onclick="goBack(); setTimeout(() => navigateTo('legacy'), 100);">
-            <i class="ph ph-download-simple"></i> Download Legacy Version
-          </button>
-        </div>
-      `;
+      // Empty state with actionable CTA
+      const downloadBtn = el('button', { className: 'btn-plain' },
+        icon('download-simple'),
+        ' Download Legacy Version'
+      );
+      downloadBtn.addEventListener('click', () => {
+        goBack();
+        setTimeout(() => navigateTo('legacy'), 100);
+      });
+
+      container.replaceChildren(
+        el('div', {
+          className: 'list-row',
+          style: { flexDirection: 'column', textAlign: 'center', padding: '24px' }
+        },
+          icon('folder-open', { style: { fontSize: '32px', color: 'var(--label-tertiary)', marginBottom: '8px' } }),
+          el('span', { className: 'row-title' }, 'No installations found'),
+          el('span', { className: 'row-subtitle', style: { marginBottom: '12px' } }, 'Download a legacy version to get started'),
+          downloadBtn
+        )
+      );
       return;
     }
 
-    container.innerHTML = vers.map((v, i) => `
-      <div class="list-row selectable" tabindex="0" onclick="selectVersion(${i})" onkeydown="handleKey(event, () => selectVersion(${i}))">
-        <div class="row-icon bg-accent-indigo">
-          <i class="ph ph-hard-drives"></i>
-        </div>
-        <div class="row-content">
-          <span class="row-title">CapCut v${v.name}</span>
-          <span class="row-subtitle">${v.size_mb.toFixed(0)} MB</span>
-        </div>
-        <i class="ph ph-check row-accessory" style="opacity: 0; color: var(--accent-blue); font-size: 18px;"></i>
-      </div>
-    `).join('');
+    // Build version list with safe DOM methods
+    const fragment = document.createDocumentFragment();
+    vers.forEach((v, i) => {
+      const row = el('div', {
+        className: 'list-row selectable',
+        tabindex: '0'
+      },
+        el('div', { className: 'row-icon bg-accent-indigo' },
+          icon('hard-drives')
+        ),
+        el('div', { className: 'row-content' },
+          el('span', { className: 'row-title' }, `CapCut v${v.name}`),
+          el('span', { className: 'row-subtitle' }, `${v.size_mb.toFixed(0)} MB`)
+        ),
+        icon('check', {
+          className: 'ph ph-check row-accessory',
+          style: { opacity: '0', color: 'var(--accent-blue)', fontSize: '18px' }
+        })
+      );
+
+      row.addEventListener('click', () => selectVersion(i));
+      row.addEventListener('keydown', (e) => handleKey(e, () => selectVersion(i)));
+      fragment.append(row);
+    });
+    container.replaceChildren(fragment);
 
   } catch (e) {
-    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
+    container.replaceChildren(
+      el('div', { className: 'list-row' },
+        el('span', { className: 'row-title', style: { color: 'var(--accent-red)' } }, `Error: ${e}`)
+      )
+    );
   }
 }
 
@@ -338,7 +424,7 @@ async function runProtectionSequence() {
   const progressBar = document.getElementById('progress-bar');
   const statusText = document.getElementById('status-text');
   const logContainer = document.getElementById('activity-log');
-  logContainer.innerHTML = '';
+  logContainer.replaceChildren();
 
   const setProgress = (msg, pct) => {
     statusText.textContent = msg;
@@ -346,14 +432,13 @@ async function runProtectionSequence() {
   };
 
   const addLog = (msg, type = 'info') => {
-    const icons = { ok: 'ph-check', warn: 'ph-warning', info: 'ph-dot' };
+    const iconNames = { ok: 'check', warn: 'warning', info: 'dot' };
     const classes = { ok: 'success', warn: 'warning', info: '' };
-    logContainer.innerHTML += `
-      <div class="log-entry ${classes[type]}">
-        <i class="ph ${icons[type]}"></i>
-        <span>${msg}</span>
-      </div>
-    `;
+    const entry = el('div', { className: `log-entry ${classes[type]}` },
+      icon(iconNames[type]),
+      el('span', {}, msg)
+    );
+    logContainer.append(entry);
     logContainer.scrollTop = logContainer.scrollHeight;
   };
 
@@ -444,32 +529,47 @@ document.getElementById('legacy-back')?.addEventListener('click', goBack);
 
 async function loadArchiveVersions() {
   const container = document.getElementById('legacy-list');
-  container.innerHTML = createSkeletonRows(4);
+  container.replaceChildren(createSkeletonRows(4));
 
   try {
     const archives = await invoke('get_archive_versions');
 
-    container.innerHTML = archives.map(v => {
+    const fragment = document.createDocumentFragment();
+    archives.forEach(v => {
       const riskColor = v.risk_level === 'High' ? 'var(--accent-red)' :
         v.risk_level === 'Medium' ? 'var(--accent-orange)' : 'var(--accent-green)';
-      return `
-        <div class="list-row">
-          <div class="row-icon" style="background: ${riskColor};">
-            <i class="ph ph-package"></i>
-          </div>
-          <div class="row-content">
-            <span class="row-title">v${v.version} · ${v.persona}</span>
-            <span class="row-subtitle">${v.description}</span>
-          </div>
-          <button class="btn-plain" style="padding: 8px;" onclick="window.__TAURI__.opener.openUrl('${v.download_url}')">
-            <i class="ph ph-download-simple" style="font-size: 18px;"></i>
-          </button>
-        </div>
-      `;
-    }).join('');
+
+      const downloadBtn = el('button', {
+        className: 'btn-plain',
+        style: { padding: '8px' }
+      },
+        icon('download-simple', { style: { fontSize: '18px' } })
+      );
+      downloadBtn.addEventListener('click', () => {
+        window.__TAURI__.opener.openUrl(v.download_url);
+      });
+
+      fragment.append(
+        el('div', { className: 'list-row' },
+          el('div', { className: 'row-icon', style: { background: riskColor } },
+            icon('package')
+          ),
+          el('div', { className: 'row-content' },
+            el('span', { className: 'row-title' }, `v${v.version} · ${v.persona}`),
+            el('span', { className: 'row-subtitle' }, v.description)
+          ),
+          downloadBtn
+        )
+      );
+    });
+    container.replaceChildren(fragment);
 
   } catch (e) {
-    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
+    container.replaceChildren(
+      el('div', { className: 'list-row' },
+        el('span', { className: 'row-title', style: { color: 'var(--accent-red)' } }, `Error: ${e}`)
+      )
+    );
   }
 }
 
@@ -482,7 +582,7 @@ document.getElementById('btn-switch-apply')?.addEventListener('click', applySwit
 
 async function loadSwitchVersions() {
   const container = document.getElementById('switch-list');
-  container.innerHTML = createSkeletonRows(2);
+  container.replaceChildren(createSkeletonRows(2));
 
   try {
     const vers = await invoke('scan_versions');
@@ -491,37 +591,61 @@ async function loadSwitchVersions() {
 
     if (vers.length === 0) {
       // Empty state with actionable guidance
-      container.innerHTML = `
-        <div class="list-row" style="flex-direction: column; text-align: center; padding: 24px;">
-          <i class="ph ph-folder-open" style="font-size: 32px; color: var(--label-tertiary); margin-bottom: 8px;"></i>
-          <span class="row-title">No installations found</span>
-          <span class="row-subtitle">Download a legacy version first</span>
-        </div>
-      `;
+      container.replaceChildren(
+        el('div', {
+          className: 'list-row',
+          style: { flexDirection: 'column', textAlign: 'center', padding: '24px' }
+        },
+          icon('folder-open', { style: { fontSize: '32px', color: 'var(--label-tertiary)', marginBottom: '8px' } }),
+          el('span', { className: 'row-title' }, 'No installations found'),
+          el('span', { className: 'row-subtitle' }, 'Download a legacy version first')
+        )
+      );
       document.getElementById('btn-switch-apply').disabled = true;
       return;
     }
 
     if (vers.length === 1) {
-      container.innerHTML = '<div class="list-row"><span class="row-title">Only one version installed — nothing to switch</span></div>';
+      container.replaceChildren(
+        el('div', { className: 'list-row' },
+          el('span', { className: 'row-title' }, 'Only one version installed — nothing to switch')
+        )
+      );
       return;
     }
 
-    container.innerHTML = vers.map((v, i) => `
-      <div class="list-row selectable" tabindex="0" onclick="selectSwitchVersion(${i})" onkeydown="handleKey(event, () => selectSwitchVersion(${i}))">
-        <div class="row-icon bg-accent-purple">
-          <i class="ph ph-hard-drives"></i>
-        </div>
-        <div class="row-content">
-          <span class="row-title">CapCut v${v.name}</span>
-          <span class="row-subtitle">${v.size_mb.toFixed(0)} MB</span>
-        </div>
-        <i class="ph ph-check row-accessory" style="opacity: 0; color: var(--accent-blue); font-size: 18px;"></i>
-      </div>
-    `).join('');
+    // Build switch version list with safe DOM methods
+    const fragment = document.createDocumentFragment();
+    vers.forEach((v, i) => {
+      const row = el('div', {
+        className: 'list-row selectable',
+        tabindex: '0'
+      },
+        el('div', { className: 'row-icon bg-accent-purple' },
+          icon('hard-drives')
+        ),
+        el('div', { className: 'row-content' },
+          el('span', { className: 'row-title' }, `CapCut v${v.name}`),
+          el('span', { className: 'row-subtitle' }, `${v.size_mb.toFixed(0)} MB`)
+        ),
+        icon('check', {
+          className: 'ph ph-check row-accessory',
+          style: { opacity: '0', color: 'var(--accent-blue)', fontSize: '18px' }
+        })
+      );
+
+      row.addEventListener('click', () => selectSwitchVersion(i));
+      row.addEventListener('keydown', (e) => handleKey(e, () => selectSwitchVersion(i)));
+      fragment.append(row);
+    });
+    container.replaceChildren(fragment);
 
   } catch (e) {
-    container.innerHTML = `<div class="list-row"><span class="row-title" style="color: var(--accent-red);">Error: ${e}</span></div>`;
+    container.replaceChildren(
+      el('div', { className: 'list-row' },
+        el('span', { className: 'row-title', style: { color: 'var(--accent-red)' } }, `Error: ${e}`)
+      )
+    );
   }
 }
 
@@ -546,30 +670,30 @@ async function applySwitch() {
 
   const btn = document.getElementById('btn-switch-apply');
   btn.disabled = true;
-  btn.innerHTML = '<i class="ph ph-circle-notch spin"></i> Switching...';
+  btn.replaceChildren(icon('circle-notch', { className: 'ph ph-circle-notch spin' }), ' Switching...');
 
   try {
     const result = await invoke('switch_version', { targetPath: state.switchTarget.path });
 
     if (result.success) {
-      btn.innerHTML = '<i class="ph ph-check"></i> Switched!';
+      btn.replaceChildren(icon('check'), ' Switched!');
       btn.style.background = 'var(--accent-green)';
       await sleep(1000);
       state.history = ['welcome'];
       showView('welcome');
       // Reset button for next use
-      btn.innerHTML = '<i class="ph ph-swap"></i> Switch Version';
+      btn.replaceChildren(icon('swap'), ' Switch Version');
       btn.style.background = '';
       btn.disabled = true; // Reset to disabled state
     } else {
       throw new Error(result.message);
     }
   } catch (e) {
-    btn.innerHTML = '<i class="ph ph-x"></i> Failed';
+    btn.replaceChildren(icon('x'), ' Failed');
     btn.style.background = 'var(--accent-red)';
     console.error(e);
     await sleep(2000);
-    btn.innerHTML = '<i class="ph ph-swap"></i> Switch Version';
+    btn.replaceChildren(icon('swap'), ' Switch Version');
     btn.style.background = '';
     btn.disabled = false;
   }
@@ -588,17 +712,30 @@ window.handleKey = function (e, action) {
   }
 }
 
-// Create skeleton loading rows (Victor's Tips: use skeletons for layout)
+/**
+ * Create skeleton loading rows (safe DOM version)
+ * @param {number} count - Number of skeleton rows
+ * @returns {DocumentFragment}
+ */
+function createSkeletonFragment(count = 3) {
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    fragment.append(
+      el('div', { className: 'skeleton-row' },
+        el('div', { className: 'skeleton-icon' }),
+        el('div', { className: 'skeleton-text' },
+          el('div', { className: 'skeleton-line medium' }),
+          el('div', { className: 'skeleton-line short' })
+        )
+      )
+    );
+  }
+  return fragment;
+}
+
+// Legacy wrapper for skeleton rows (returns fragment for replaceChildren)
 function createSkeletonRows(count = 3) {
-  return Array(count).fill(0).map(() => `
-    <div class="skeleton-row">
-      <div class="skeleton-icon"></div>
-      <div class="skeleton-text">
-        <div class="skeleton-line medium"></div>
-        <div class="skeleton-line short"></div>
-      </div>
-    </div>
-  `).join('');
+  return createSkeletonFragment(count);
 }
 
 // ============================================
