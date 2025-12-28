@@ -69,12 +69,34 @@ I built **CC Version Guard** to give power back to the creators. It started as a
 
 - Windows 10 or 11
 - [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) (usually installed by default)
+- [Rust](https://www.rust-lang.org/tools/install) (1.70 or later)
+- [Node.js](https://nodejs.org/) (LTS version recommended)
 
 ### Installation
 
-1. Download the latest installer from the [Releases](https://github.com/Zendevve/capcut-version-guard/releases) page.
-2. Run `CC-Version-Guard-Setup.exe`.
-3. Launch the application and select your CapCut installation.
+Currently, there are no prebuilt binaries available. To use CC Version Guard, you'll need to build it from source:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Zendevve/CC-Version-Guard.git
+   cd CC-Version-Guard
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Build the application:**
+   ```bash
+   npm run tauri build
+   ```
+
+4. **Run the installer:**
+   - The built installer will be located in `src-tauri/target/release/bundle/`
+   - Run the setup executable to install the application
+
+5. **Launch the application** and select your CapCut installation.
 
 ## What's Inside?
 
@@ -106,9 +128,9 @@ We welcome contributions! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) 
 
 Distributed under the **CC Version Guard License**. See `LICENSE` for more information.
 
-This is an **Open Core** project:
+This is a **Proprietary** project:
 - The source code is proprietary for personal use.
-- Binaries are provided for convenience.
+- Users can build the application from source following the installation instructions.
 
 ## Footer
 
