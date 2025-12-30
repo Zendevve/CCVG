@@ -76,17 +76,10 @@ I built **CC Version Guard** to give power back to the creators. It started as a
 
 ### Installation
 
-**Option 1: Pre-built Installer (Recommended)**
-Support the project and get the signed, ready-to-use installer immediately.
-- [Download via Gumroad](https://gumroad.com/YOUR_LINK_HERE)
-- [Get it on itch.io](https://zendevve.itch.io/cc-version-guard)
-- [Support on Ko-fi](https://ko-fi.com/YOUR_LINK_HERE)
+This project is proprietary. You can compile it yourself for personal use by following the comprehensive guide below.
 
----
-
-**Option 2: Build from Source (Free)**
-
-This project is proprietary. Advanced users can compile it themselves by following the comprehensive guide below.
+> [!TIP]
+> **Pre-built installers coming soon!** Follow the project for updates on ready-to-use releases.
 
 #### 2.1 Development Environment Prerequisites
 
