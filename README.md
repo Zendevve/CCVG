@@ -39,6 +39,12 @@
 > [!NOTE]
 > All "Legacy Versions" downloads are sourced **directly** from official CapCut servers. We do not host, crack, or modify any CapCut binaries.
 
+> [!CAUTION]
+> **BINARY DISTRIBUTION STRICTLY PROHIBITED:**
+> The author (Zendevve) reserves the **sole and exclusive right** to distribute pre-compiled binaries (executables) of this application.
+>
+> You are **NOT** permitted to re-upload, mirror, or redistribute the compiled artifacts (e.g., `.exe`, `.msi`) from this repository or the official releases page. You are welcome to compile the code from source for legitimate personal use in accordance with the Proprietary License license.
+
 ---------------
 
 ## Table of Contents
@@ -296,9 +302,10 @@ We welcome contributions! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) 
 
 Distributed under the **CC Version Guard License**. See `LICENSE` for more information.
 
-This is an **Open Core** project:
-- The source code is proprietary for personal use.
-- Binaries are provided for convenience.
+This is a **Proprietary** project with restricted binary distribution:
+- The **Source Code** is proprietary for personal use.
+- **Zendevve** retains the **exclusive right** to distribute official binaries.
+- Redistribution of pre-built binaries is **strictly prohibited**.
 
 ## Footer
 
