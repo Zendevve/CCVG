@@ -1,5 +1,5 @@
 /**
- * Version Guard - Main Controller
+ * CC Version Guard - Main Controller
  * macOS 26 Tahoe Design System
  *
  * Security: All DOM manipulation uses safe builder functions (no innerHTML)
@@ -215,14 +215,14 @@ function updateStatusCard(isProtected) {
   if (isProtected) {
     wrapper.className = 'status-icon-wrapper protected';
     icon.className = 'ph ph-shield-check';
-    title.innerText = 'Protected';
-    subtitle.innerText = 'Your version is locked safe';
+    title.innerText = 'Version Locked';
+    subtitle.innerText = 'Updates are disabled';
     if (removeBtn) removeBtn.style.display = 'inline-flex';
   } else {
     wrapper.className = 'status-icon-wrapper unprotected';
     icon.className = 'ph ph-shield-warning';
-    title.innerText = 'Not Protected';
-    subtitle.innerText = 'CapCut can update automatically';
+    title.innerText = 'Version Unlocked';
+    subtitle.innerText = 'Updates are enabled';
     if (removeBtn) removeBtn.style.display = 'none';
   }
 }
@@ -230,9 +230,9 @@ function updateStatusCard(isProtected) {
 async function removeProtection() {
   // Show confirmation dialog first
   const confirmed = await modal.show({
-    title: 'Remove Protection?',
-    message: 'CapCut will be able to auto-update again. You can re-apply protection anytime.',
-    confirmText: 'Remove',
+    title: 'Unlock Version?',
+    message: 'Updates will be enabled again. You can re-lock anytime.',
+    confirmText: 'Unlock',
     cancelText: 'Keep Protected',
     danger: true,
     iconName: 'shield-slash'
@@ -273,7 +273,7 @@ async function removeProtection() {
     btn.style.background = 'var(--accent-red)';
     console.error(e);
     await sleep(2000);
-    btn.replaceChildren(icon('shield-slash'), ' Remove Protection');
+    btn.replaceChildren(icon('lock-open-open'), ' Unlock Version');
     btn.style.background = '';
     btn.disabled = false;
   }
@@ -464,9 +464,9 @@ document.getElementById('btn-apply')?.addEventListener('click', async () => {
   // If deleting other versions, show confirmation
   if (versionsToDelete.length > 0) {
     const confirmed = await modal.show({
-      title: 'Apply Protection?',
+      title: 'Lock Version?',
       message: `This will permanently delete ${versionsToDelete.length} other version${versionsToDelete.length !== 1 ? 's' : ''} and lock your selected version.`,
-      confirmText: 'Apply Protection',
+      confirmText: 'Lock Version',
       cancelText: 'Go Back',
       danger: false,
       iconName: 'shield-check'
@@ -542,7 +542,7 @@ async function runProtectionSequence() {
 
   try {
     setProgress('Preparing...', 10);
-    addLog('Starting protection sequence');
+    addLog('Starting version lock sequence');
     await sleep(300);
 
     const versionsToDelete = state.versions
@@ -553,7 +553,7 @@ async function runProtectionSequence() {
     addLog(`Found ${versionsToDelete.length} version(s) to remove`);
     await sleep(200);
 
-    setProgress('Applying protection...', 50);
+    setProgress('Locking version...', 50);
 
     const result = await invoke('run_full_protection', {
       params: {
@@ -579,7 +579,7 @@ async function runProtectionSequence() {
     await sleep(300);
 
     setProgress('Complete', 100);
-    addLog('Protection applied successfully', 'ok');
+    addLog('Version locked successfully', 'ok');
     await sleep(400);
 
     navigateTo('complete');

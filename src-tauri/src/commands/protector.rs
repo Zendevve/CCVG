@@ -23,7 +23,7 @@ fn unset_readonly_recursive(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-/// Create readonly blocker file
+/// Create readonly lock file
 fn create_readonly(path: &Path) -> Result<(), String> {
     if path.exists() {
         unset_readonly_recursive(path).ok();
@@ -71,7 +71,7 @@ fn lock_configuration(apps_path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-/// Create dummy blocker files
+/// Create dummy lock files
 fn create_dummy_files(capcut_path: &Path, apps_path: &Path) -> Result<(), String> {
     let pinfo = apps_path.join("ProductInfo.xml");
     create_readonly(&pinfo)?;
@@ -147,7 +147,7 @@ pub fn delete_versions(paths: Vec<String>) -> ProtectionResult {
     }
 }
 
-/// Apply protection (lock config + create blockers)
+/// Apply protection (lock config + create locks)
 #[tauri::command]
 pub fn apply_protection() -> ProtectionResult {
     let capcut_paths = match paths::resolve_capcut_paths() {
@@ -176,8 +176,8 @@ pub fn apply_protection() -> ProtectionResult {
     }
     logs.push("[OK] Configuration locked".to_string());
 
-    // Create blockers
-    logs.push("Creating blockers...".to_string());
+    // Create locks
+    logs.push("Creating locks...".to_string());
     if let Err(e) = create_dummy_files(&capcut_root, &apps_path) {
         return ProtectionResult {
             success: false,
@@ -185,7 +185,7 @@ pub fn apply_protection() -> ProtectionResult {
             logs,
         };
     }
-    logs.push("[OK] Update blockers created".to_string());
+    logs.push("[OK] Version lock active".to_string());
 
     ProtectionResult {
         success: true,
@@ -226,9 +226,9 @@ pub fn apply_protection_with_options(lock_config: bool, create_blockers: bool) -
         logs.push("Skipping config lock (disabled)".to_string());
     }
 
-    // Create blockers if enabled
+    // Create locks if enabled
     if create_blockers {
-        logs.push("Creating blockers...".to_string());
+        logs.push("Creating locks...".to_string());
         if let Err(e) = create_dummy_files(&capcut_root, &apps_path) {
             return ProtectionResult {
                 success: false,
@@ -236,9 +236,9 @@ pub fn apply_protection_with_options(lock_config: bool, create_blockers: bool) -
                 logs,
             };
         }
-        logs.push("[OK] Update blockers created".to_string());
+        logs.push("[OK] Version lock active".to_string());
     } else {
-        logs.push("Skipping blocker creation (disabled)".to_string());
+        logs.push("Skipping lock creation (disabled)".to_string());
     }
 
     ProtectionResult {
@@ -340,7 +340,7 @@ pub fn check_protection_status() -> ProtectionStatus {
     let apps_path = capcut_paths.apps;
     let capcut_root = capcut_paths.root;
 
-    // Check if ProductInfo.xml is a readonly empty file (blocker)
+    // Check if ProductInfo.xml is a readonly empty file (lock)
     let product_info = apps_path.join("ProductInfo.xml");
     let blockers_exist = if product_info.exists() {
         if let Ok(meta) = fs::metadata(&product_info) {
@@ -352,7 +352,7 @@ pub fn check_protection_status() -> ProtectionStatus {
         false
     };
 
-    // Check if update.exe blocker exists
+    // Check if update.exe lock exists
     let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
     let update_blocked = if update_blocker.exists() {
         if let Ok(meta) = fs::metadata(&update_blocker) {
@@ -401,31 +401,31 @@ pub fn remove_protection() -> ProtectionResult {
     let capcut_root = capcut_paths.root;
     let mut logs: Vec<String> = Vec::new();
 
-    // Remove ProductInfo.xml blocker
+    // Remove ProductInfo.xml lock
     let product_info = apps_path.join("ProductInfo.xml");
     if product_info.exists() {
-        logs.push("Removing ProductInfo.xml blocker...".to_string());
+        logs.push("Removing ProductInfo.xml lock...".to_string());
         if let Err(e) = unset_readonly_recursive(&product_info) {
             logs.push(format!("[!] Warning: {}", e));
         }
         if let Err(e) = fs::remove_file(&product_info) {
             logs.push(format!("[!] Could not remove ProductInfo.xml: {}", e));
         } else {
-            logs.push("[OK] ProductInfo.xml blocker removed".to_string());
+            logs.push("[OK] ProductInfo.xml lock removed".to_string());
         }
     }
 
-    // Remove update.exe blocker
+    // Remove update.exe lock
     let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
     if update_blocker.exists() {
-        logs.push("Removing update.exe blocker...".to_string());
+        logs.push("Removing update.exe lock...".to_string());
         if let Err(e) = unset_readonly_recursive(&update_blocker) {
             logs.push(format!("[!] Warning: {}", e));
         }
         if let Err(e) = fs::remove_file(&update_blocker) {
             logs.push(format!("[!] Could not remove update.exe: {}", e));
         } else {
-            logs.push("[OK] update.exe blocker removed".to_string());
+            logs.push("[OK] update.exe lock removed".to_string());
         }
     }
 
@@ -447,7 +447,7 @@ pub fn remove_protection() -> ProtectionResult {
         }
     }
 
-    logs.push("[OK] Protection removed - CapCut can now auto-update".to_string());
+    logs.push("[OK] Protection removed - CapCut allows updates".to_string());
 
     ProtectionResult {
         success: true,

@@ -1,5 +1,5 @@
 {
-  "name": "capcut_guard_tauri",
+  "name": "cc-version-guard",
   "private": true,
   "version": "2.3.0",
   "type": "module",

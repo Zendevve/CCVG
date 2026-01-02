@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Version Guard</title>
+  <title>CC Version Guard</title>
   <meta name="description" content="Protect your CapCut version from automatic updates">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.0.3/src/regular/style.min.css">
@@ -39,7 +39,10 @@
       <!-- Hero: Minimal branding (Law of Prägnanz - simplest form) -->
       <div class="hero" style="padding-bottom: var(--space-4);">
         <i class="ph ph-shield-check hero-icon"></i>
-        <h1>Version Guard</h1>
+        <h1>CC Version Guard</h1>
+        <div class="disclaimer-banner" style="font-size: 10px; color: var(--label-tertiary); margin-top: 4px; border: 1px solid var(--border-opaque); padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.2);">
+          Unofficial Utility - Not affiliated with CapCut
+        </div>
       </div>
 
       <!-- Status Card: Zeigarnik Effect - Show protection state -->
@@ -60,11 +63,11 @@
       <div class="button-stack mx-auto" style="max-width: 100%;">
         <button class="btn-primary btn-primary-large" id="btn-start">
           <i class="ph ph-shield-check"></i>
-          Protect My Version
+          Lock Current Version
         </button>
         <button class="btn-secondary" id="btn-remove-protection" style="display: none; width: 100%;">
-          <i class="ph ph-shield-slash"></i>
-          Remove Protection
+          <i class="ph ph-lock-open-open"></i>
+          Unlock Version
         </button>
       </div>
 
@@ -234,8 +237,8 @@
               <i class="ph ph-shield"></i>
             </div>
             <div class="row-content">
-              <span class="row-title">Create Blockers</span>
-              <span class="row-subtitle">Blocks updater executable</span>
+              <span class="row-title">Create Copy Locks</span>
+              <span class="row-subtitle">Locks updater executable</span>
             </div>
             <div class="toggle-switch on" id="toggle-blocker" role="switch" aria-checked="true" tabindex="0"></div>
           </div>
@@ -248,7 +251,7 @@
       <div class="button-stack mx-auto">
         <button class="btn-primary" id="btn-apply">
           <i class="ph ph-lock"></i>
-          Apply Protection
+          Lock Version
         </button>
       </div>
     </section>

@@ -1,5 +1,5 @@
 <div align="center">
-    <a href="https://github.com/Zendevve/capcut-version-guard">
+    <a href="https://github.com/Zendevve/cc-version-guard">
         <img src="docs/images/banner_large.png" alt="CC Version Guard Banner" width="100%" />
     </a>
 </div>
@@ -8,7 +8,7 @@
 
 <div align="center">
     <a href="https://prgportfolio.com" target="_blank">
-        <img src="https://img.shields.io/badge/PRG-Gold Project-FFD700?style=for-the-badge&logo=data:image/svg%2bxml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjYuMDAwMDAwcHQiIGhlaWdodD0iMzQuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCAyNi4wMDAwMDAgMzQuMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCI+Cgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwzNC4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiCmZpbGw9IiNGRkQ3MDAiIHN0cm9rZT0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAzMjggYy04IC04IC0xMiAtNTEgLTEyIC0xMzUgMCAtMTA5IDIgLTEyNSAxOSAtMTQwIDQyIC0zOCA0OAotNDIgNTkgLTMxIDcgNyAxNyA2IDMxIC0xIDEzIC03IDIxIC04IDIxIC0yIDAgNiAyOCAxMSA2MyAxMyBsNjIgMyAwIDE1MCAwCjE1MCAtMTE1IDMgYy04MSAyIC0xMTkgLTEgLTEyOCAtMTB6IG0xMDIgLTc0IGMtNiAtMzMgLTUgLTM2IDE3IC0zMiAxOCAyIDIzCjggMjEgMjUgLTMgMjQgMTUgNDAgMzAgMjUgMTQgLTE0IC0xNyAtNTkgLTQ4IC02NiAtMjAgLTUgLTIzIC0xMSAtMTggLTMyIDYKLTIxIDMgLTI1IC0xMSAtMjIgLTE2IDIgLTE4IDEzIC0xOCA2NiAxIDc3IDAgNzIgMTggNzIgMTMgMCAxNSAtNyA5IC0zNnoKbTExNiAtMTY5IGMwIC0yMyAtMyAtMjUgLTQ5IC0yNSAtNDAgMCAtNTAgMyAtNTQgMjAgLTMgMTQgLTE0IDIwIC0zMiAyMCAtMTgKMCAtMjkgLTYgLTMyIC0yMCAtNyAtMjUgLTIzIC0yNiAtMjMgLTIgMCAyOSA4IDMyIDEwMiAzMiA4NyAwIDg4IDAgODggLTI1eiIvPgo8L2c+Cjwvc3ZnPgo=" alt="Gold" />
+        <img src="https://img.shields.io/badge/PRG-Gold Project-FFD700?style=for-the-badge&logo=data:image/svg%2bxml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjYuMDAwMDAwcHQiIGhlaWdodD0iMzQuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCAyNi4wMDAwMDAgMzQuMDAwMDAwIgogcHJlc2VlYXNwZWN0cmF0aW89InhNaWRZTWlkIG1lZXQiPgogCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDM0LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwMCkiCmZpbGw9IiNGRkQ3MDAiIHN0cm9rZT0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAzMjggYy04IC04IC0xMiAtNTEgLTEyIC0xMzUgMCAtMTA5IDIgLTEyNSAxOSAtMTQwIDQyIC0zOCA0OCotNDIgNTkgLTMxIDcgNyAxNyA2IDMxIC0xIDEzIC03IDIxIC04IDIxIC0yIDAgNiAyOCAxMSA2MyAxMyBsNjIgMyAwIDE1MCAwCjE1MCAtMTE1IDMgYy04MSAyIC0xMTkgLTEgLTEyOCAtMTB6IG0xMDIgLTc0IGMtNiAtMzMgLTUgLTM2IDE3IC0zMiAxOCAyIDIzCjggMjEgMjUgLTMgMjQgMTUgNDAgMzAgMjUgMTQgLTE0IC0xNyAtNTkgLTQ4IC02NiAtMjAgLTUtMjMgLTExIC0xOCAtMzIgNiwtMjEgMyAtMjUgLTExIC0yMiAtMTYgMiAtMTggMTMgLTE4IDY2IDEgNzcgMCA3MiAxOCAxOCAxMyAwIDE1IC03IDkgLTM2enAKbTExNiAtMTY5IGMwIC0yMyAtMyAtMjUgLTQ5IC0yNSAtNDAgMCAtNTAgMyAtNTQgMjAgLTMgMTQgLTE0IDIwIC0zMiAyMCAtMTgKMCAtMjkgLTYgLTMyIC0yMCAtNyAtMjUtMjMgLTI2IC0yMyAtMiAwIDI5IDggMzIgMTAyIDMyIDg3IDAgODggMCA4OCAtMjV6Ii8+CjwvZz4KPC9zdmc+Cg==" alt="Gold" />
     </a>
     <br>
     <a href="LICENSE">
@@ -28,13 +28,16 @@
 <br>
 
 <div align="center">
-  <b>CC Version Guard</b> is a powerful, secure version manager for CapCut desktop, giving creators full control over their editing environment.
+  <b>CC Version Guard</b> is a powerful, secure version manager for CapCut desktop, giving creators full control over their editing workspace.
 </div>
 
-> [!IMPORTANT]
-> **Unofficial Tool:** This application is not affiliated with, endorsed by, or connected to ByteDance or CapCut. It is a local file manager designed to help users manage their own legally installed software versions.
+> [!CAUTION]
+> **UNOFFICIAL UTILITY:** This software is an unofficial tool and is **NOT** affiliated with, endorsed by, or connected to ByteDance or CapCut.
 >
-> All "Legacy Versions" downloads are sourced **directly** from official CapCut servers (CDNs). We do not host or modify any CapCut binaries.
+> It is a local file manager designed to help users manage their own legally installed software versions. **Use at your own risk.** Modifying your installation files may violate the Terms of Service.
+
+> [!NOTE]
+> All "Legacy Versions" downloads are sourced **directly** from official CapCut servers. We do not host, crack, or modify any CapCut binaries.
 
 ---------------
 
@@ -54,8 +57,8 @@
 
 ## Features
 
-- 🛡️ **Auto-Update Blocker:** Prevent CapCut from updating automatically, keeping your preferred version stable.
-- 💾 **Version Switching:** Instantly switch between installed versions without re-downloading.
+- 🔒 **Version Lock:** Securely lock your preferred version to prevent unexpected changes, keeping your workflow stable.
+- 💾 **Version Switching:** Instantly switch between multiple installed versions without re-downloading.
 - ⬇️ **Legacy Downloader:** Access and install previous official versions of CapCut directly from their servers.
 - 📦 **Backup Manager:** Create and restore backups of your specific version installations.
 - 🚀 **Performance Optimized:** Built with Rust and Tauri for a lightweight, blazing-fast experience.
