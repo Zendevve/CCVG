@@ -27,11 +27,20 @@ pub enum PathDetectionSource {
 /// Registry keys to check for CapCut installation
 const REGISTRY_PATHS: &[(&str, &str)] = &[
     // Standard uninstall location
-    (r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CapCut", "InstallLocation"),
+    (
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CapCut",
+        "InstallLocation",
+    ),
     // 64-bit uninstall location
-    (r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\CapCut", "InstallLocation"),
+    (
+        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\CapCut",
+        "InstallLocation",
+    ),
     // App Paths
-    (r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\CapCut.exe", "Path"),
+    (
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\CapCut.exe",
+        "Path",
+    ),
 ];
 
 /// Try to find CapCut installation path from Windows Registry
@@ -139,7 +148,11 @@ pub fn validate_custom_path(custom_path: &str) -> Option<CapCutPaths> {
     };
 
     Some(CapCutPaths {
-        root: if apps == root { apps.parent()?.to_path_buf() } else { root },
+        root: if apps == root {
+            apps.parent()?.to_path_buf()
+        } else {
+            root
+        },
         apps,
         source: PathDetectionSource::Custom(custom_path.to_string()),
     })

@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-use std::fs;
 use crate::commands::scanner::{get_capcut_apps_path, get_capcut_root_path};
 use serde::Serialize;
+use std::fs;
+use std::path::PathBuf;
 
 #[derive(Serialize)]
 pub struct SwitchResult {
@@ -27,7 +27,8 @@ pub fn switch_version(target_path: String) -> SwitchResult {
     }
 
     // Identify version from path (e.g. .../3.1.0.100)
-    let version_name = target_dir.file_name()
+    let version_name = target_dir
+        .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or("unknown");
 
@@ -77,16 +78,16 @@ pub fn switch_version(target_path: String) -> SwitchResult {
 
         // Remove Read-Only if present
         if let Ok(metadata) = fs::metadata(&config_path) {
-             let mut perms = metadata.permissions();
-             if perms.readonly() {
-                 perms.set_readonly(false);
-                 let _ = fs::set_permissions(&config_path, perms);
-             }
+            let mut perms = metadata.permissions();
+            if perms.readonly() {
+                perms.set_readonly(false);
+                let _ = fs::set_permissions(&config_path, perms);
+            }
         }
 
         match fs::write(&config_path, config_content) {
-             Ok(_) => logs.push("[OK] Updated configure.ini".to_string()),
-             Err(e) => logs.push(format!("[!] Failed to write configure.ini: {}", e)),
+            Ok(_) => logs.push("[OK] Updated configure.ini".to_string()),
+            Err(e) => logs.push(format!("[!] Failed to write configure.ini: {}", e)),
         }
     }
 

@@ -203,6 +203,24 @@ LargeTitle: 26px / 32px, weight 700
 - **ALWAYS strictly follow MCAF phases** (Planning -> Execution -> Verification). Never skip directly to coding.
 - Never ignore user frustration signals — add emphatic rules immediately
 
+### Legal Protection (ByteDance/CapCut)
+
+- **No distribution of CapCut**: We only link to official ByteDance servers, NEVER host binaries
+- **Trademark disclaimers**: Always use nominative fair use, include "CapCut is a trademark of ByteDance Ltd." in legal docs
+- **User liability**: All ToS risk belongs to users, not the developer — enforce via indemnification clauses
+- **LEGAL_DISCLAIMER.md is mandatory**: Comprehensive legal protection, 12 sections minimum
+- **LICENSE explains terms**: Proprietary limited personal use terms
+- **README must warn users**: CAUTION blocks for ToS violations, account suspension risks
+- **Binary distribution restricted to Zendevve**: Only author distributes compiled binaries
+
+### Version Database (Backend Data)
+
+- **Version data format**: Pipe-separated (`Label|Version|URL`) for maintainability
+- **Parser-based approach**: Use string parsing, not hardcoded structs for 300+ versions
+- **Risk levels**: v5.x/v4.x = High, v3.x = Medium, v1.x/v2.x = Low
+- **Official CDN only**: All download URLs must be `lf16-capcut.faceulv.com` (ByteDance servers)
+- **Version compatibility note**: 5.4.0 Beta 6 is last version where CC Version Guard works
+
 ### Boundaries
 
 **Always:**

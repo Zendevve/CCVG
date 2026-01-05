@@ -1,8 +1,8 @@
 //! Process detection functionality
 //! Migrated from original eframe/egui main.rs
 
-use sysinfo::System;
 use std::process::Command;
+use sysinfo::System;
 
 use super::paths;
 
@@ -13,7 +13,10 @@ pub fn is_capcut_running() -> bool {
     sys.refresh_processes();
 
     sys.processes_by_name("CapCut".as_ref()).next().is_some()
-        || sys.processes_by_name("CapCut.exe".as_ref()).next().is_some()
+        || sys
+            .processes_by_name("CapCut.exe".as_ref())
+            .next()
+            .is_some()
 }
 
 /// System pre-check results
@@ -54,10 +57,12 @@ pub fn launch_capcut() -> LaunchResult {
     // Find CapCut executable
     let apps_path = match paths::get_capcut_apps_path() {
         Some(p) if p.exists() => p,
-        _ => return LaunchResult {
-            success: false,
-            error: Some("CapCut installation not found".to_string()),
-        },
+        _ => {
+            return LaunchResult {
+                success: false,
+                error: Some("CapCut installation not found".to_string()),
+            }
+        }
     };
 
     // Look for versions and find CapCut.exe
@@ -77,14 +82,18 @@ pub fn launch_capcut() -> LaunchResult {
         let exe_path = version_path.join("CapCut.exe");
         if exe_path.exists() {
             match Command::new(&exe_path).spawn() {
-                Ok(_) => return LaunchResult {
-                    success: true,
-                    error: None,
-                },
-                Err(e) => return LaunchResult {
-                    success: false,
-                    error: Some(format!("Failed to launch: {}", e)),
-                },
+                Ok(_) => {
+                    return LaunchResult {
+                        success: true,
+                        error: None,
+                    }
+                }
+                Err(e) => {
+                    return LaunchResult {
+                        success: false,
+                        error: Some(format!("Failed to launch: {}", e)),
+                    }
+                }
             }
         }
     }

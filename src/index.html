@@ -46,13 +46,13 @@
       </div>
 
       <!-- Status Card: Zeigarnik Effect - Show protection state -->
-      <div class="status-card" id="status-card">
+      <div class="status-card" id="status-card" style="margin-bottom: var(--space-4);">
         <div class="status-icon-wrapper unprotected" id="status-icon-wrapper">
           <i class="ph ph-shield-warning" id="status-icon"></i>
         </div>
         <div class="status-content">
-          <span class="status-title" id="status-title">Not Protected</span>
-          <span class="status-subtitle" id="status-subtitle">CapCut can update automatically</span>
+          <span class="status-title" id="status-title" style="font-size: 14px;">Not Protected</span>
+          <span class="status-subtitle" id="status-subtitle" style="font-size: 11px;">CapCut can update automatically</span>
         </div>
       </div>
 
@@ -60,12 +60,12 @@
       <div class="spacer"></div>
 
       <!-- Primary CTA: Von Restorff + Fitts's Law (Large, Distinct) -->
-      <div class="button-stack mx-auto" style="max-width: 100%;">
-        <button class="btn-primary btn-primary-large" id="btn-start">
+      <div class="button-stack mx-auto" style="max-width: 100%; flex-direction: row; gap: var(--space-2);">
+        <button class="btn-primary" id="btn-start" style="height: 44px; font-size: 14px; flex: 1;">
           <i class="ph ph-shield-check"></i>
           Lock Current Version
         </button>
-        <button class="btn-secondary" id="btn-remove-protection" style="display: none; width: 100%;">
+        <button class="btn-secondary" id="btn-remove-protection" style="display: none; height: 44px; font-size: 13px; flex: 1;">
           <i class="ph ph-lock-open-open"></i>
           Unlock Version
         </button>
@@ -73,25 +73,25 @@
 
       <!-- Tools: Law of Common Region (Grouped secondary actions) -->
       <!-- Hick's Law: Only 3 secondary options to minimize choice -->
-      <div class="tools-container glass-panel" style="display: flex; gap: 1px; padding: 2px; margin-top: var(--space-5);">
+      <div class="tools-container glass-panel" style="display: flex; align-items: stretch; gap: 1px; padding: 2px; margin-top: var(--space-5);">
         <button class="btn-tool" id="btn-switch" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
-          <i class="ph ph-swap" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
-          <span style="font-size: 11px;">Switch</span>
+          <i class="ph ph-swap" style="font-size: 18px; display: block; margin: 0 auto 4px;"></i>
+          <span style="font-size: 11px; display: block;">Switch</span>
         </button>
         <div style="width: 1px; background: var(--border-opaque);"></div>
         <button class="btn-tool" id="btn-legacy" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
-          <i class="ph ph-download-simple" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
-          <span style="font-size: 11px;">Legacy</span>
+          <i class="ph ph-download-simple" style="font-size: 18px; display: block; margin: 0 auto 4px;"></i>
+          <span style="font-size: 11px; display: block;">Legacy</span>
         </button>
         <div style="width: 1px; background: var(--border-opaque);"></div>
         <button class="btn-tool" id="btn-backups" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
-          <i class="ph ph-clock-counter-clockwise" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
-          <span style="font-size: 11px;">Backups</span>
+          <i class="ph ph-clock-counter-clockwise" style="font-size: 18px; display: block; margin: 0 auto 4px;"></i>
+          <span style="font-size: 11px; display: block;">Backups</span>
         </button>
         <div style="width: 1px; background: var(--border-opaque);"></div>
         <button class="btn-tool" id="btn-settings" style="flex: 1; border: none; background: transparent; padding: var(--space-3); color: var(--label-secondary); cursor: pointer;">
-          <i class="ph ph-gear" style="font-size: 18px; margin-bottom: 4px; display: block;"></i>
-          <span style="font-size: 11px;">Settings</span>
+          <i class="ph ph-gear" style="font-size: 18px; display: block; margin: 0 auto 4px;"></i>
+          <span style="font-size: 11px; display: block;">Settings</span>
         </button>
       </div>
 
@@ -335,7 +335,7 @@
          - Serial Position Effect: Most popular versions at top
          - Law of Common Region: Grouped in glass panel
          ================================================================ -->
-    <section id="view-legacy" class="view">
+    <section id="view-legacy" class="view" style="padding-bottom: var(--space-4);">
       <nav class="tahoe-nav">
         <button class="tahoe-nav-back" id="legacy-back">
           <i class="ph ph-caret-left"></i> Back
@@ -348,10 +348,18 @@
         <span style="font-size: 11px; opacity: 0.7;">Downloads sourced directly from official CapCut servers.</span>
       </p>
 
-      <div class="list-section" style="flex: 1; overflow-y: auto;">
+      <div class="list-section" style="flex: 1; overflow-y: auto; min-height: 0;">
         <div class="glass-panel" id="legacy-list">
           <!-- Legacy versions populated by JS -->
         </div>
+      </div>
+
+      <!-- Browse All Versions Button -->
+      <div class="button-stack mx-auto" style="margin-top: var(--space-3); flex-shrink: 0; padding-top: var(--space-2);">
+        <button class="btn-secondary" id="btn-browse-all-versions" style="width: 100%;">
+          <i class="ph ph-rows"></i>
+          Browse All Versions
+        </button>
       </div>
     </section>
 
@@ -488,6 +496,42 @@
     </section>
 
   </main>
+
+  <!-- ================================================================
+       MODAL: ALL VERSIONS BROWSER
+       Laws of UX Applied:
+       - Hick's Law: Only 4 filter options (All/Low/Medium/High)
+       - Law of Common Region: Filters visually grouped
+       - Fitts's Law: 44px list rows, 32px touch targets
+       - Doherty Threshold: Debounced search <400ms
+       ================================================================ -->
+  <div id="all-versions-modal" class="modal-overlay" style="display: none;">
+    <div class="all-versions-container glass-panel">
+      <nav class="tahoe-nav">
+        <button class="tahoe-nav-back" id="all-versions-close">
+          <i class="ph ph-caret-left"></i> Close
+        </button>
+        <span class="tahoe-nav-title">All Legacy Versions</span>
+      </nav>
+
+      <!-- Search & Filter Bar -->
+      <div class="search-filter-bar">
+        <input
+          type="text"
+          id="version-search"
+          placeholder="Search versions..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Versions List -->
+      <div class="all-versions-list-container">
+        <div class="glass-panel" id="all-versions-list" style="padding: 0;">
+          <!-- Versions rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ================================================================
        MODAL: CONFIRMATION DIALOG

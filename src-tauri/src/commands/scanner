@@ -1,0 +1,28 @@
+//! Complete list of all CapCut versions up to 5.4.0 Beta 6
+//! Format: "Label|BaseVersion|URL"
+//! This file is auto-generated - see scripts/generate_all_versions.py
+
+pub const ALL_VERSIONS_DATA: &str = r#"
+5.4.0 (Beta6)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1991_beta6_capcutpc_beta_creatortool.exe
+5.4.0 (Beta5)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1988_beta5_capcutpc_beta_creatortool.exe
+5.4.0 (Beta4)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1982_beta4_capcutpc_beta_creatortool.exe
+5.4.0 (Beta3)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1979_beta3_capcutpc_beta_creatortool.exe
+5.4.0 (Beta2)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1978_beta2_capcutpc_beta_creatortool.exe
+5.4.0 (Beta1)|5.4.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_4_0_1976_beta1_capcutpc_beta_creatortool.exe
+5.3.0 (Latest)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1964_capcutpc_0_creatortool.exe
+5.3.0 (Test2)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1961_capcutpc_0_creatortool.exe
+5.3.0 (Test1)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1957_capcutpc_0_creatortool.exe
+5.3.0 (Beta5)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1962_beta5_capcutpc_beta_creatortool.exe
+5.3.0 (Beta4)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1956_beta4_capcutpc_beta_creatortool.exe
+5.3.0 (Beta3)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1952_beta3_capcutpc_beta_creatortool.exe
+5.3.0 (Latest) (Beta2)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1949_beta2_capcutpc_beta_creatortool.exe
+5.3.0 (Test1) (Beta2)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1947_beta2_capcutpc_beta_creatortool.exe
+5.3.0 (Latest) (Beta1)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1942_beta1_capcutpc_beta_creatortool.exe
+5.3.0 (Test1) (Beta1)|5.3.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_3_0_1941_beta1_capcutpc_beta_creatortool.exe
+5.2.0 (Latest)|5.2.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_2_0_1950_capcutpc_0_creatortool.exe
+5.2.0 (Test3)|5.2.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_2_0_1946_capcutpc_0_creatortool.exe
+5.2.0 (Test2)|5.2.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_2_0_1940_capcutpc_0_creatortool.exe
+5.2.0 (Test1)|5.2.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_2_0_1939_capcutpc_0_creatortool.exe
+5.2.0 (Beta8)|5.2.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_5_2_0_1945_beta8_capcutpc_beta_creatortool.exe
+1.0.0 (Latest)|1.0.0|https://lf16-capcut.faceulv.com/obj/capcutpc-packages-us/packages/CapCut_1_0_0_44_capcutpc_0.exe
+"#;

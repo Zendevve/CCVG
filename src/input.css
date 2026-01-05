@@ -641,12 +641,12 @@
   .status-card {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4);
+    gap: var(--space-3);
+    padding: var(--space-3);
     background: var(--glass-panel);
     backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
     -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(var(--saturation-panel));
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     border: 0.5px solid var(--border-opaque);
     box-shadow: var(--shadow-card);
   }
@@ -655,10 +655,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-panel);
-    font-size: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    font-size: 18px;
     transition: all var(--duration-slow) var(--ease-spring);
   }
 
@@ -815,6 +815,7 @@
 
   .view.active {
     display: flex;
+    overflow: hidden;
   }
 
   @keyframes viewEnter {
@@ -851,6 +852,10 @@
      Hick's Law: Group secondary actions to minimize choice per view
      ======================================================================== */
   .tools-container .btn-tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     transition: all var(--duration-fast) var(--ease-out);
   }
 
@@ -1166,24 +1171,150 @@
   }
 
   .modal-message {
-    font-size: 13px;
+    font-size: 11px;
+    font-weight: var(--font-weight-regular);
     color: var(--label-secondary);
-    line-height: 1.4;
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
+    text-align: center;
   }
 
   .modal-actions {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    width: 100%;
   }
 
   .modal-actions button {
     flex: 1;
-    height: 40px;
   }
 
   .btn-danger {
-    background: var(--accent-red) !important;
+    background: var(--accent-red);
+  }
+
+  /* ========================================================================
+     ALL VERSIONS MODAL (Browse All Versions)
+     Following design.json components.alert specs
+     Laws of UX: Hick's Law (4 filters), Fitts's Law (44px rows)
+     ======================================================================== */
+  .all-versions-container {
+    width: min(640px, 95vw);
+    height: min(70vh, 90vh);
+    max-height: min(600px, 90vh);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-modal);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: var(--radius-xl);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
+    box-shadow: var(--shadow-elevated);
+    overflow: hidden;
+    margin: auto;
+  }
+
+  /* Search & Filter Bar */
+  .search-filter-bar {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 0.5px solid var(--border-separator);
+    display: flex;
+    gap: var(--space-3);
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  #version-search {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: var(--radius-button);
+    background: var(--fill-secondary);
+    border: 0.5px solid var(--border-opaque);
+    font-size: 13px;
+    color: var(--label-primary);
+    font-family: var(--font-system);
+    transition: all var(--duration-fast) var(--ease-out);
+    outline: none;
+    width: 100%;
+  }
+
+  #version-search:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
+    background: var(--fill-primary);
+  }
+
+  #version-search::placeholder {
+    color: var(--label-tertiary);
+  }
+
+  /* Filter Pills (Hick's Law: only 4 options) */
+  .filter-pills {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    background: var(--fill-secondary);
+    border: 0.5px solid var(--border-opaque);
+    color: var(--label-secondary);
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+    white-space: nowrap;
+  }
+
+  .filter-pill:hover {
+    background: var(--fill-primary);
+    color: var(--label-primary);
+  }
+
+  /* Von Restorff Effect: Active filter is distinctively different */
+  .filter-pill.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: var(--label-primary);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.30);
+  }
+
+  .filter-pill:active {
+    transform: scale(0.97);
+  }
+
+  /* Version List Container */
+  .all-versions-list-container {
+    flex: 1;
+    overflow: hidden;
+    padding: var(--space-3);
+    min-height: 0;
+  }
+
+  .all-versions-list-container .glass-panel {
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar for modal (Tahoe spec) */
+  .all-versions-list-container .glass-panel::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .all-versions-list-container .glass-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .all-versions-list-container .glass-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+
+  .all-versions-list-container .glass-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
   }
 
   .btn-danger:hover {

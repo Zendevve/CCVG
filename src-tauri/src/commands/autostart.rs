@@ -1,9 +1,9 @@
 //! Windows startup/autostart management
 //! Adds/removes the app from Windows startup via Registry
 
+use std::env;
 use winreg::enums::*;
 use winreg::RegKey;
-use std::env;
 
 const STARTUP_KEY: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
 const APP_NAME: &str = "CCVersionGuard";
@@ -28,8 +28,8 @@ pub fn set_autostart_enabled(enabled: bool) -> Result<(), String> {
 
     if enabled {
         // Get current executable path
-        let exe_path = env::current_exe()
-            .map_err(|e| format!("Failed to get executable path: {}", e))?;
+        let exe_path =
+            env::current_exe().map_err(|e| format!("Failed to get executable path: {}", e))?;
 
         let exe_str = exe_path.to_string_lossy().to_string();
 

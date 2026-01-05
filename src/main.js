@@ -672,6 +672,124 @@ async function loadArchiveVersions() {
 }
 
 // ============================================
+// All Versions Modal
+// ============================================
+let allVersionsData = [];
+let filteredVersions = [];
+
+document.getElementById('btn-browse-all-versions')?.addEventListener('click', openAllVersionsModal);
+document.getElementById('all-versions-close')?.addEventListener('click', closeAllVersionsModal);
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('all-versions-modal').style.display !== 'none') {
+    closeAllVersionsModal();
+  }
+});
+
+async function openAllVersionsModal() {
+  const modal = document.getElementById('all-versions-modal');
+  modal.style.display = 'flex';
+  await loadAllVersions();
+}
+
+function closeAllVersionsModal() {
+  document.getElementById('all-versions-modal').style.display = 'none';
+  // Reset search
+  document.getElementById('version-search').value = '';
+}
+
+async function loadAllVersions() {
+  const container = document.getElementById('all-versions-list');
+  container.replaceChildren(createSkeletonRows(8));
+
+  try {
+    const versions = await invoke('get_all_archive_versions');
+    allVersionsData = versions;
+    filteredVersions = versions;
+    renderAllVersionsList(filteredVersions);
+  } catch (e) {
+    container.replaceChildren(
+      el('div', { className: 'list-row', style: { padding: 'var(--space-4)', textAlign: 'center' } },
+        el('span', { className: 'row-title', style: { color: 'var(--accent-red)' } }, `Error loading versions: ${e}`)
+      )
+    );
+  }
+}
+
+function renderAllVersionsList(versions) {
+  const container = document.getElementById('all-versions-list');
+
+  if (versions.length === 0) {
+    container.replaceChildren(
+      el('div', { className: 'list-row', style: { padding: 'var(--space-6)', textAlign: 'center', flexDirection: 'column', gap: 'var(--space-2)' } },
+        icon('magnifying-glass', { style: { fontSize: '32px', color: 'var(--label-tertiary)' } }),
+        el('span', { className: 'row-title' }, 'No versions found'),
+        el('span', { className: 'row-subtitle' }, 'Try adjusting your search or filters')
+      )
+    );
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  versions.forEach(v => {
+    const downloadBtn = el('button', {
+      className: 'btn-plain',
+      style: { padding: '8px' }
+    },
+      icon('download-simple', { style: { fontSize: '18px' } })
+    );
+    downloadBtn.addEventListener('click', () => {
+      window.__TAURI__.opener.openUrl(v.download_url);
+    });
+
+    // Use persona field (contains full label like "5.4.0 (Beta3)")
+    // If no persona, fall back to version
+    const versionLabel = v.persona || `v${v.version}`;
+
+    fragment.append(
+      el('div', { className: 'list-row' },
+        el('div', { className: 'row-icon', style: { background: 'var(--fill-secondary)' } },
+          icon('package')
+        ),
+        el('div', { className: 'row-content' },
+          el('span', { className: 'row-title' }, versionLabel),
+          el('span', { className: 'row-subtitle' }, v.description || 'Legacy Version')
+        ),
+        downloadBtn
+      )
+    );
+  });
+
+  container.replaceChildren(fragment);
+}
+
+// Search handler with debounce
+const searchInput = document.getElementById('version-search');
+if (searchInput) {
+  let searchTimeout;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => handleVersionFilter(e.target.value), 300);
+  });
+}
+
+function handleVersionFilter(searchQuery = '') {
+  const query = searchQuery.toLowerCase();
+
+  filteredVersions = allVersionsData.filter(v => {
+    const versionLabel = v.persona || `v${v.version}`;
+    return !query ||
+      versionLabel.toLowerCase().includes(query) ||
+      (v.description && v.description.toLowerCase().includes(query));
+  });
+
+  renderAllVersionsList(filteredVersions);
+}
+
+
+// ============================================
 // Quick Switch View Handlers
 // ============================================
 document.getElementById('btn-switch')?.addEventListener('click', () => navigateTo('switch'));

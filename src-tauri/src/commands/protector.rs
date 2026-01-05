@@ -114,7 +114,10 @@ pub fn delete_versions(paths: Vec<String>) -> ProtectionResult {
             }
         } else {
             // Backup failed - warn but continue (user confirmed deletion)
-            logs.push(format!("[!] Backup failed: {}", backup_result.error.unwrap_or_default()));
+            logs.push(format!(
+                "[!] Backup failed: {}",
+                backup_result.error.unwrap_or_default()
+            ));
             logs.push("[!] Proceeding with deletion (backup unavailable)".to_string());
         }
 
@@ -297,7 +300,8 @@ pub fn run_full_protection(params: ProtectionParams) -> ProtectionResult {
 
     // Apply protection (conditionally based on flags)
     if params.lock_config || params.create_blockers {
-        let protect_result = apply_protection_with_options(params.lock_config, params.create_blockers);
+        let protect_result =
+            apply_protection_with_options(params.lock_config, params.create_blockers);
         all_logs.extend(protect_result.logs);
         if !protect_result.success {
             return ProtectionResult {
@@ -330,11 +334,13 @@ pub struct ProtectionStatus {
 pub fn check_protection_status() -> ProtectionStatus {
     let capcut_paths = match paths::resolve_capcut_paths() {
         Some(p) => p,
-        None => return ProtectionStatus {
-            is_protected: false,
-            config_locked: false,
-            blockers_exist: false,
-        },
+        None => {
+            return ProtectionStatus {
+                is_protected: false,
+                config_locked: false,
+                blockers_exist: false,
+            }
+        }
     };
 
     let apps_path = capcut_paths.apps;
@@ -353,7 +359,10 @@ pub fn check_protection_status() -> ProtectionStatus {
     };
 
     // Check if update.exe lock exists
-    let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
+    let update_blocker = capcut_root
+        .join("User Data")
+        .join("Download")
+        .join("update.exe");
     let update_blocked = if update_blocker.exists() {
         if let Ok(meta) = fs::metadata(&update_blocker) {
             meta.len() == 0 && meta.permissions().readonly()
@@ -416,7 +425,10 @@ pub fn remove_protection() -> ProtectionResult {
     }
 
     // Remove update.exe lock
-    let update_blocker = capcut_root.join("User Data").join("Download").join("update.exe");
+    let update_blocker = capcut_root
+        .join("User Data")
+        .join("Download")
+        .join("update.exe");
     if update_blocker.exists() {
         logs.push("Removing update.exe lock...".to_string());
         if let Err(e) = unset_readonly_recursive(&update_blocker) {

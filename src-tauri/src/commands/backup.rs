@@ -59,11 +59,13 @@ fn calc_dir_size(path: &Path) -> u64 {
 pub fn create_backup(version_path: &Path, reason: &str) -> BackupResult {
     let backup_dir = match get_backup_dir() {
         Some(d) => d,
-        None => return BackupResult {
-            success: false,
-            backup_id: None,
-            error: Some("Could not determine backup directory".to_string()),
-        },
+        None => {
+            return BackupResult {
+                success: false,
+                backup_id: None,
+                error: Some("Could not determine backup directory".to_string()),
+            }
+        }
     };
 
     // Create backup directory if it doesn't exist
@@ -111,7 +113,10 @@ pub fn create_backup(version_path: &Path, reason: &str) -> BackupResult {
 
     // Save metadata
     let metadata_path = backup_path.join("_backup_metadata.json");
-    if let Err(e) = fs::write(&metadata_path, serde_json::to_string_pretty(&metadata).unwrap_or_default()) {
+    if let Err(e) = fs::write(
+        &metadata_path,
+        serde_json::to_string_pretty(&metadata).unwrap_or_default(),
+    ) {
         // Non-fatal error, backup still exists
         eprintln!("Warning: Could not save metadata: {}", e);
     }
@@ -153,11 +158,13 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), String> {
 pub fn restore_backup(backup_id: &str) -> RestoreResult {
     let backup_dir = match get_backup_dir() {
         Some(d) => d,
-        None => return RestoreResult {
-            success: false,
-            restored_path: None,
-            error: Some("Could not determine backup directory".to_string()),
-        },
+        None => {
+            return RestoreResult {
+                success: false,
+                restored_path: None,
+                error: Some("Could not determine backup directory".to_string()),
+            }
+        }
     };
 
     let backup_path = backup_dir.join(backup_id);
@@ -174,17 +181,21 @@ pub fn restore_backup(backup_id: &str) -> RestoreResult {
     let metadata: BackupMetadata = match fs::read_to_string(&metadata_path) {
         Ok(content) => match serde_json::from_str(&content) {
             Ok(m) => m,
-            Err(e) => return RestoreResult {
+            Err(e) => {
+                return RestoreResult {
+                    success: false,
+                    restored_path: None,
+                    error: Some(format!("Invalid metadata: {}", e)),
+                }
+            }
+        },
+        Err(e) => {
+            return RestoreResult {
                 success: false,
                 restored_path: None,
-                error: Some(format!("Invalid metadata: {}", e)),
-            },
-        },
-        Err(e) => return RestoreResult {
-            success: false,
-            restored_path: None,
-            error: Some(format!("Could not read metadata: {}", e)),
-        },
+                error: Some(format!("Could not read metadata: {}", e)),
+            }
+        }
     };
 
     let original_path = PathBuf::from(&metadata.original_path);
@@ -212,7 +223,9 @@ pub fn restore_backup(backup_id: &str) -> RestoreResult {
     }
 
     // Copy backup to original location (excluding metadata file)
-    if let Err(e) = copy_dir_recursive_filtered(&backup_path, &original_path, "_backup_metadata.json") {
+    if let Err(e) =
+        copy_dir_recursive_filtered(&backup_path, &original_path, "_backup_metadata.json")
+    {
         return RestoreResult {
             success: false,
             restored_path: None,
@@ -239,7 +252,11 @@ fn copy_dir_recursive_filtered(src: &Path, dst: &Path, exclude_file: &str) -> Re
         let entry_path = entry.path();
 
         // Skip the excluded file
-        if entry_path.file_name().map(|n| n == exclude_file).unwrap_or(false) {
+        if entry_path
+            .file_name()
+            .map(|n| n == exclude_file)
+            .unwrap_or(false)
+        {
             continue;
         }
 
@@ -297,11 +314,13 @@ pub fn restore_version_backup(backup_id: String) -> RestoreResult {
 pub fn delete_backup(backup_id: String) -> BackupResult {
     let backup_dir = match get_backup_dir() {
         Some(d) => d,
-        None => return BackupResult {
-            success: false,
-            backup_id: None,
-            error: Some("Could not determine backup directory".to_string()),
-        },
+        None => {
+            return BackupResult {
+                success: false,
+                backup_id: None,
+                error: Some("Could not determine backup directory".to_string()),
+            }
+        }
     };
 
     let backup_path = backup_dir.join(&backup_id);
@@ -344,11 +363,13 @@ pub fn get_backup_size() -> u64 {
 pub fn clear_all_backups() -> BackupResult {
     let backup_dir = match get_backup_dir() {
         Some(d) => d,
-        None => return BackupResult {
-            success: false,
-            backup_id: None,
-            error: Some("Could not determine backup directory".to_string()),
-        },
+        None => {
+            return BackupResult {
+                success: false,
+                backup_id: None,
+                error: Some("Could not determine backup directory".to_string()),
+            }
+        }
     };
 
     if !backup_dir.exists() {

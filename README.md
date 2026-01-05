@@ -32,18 +32,40 @@
 </div>
 
 > [!CAUTION]
-> **UNOFFICIAL UTILITY:** This software is an unofficial tool and is **NOT** affiliated with, endorsed by, or connected to ByteDance or CapCut.
+> **IMPORTANT LEGAL NOTICE** - Please read before using this software:
 >
-> It is a local file manager designed to help users manage their own legally installed software versions. **Use at your own risk.** Modifying your installation files may violate the Terms of Service.
+> 1. **UNOFFICIAL THIRD-PARTY TOOL:** This software is **NOT** affiliated with, endorsed by, or connected to ByteDance Ltd. or CapCut.
+> 2. **NO CAPCUT DISTRIBUTION:** We do **NOT** host, distribute, crack, or modify CapCut binaries. All version links point **directly** to official ByteDance/CapCut servers.
+> 3. **TERMS OF SERVICE RISK:** Using version management tools **MAY VIOLATE** CapCut's Terms of Service. You use this software **entirely at your own risk**.
+> 4. **NO WARRANTY:** This software is provided "AS IS" with NO WARRANTY of any kind. See [LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md) for full terms.
+>
+> **BY USING THIS SOFTWARE, YOU ACCEPT ALL RISKS** and agree to indemnify the author from any claims, damages, or legal action.
 
 > [!NOTE]
-> All "Legacy Versions" downloads are sourced **directly** from official CapCut servers. We do not host, crack, or modify any CapCut binaries.
+> **Trademark Notice:** "CapCut" is a registered trademark of ByteDance Ltd. We claim NO ownership of this trademark. Our use is purely nominative  (identifying the software this tool manages) under fair use principles.
+
+> [!NOTE]
+> **Download Sources:** All "Legacy Versions" are sourced **directly and exclusively** from official CapCut servers (`lf16-capcut.faceulv.com`). We merely provide **links**, not files.
 
 > [!CAUTION]
-> **BINARY DISTRIBUTION STRICTLY PROHIBITED:**
-> The author (Zendevve) reserves the **sole and exclusive right** to distribute pre-compiled binaries (executables) of this application.
+> **BINARY DISTRIBUTION RESTRICTED:**
 >
-> You are **NOT** permitted to re-upload, mirror, or redistribute the compiled artifacts (e.g., `.exe`, `.msi`) from this repository or the official releases page. You are welcome to compile the code from source for legitimate personal use in accordance with the Proprietary License license.
+> - **Pre-compiled binaries** (.exe, .msi) may ONLY be distributed by **Zendevve** (the author)
+> - **Redistribution of binaries** is PROHIBITED (as specified in LICENSE)
+> - You may **compile from source** for personal use under license terms
+> - See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for commercial use details
+
+---------------
+
+## Legal Documentation
+
+Before using this software, please review:
+
+- **[LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md)** - Comprehensive legal protections and risk disclosures
+- **[COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md)** - Commercial distribution details and binary licensing
+- **[LICENSE](LICENSE)** - Full license terms
+
+**CRITICAL:** This software may result in CapCut account suspension or legal action from ByteDance. Proceed at your own risk.
 
 ---------------
 

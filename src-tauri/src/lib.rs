@@ -14,7 +14,13 @@ use tauri::{
 fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     // Create menu items
     let show_i = MenuItem::with_id(app, "show", "Show Version Guard", true, None::<&str>)?;
-    let check_i = MenuItem::with_id(app, "check_status", "Check Protection Status", true, None::<&str>)?;
+    let check_i = MenuItem::with_id(
+        app,
+        "check_status",
+        "Check Protection Status",
+        true,
+        None::<&str>,
+    )?;
     let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
     // Build menu
@@ -80,6 +86,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             // Scanner commands
             scanner::get_archive_versions,
+            scanner::get_all_archive_versions,
             scanner::scan_versions,
             scanner::get_capcut_paths,
             // Path resolution commands
