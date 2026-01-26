@@ -63,19 +63,19 @@ Using this software to manage CapCut installations **MAY** violate CapCut's Term
 ### 6. Licensing and Distribution
 
 #### Source Code (Restricted)
-- The **source code** of CC Version Guard is proprietary software
-- You may study the source code under the proprietary license terms
-- See [LICENSE](LICENSE) for full license text
+- The **source code** of CC Version Guard is proprietary
+- Permission is granted to view and modify for **Personal Use Only**
+- **Redistribution of source code is STRICTLY PROHIBITED**
+- See [LICENSE](LICENSE) for full terms
 
 #### Binary Distribution (Restricted)
 - **Pre-compiled binaries** (.exe, .msi) may ONLY be distributed by Zendevve (the author)
 - Unauthorized redistribution of compiled binaries is **strictly prohibited**
-- This restriction is defined in the license terms
 
 #### Commercial Use
 - Zendevve reserves the right to sell pre-compiled binaries
 - Purchasing a binary does NOT grant redistribution rights
-- Users may compile from source for personal use
+- Users may compile from source for personal use only
 
 ### 7. No Warranty and Limitation of Liability
 
