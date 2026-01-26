@@ -109,7 +109,7 @@ I built **CC Version Guard** to give power back to the creators. It started as a
 This project is proprietary. You can compile it yourself for personal use by following the comprehensive guide below.
 
 > [!TIP]
-> **Pre-built installers coming soon!** Follow the project for updates on ready-to-use releases.
+> **Get Pre-built Installers:** Save time compiling! Purchase the official installer on [Buy Me A Coffee](https://buymeacoffee.com/zendevve/e/503073).
 
 #### 2.1 Development Environment Prerequisites
 
