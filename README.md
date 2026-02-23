@@ -72,9 +72,6 @@ Before using this software, please review:
 
 - [Features](#features)
 - [Background Story](#background-story)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
 - [What's Inside?](#whats-inside)
 - [What's Next?](#whats-next)
 - [Project](#project)
@@ -96,13 +93,6 @@ Before using this software, please review:
 As a video editor, I was frustrated by mandatory updates that would often break my workflow or change features I relied on. I needed a way to stick to a stable version of CapCut while still having the flexibility to test new features when I chose to—not when the software decided.
 
 I built **CC Version Guard** to give power back to the creators. It started as a simple script and evolved into a full-fledged application, prioritizing security, legality, and user experience.
-
-## Getting Started
-
-### Prerequisites
-
-- Windows 10 or 11
-- [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) (usually installed by default)
 
 ## What's Inside?
 

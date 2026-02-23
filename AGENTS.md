@@ -250,3 +250,4 @@ LargeTitle: 26px / 32px, weight 700
 - Layouts requiring scroll for basic content
 - Monolithic single-file Rust code
 - npm dependencies when vanilla JS works
+- Public-facing references to building from source or source build instructions
