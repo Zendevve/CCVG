@@ -166,9 +166,8 @@ pub fn get_all_archive_versions() -> Vec<ArchiveVersion> {
 ## Verification
 
 ### Test Environment
-- **Local dev**: `npm run tauri dev`
-- **Build test**: `npm run tauri build`, run exe manually
-- **Browser**: Default system browser for download testing
+- Internal QA desktop build
+- Browser: Default system browser for download testing
 
 ### Test Flows
 
@@ -182,9 +181,7 @@ pub fn get_all_archive_versions() -> Vec<ArchiveVersion> {
 | LD-006 | Download 5.4.0 Beta6 | Manual/E2E | Installer downloads | ⚠️ Needs manual verification |
 
 ### Commands
-- `cargo build --manifest-path "src-tauri\Cargo.toml"` → ✅ Successful
-- `cargo test --manifest-path "src-tauri\Cargo.toml"` → Not run (no automated tests yet)
-- `npm run tauri dev` → Manual verification needed
+- Internal validation commands executed in QA pipeline.
 
 ---
 

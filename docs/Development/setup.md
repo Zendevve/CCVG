@@ -7,34 +7,15 @@
 
 ## Setup
 
-```bash
-# Clone
-git clone https://github.com/Zendevve/capcut-version-guard.git
-cd capcut-version-guard
-
-# Build
-cargo build --release
-
-# Run
-cargo run --release
-```
+Development build instructions are intentionally not documented in this public repository.
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `cargo build --release` | Build optimized binary |
-| `cargo run --release` | Build and run |
-| `cargo fmt` | Format code |
-| `cargo clippy` | Run linter |
-| `cargo test` | Run tests |
+Internal validation commands are maintained privately.
 
 ## Output
 
-The release binary is at:
-```
-target/release/capcut_guard_rust.exe
-```
+Release binaries are distributed through official project channels.
 
 ## Project Structure
 

@@ -3,7 +3,7 @@
 ## Test Levels
 
 ### Manual Testing (Primary)
-This is a desktop GUI app — primary testing is manual via `cargo run --release`.
+This is a desktop GUI app — primary testing is manual using internal QA builds.
 
 Test matrix:
 - [ ] Welcome screen displays correctly
@@ -20,7 +20,7 @@ Test matrix:
 - [ ] Responsive at large/fullscreen size
 
 ### Unit Tests (Future)
-`cargo test` — currently minimal coverage.
+Automated coverage is currently minimal.
 
 Priority areas for unit tests:
 - Version parsing logic
@@ -35,10 +35,4 @@ Priority areas for unit tests:
 
 ## Running Tests
 
-```bash
-# Manual test
-cargo run --release
-
-# Unit tests
-cargo test
-```
+Testing execution details are maintained in internal QA workflows.

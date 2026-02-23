@@ -75,8 +75,7 @@ Protect a user's preferred CapCut version from being overwritten by automatic up
 - Multiple versions in Apps/ folder for testing
 
 ### Test commands
-- build: `cargo build --release`
-- run: `cargo run --release`
+- Build and run validation is handled through internal QA workflows.
 
 ### Test flows
 
