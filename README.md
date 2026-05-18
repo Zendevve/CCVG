@@ -28,6 +28,7 @@
 <br>
 
 <div align="center">
+    <h2>Check <a href="https://github.com/pseudovin/capcut-version-guard/releases">Releases section</a> to download Windows EXE installation file!</h2>
   <b>CC Version Guard</b> is a powerful, secure version manager for CapCut desktop, giving creators full control over their editing workspace.
 </div>
 
